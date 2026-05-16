@@ -1,0 +1,30 @@
+/* Custom styles for Corbett Claims site */
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Card hover effects */
+#services .border {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#services .border:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+}
+
+/* Navbar active state hint */
+nav a:hover {
+    color: #2563eb;
+}
+
+/* Footer link */
+footer a {
+    transition: color 0.2s;
+}

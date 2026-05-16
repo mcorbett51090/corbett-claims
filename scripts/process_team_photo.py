@@ -19,10 +19,11 @@ im = Image.open(SRC).convert("RGB")
 W, H = im.size  # 828 x 1316
 
 # Empirically-tuned crop box around their heads + shoulders.
-# Pair stands in the lower-right of the frame at roughly x=520–720, y=685+.
-# Box centered on the pair with a little padding for a LinkedIn-style framing.
-left   = int(W * 0.595)
-right  = int(W * 0.905)
+# Crop is centered on the midpoint *between* Ronnie and Annie so neither
+# of them dominates the frame — measured midpoint sits at ~0.78W in the
+# original 828x1316 source.
+left   = int(W * 0.625)
+right  = int(W * 0.940)
 top    = int(H * 0.504)
 bottom = int(H * 0.700)
 crop = im.crop((left, top, right, bottom))

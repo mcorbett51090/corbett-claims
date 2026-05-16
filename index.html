@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
     <meta name="description" content="Professional auto collision repair and insurance claims assistance in Baton Rouge, Louisiana. Local experts helping with vehicle insurance claims and repairs.">
-    <!-- v5 - Forced redeploy to clear CDN cache -->
+    <!-- v6 - Made more resilient with fallback styles -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@600&display=swap');
         
@@ -16,6 +16,13 @@
         
         .nav-link { transition: color 0.2s; }
         .nav-link:hover { color: #1e3a5f; }
+
+        /* Fallback styles if Tailwind CDN fails */
+        .fallback-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
@@ -270,20 +277,44 @@
     </footer>
 
     <script>
+        // Tailwind config
+        function initializeTailwind() {
+            if (typeof tailwind !== 'undefined') {
+                tailwind.config = {
+                    theme: {
+                        extend: {
+                            colors: {
+                                primary: '#1e3a5f'
+                            }
+                        }
+                    }
+                };
+            }
+        }
+        
         // Mobile menu toggle
-        const menuBtn = document.getElementById('menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
+        function initMobileMenu() {
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
 
-        menuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
+            if (menuBtn && mobileMenu) {
+                menuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
 
-        // Close mobile menu when clicking a link
-        document.querySelectorAll('#mobile-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.add('hidden');
-            });
-        });
+                document.querySelectorAll('#mobile-menu a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        mobileMenu.classList.add('hidden');
+                    });
+                });
+            }
+        }
+
+        // Initialize everything
+        window.onload = function() {
+            initializeTailwind();
+            initMobileMenu();
+        };
     </script>
 </body>
 </html>

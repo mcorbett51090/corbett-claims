@@ -1,16 +1,15 @@
-/* Corbett Claims - Clean Self-Contained Mobile-First Styles */
+/* Corbett Claims - Premium Self-Contained Styles */
 
 :root {
     --primary: #1e3a5f;
     --primary-dark: #0f2744;
+    --accent: #3b82f6;
 }
 
 body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     line-height: 1.6;
     color: #111827;
-    margin: 0;
-    padding: 0;
 }
 
 /* Logo */
@@ -18,7 +17,6 @@ body {
     font-weight: 800;
     letter-spacing: -1.5px;
     color: var(--primary);
-    font-size: 1.75rem;
 }
 
 .logo-script {
@@ -26,128 +24,152 @@ body {
     font-style: italic;
     font-weight: 700;
     color: var(--primary);
-    font-size: 1.5rem;
 }
 
 /* Navigation */
 nav {
     background: white;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
 nav a {
     color: #374151;
     text-decoration: none;
+    transition: color 0.2s ease;
 }
 
 nav a:hover {
     color: var(--primary);
 }
 
-/* Hero Section */
+/* Hero */
 header {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
-    padding: 4rem 0;
+    position: relative;
+    overflow: hidden;
 }
 
-header h1 {
-    color: white;
-    font-size: 2.5rem;
-    line-height: 1.1;
-}
-
-@media (min-width: 768px) {
-    header h1 {
-        font-size: 3.5rem;
-    }
+header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.08) 0%, transparent 50%);
+    pointer-events: none;
 }
 
 /* Trust Bar */
 .trust-bar {
     background: white;
-    padding: 2rem 0;
     border-bottom: 1px solid #e5e7eb;
 }
 
 .trust-number {
-    font-size: 2rem;
+    font-size: 2.25rem;
     font-weight: 700;
     color: var(--primary);
+    line-height: 1;
 }
 
-/* Cards */
+/* Premium Cards */
 .card {
     background: white;
     border: 1px solid #e5e7eb;
-    border-radius: 1rem;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
 }
 
-@media (min-width: 768px) {
-    .card {
-        padding: 2rem;
-    }
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.08);
+    border-color: #bfdbfe;
 }
 
-/* Buttons */
+/* Premium Buttons */
 .btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 32px;
     background: var(--primary);
     color: white;
-    padding: 14px 28px;
+    font-weight: 600;
     border-radius: 9999px;
     text-decoration: none;
-    font-weight: 600;
-    text-align: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
 .btn:hover {
     background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.15), 0 4px 6px -4px rgb(0 0 0 / 0.15);
 }
 
 .btn-secondary {
     background: transparent;
     border: 2px solid white;
     color: white;
+    box-shadow: none;
+}
+
+.btn-secondary:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: white;
 }
 
 /* Section Titles */
 .section-title {
-    font-size: 2rem;
+    font-size: 2.25rem;
     font-weight: 700;
-    margin-bottom: 1rem;
+    letter-spacing: -0.025em;
 }
 
-/* Mobile Menu */
-#mobile-menu {
+/* FAQ */
+.faq-item {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.faq-item summary {
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+}
+
+.faq-item summary::-webkit-details-marker {
     display: none;
-}
-
-#mobile-menu.show {
-    display: block;
 }
 
 /* Floating Button */
 .floating-btn {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 24px;
+    right: 24px;
     background: var(--primary);
     color: white;
-    padding: 14px 20px;
+    padding: 14px 22px;
     border-radius: 9999px;
     text-decoration: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.2), 0 4px 6px -4px rgb(0 0 0 / 0.2);
     font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.floating-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.15);
 }
 
 /* Footer */
 footer {
     background: #111827;
     color: #9ca3af;
-    padding: 2rem 0;
-    text-align: center;
-    font-size: 0.9rem;
 }

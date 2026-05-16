@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
-"""Crop, zoom, and enhance the Ronnie & Annie photo for the Meet the Team block.
+"""Crop the Ronnie & Annie photo to a LinkedIn-style head-and-shoulders frame.
 
 Source:  images/IMG_6434.jpeg  (full frame, couple is small in lower-right)
-Output:  images/ronnie-annie.jpg  (zoomed portrait, sharpened, web-sized)
+Output:  images/ronnie-annie.jpg  (tight upper-body crop, denoised+sharpened)
+
+The original is a phone photo taken from far away — the couple occupies a
+small portion of the frame, so straight cropping leaves visible JPEG noise
+and pixelation. This script crops to just their upper bodies, then runs a
+denoise → upscale → unsharp-mask pipeline to recover apparent detail.
 """
 from PIL import Image, ImageEnhance, ImageFilter
 from pathlib import Path
@@ -13,27 +18,43 @@ DST = Path(__file__).resolve().parent.parent / "images" / "ronnie-annie.jpg"
 im = Image.open(SRC).convert("RGB")
 W, H = im.size  # 828 x 1316
 
-# Couple stands in the lower-right of the frame in front of the clubhouse.
-# Crop to a ~3:4 portrait that keeps the clubhouse and flag visible above them
-# while making the couple the visual anchor.
-# Roughly: pull in from the left to remove dead grass, drop the very top of the
-# sky, and keep the flagpole + clubhouse for context.
-left   = int(W * 0.10)
-right  = int(W * 0.96)
-top    = int(H * 0.18)
-bottom = int(H * 0.99)
-im = im.crop((left, top, right, bottom))
+# Empirically-tuned crop box around their heads + shoulders.
+# Pair stands in the lower-right of the frame at roughly x=520–720, y=685+.
+# Box centered on the pair with a little padding for a LinkedIn-style framing.
+left   = int(W * 0.595)
+right  = int(W * 0.905)
+top    = int(H * 0.504)
+bottom = int(H * 0.700)
+crop = im.crop((left, top, right, bottom))
+cw, ch = crop.size
 
-# Upscale slightly so the final image renders crisply on retina displays.
-target_w = 1100
-ratio = target_w / im.width
-im = im.resize((target_w, int(im.height * ratio)), Image.LANCZOS)
+# 1) Denoise on the small crop (smooths blocky JPEG artifacts).
+crop = crop.filter(ImageFilter.MedianFilter(size=3))
 
-# Enhancement pass: gentle, not soap-opera.
-im = im.filter(ImageFilter.UnsharpMask(radius=1.4, percent=130, threshold=3))
-im = ImageEnhance.Contrast(im).enhance(1.08)
-im = ImageEnhance.Color(im).enhance(1.06)
-im = ImageEnhance.Sharpness(im).enhance(1.25)
+# 2) Upscale 3x with LANCZOS for a high-DPI source.
+target_w = cw * 3
+target_h = ch * 3
+crop = crop.resize((target_w, target_h), Image.LANCZOS)
 
-im.save(DST, "JPEG", quality=88, optimize=True, progressive=True)
-print(f"Wrote {DST} — {DST.stat().st_size} bytes, size {im.size}")
+# 3) Two-stage unsharp mask: broad first to recover structure,
+#    then a finer pass for edge crispness.
+crop = crop.filter(ImageFilter.UnsharpMask(radius=2.6, percent=130, threshold=2))
+crop = crop.filter(ImageFilter.UnsharpMask(radius=1.0, percent=80,  threshold=1))
+
+# 4) Gentle tonal pass.
+crop = ImageEnhance.Contrast(crop).enhance(1.10)
+crop = ImageEnhance.Color(crop).enhance(1.08)
+crop = ImageEnhance.Sharpness(crop).enhance(1.20)
+
+# 5) Resize down to web-friendly square-ish dimensions (will be displayed
+#    inside a ~160px round avatar, so 600px is plenty even on retina).
+final_size = 600
+side = min(crop.size)
+# Center-crop to square (the source crop is close to 1:1 already).
+left2 = (crop.width - side) // 2
+top2 = (crop.height - side) // 2
+crop = crop.crop((left2, top2, left2 + side, top2 + side))
+crop = crop.resize((final_size, final_size), Image.LANCZOS)
+
+crop.save(DST, "JPEG", quality=90, optimize=True, progressive=True)
+print(f"Wrote {DST} — {DST.stat().st_size} bytes, size {crop.size}")

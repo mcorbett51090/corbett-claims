@@ -12,21 +12,32 @@
     <!-- Navbar -->
     <nav class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo -->
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span class="text-white font-bold text-xl">CC</span>
-                </div>
-                <div>
-                    <h1 class="font-semibold text-xl">Corbett Claims</h1>
-                    <p class="text-xs text-gray-500">Baton Rouge, LA</p>
-                </div>
+                <a href="#" class="flex items-center gap-3 group">
+                    <!-- Professional inline SVG logo matching generated design -->
+                    <svg width="48" height="48" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="group-hover:scale-105 transition-transform">
+                        <!-- Shield shape -->
+                        <path d="M60 8 L100 25 L100 65 Q100 95 60 112 Q20 95 20 65 L20 25 Z" fill="#1E40AF" stroke="#1E3A8A" stroke-width="4"/>
+                        <!-- Inner highlight -->
+                        <path d="M35 30 Q60 20 85 30" fill="none" stroke="#60A5FA" stroke-width="3" stroke-opacity="0.6"/>
+                        <!-- Text area -->
+                        <text x="60" y="58" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="700" letter-spacing="-1">C</text>
+                        <text x="60" y="78" text-anchor="middle" fill="#93C5FD" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600">CLAIMS</text>
+                    </svg>
+                    <div>
+                        <h1 class="font-semibold text-2xl tracking-tight text-gray-900 group-hover:text-blue-700 transition">Corbett Claims</h1>
+                        <p class="text-xs text-gray-500 -mt-1">Baton Rouge, LA</p>
+                    </div>
+                </a>
             </div>
-            <div class="flex gap-6 text-sm">
-                <a href="#about" class="hover:text-blue-600 transition">About</a>
-                <a href="#services" class="hover:text-blue-600 transition">Services</a>
-                <a href="#contact" class="hover:text-blue-600 transition">Contact</a>
-                <a href="#research" class="hover:text-blue-600 transition">Research</a>
-                <a href="data.json" class="hover:text-blue-600 transition" target="_blank">JSON Data</a>
+            
+            <div class="flex gap-6 text-sm font-medium">
+                <a href="#about" class="hover:text-blue-600 transition-colors">About</a>
+                <a href="#services" class="hover:text-blue-600 transition-colors">Services</a>
+                <a href="#contact" class="hover:text-blue-600 transition-colors">Contact</a>
+                <a href="#research" class="hover:text-blue-600 transition-colors">Research</a>
+                <a href="data.json" class="hover:text-blue-600 transition-colors" target="_blank">JSON Data</a>
             </div>
         </div>
     </nav>

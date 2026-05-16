@@ -58,6 +58,22 @@ Based on directory listings (e.g., Carwise):
 
 **Sources**: Public web searches, business directories (Manta, Carwise, Bizapedia, LinkedIn, TruePeopleSearch), Louisiana SOS references. Information is aggregated from public records and may change; always verify directly.
 
+## Logo
+No official public logo was found for Corbett Claims Service (consistent with the business's very limited online presence).
+
+I generated a clean, professional placeholder logo using Grok Imagine:
+- Shield/protection motif in deep blue (fitting for claims/insurance work)
+- Clean typography
+- Suitable for website header or branding
+
+**To add the logo to the site**:
+1. The generated logo image is available in this conversation (or ask me for the file).
+2. Download it and upload to the repo (recommended: create an `images/` folder and name it `logo.jpg` or `corbett-claims-logo.png`).
+3. Update the `src` attribute in `index.html` (navbar logo) to point to your uploaded file, e.g. `src="images/logo.jpg"`.
+4. Commit and push.
+
+The website currently uses a nice inline SVG version of a similar logo for immediate visual appeal.
+
 ## Structured Data
 See `data.json` for machine-readable business profile in JSON format.
 

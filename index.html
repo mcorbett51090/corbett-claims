@@ -7,26 +7,33 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
     <meta name="description" content="Professional auto collision repair and insurance claims assistance in Baton Rouge, Louisiana. Expert help navigating your vehicle insurance claims.">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@600&display=swap');
+        
+        .logo-text {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+        .logo-script {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-style: italic;
+            font-weight: 700;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
     <!-- Navbar -->
     <nav class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <!-- Logo -->
-            <div class="flex items-center gap-3">
-                <a href="#" class="flex items-center gap-3 group">
-                    <svg width="48" height="48" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="group-hover:scale-105 transition-transform">
-                        <path d="M60 8 L100 25 L100 65 Q100 95 60 112 Q20 95 20 65 L20 25 Z" fill="#1E40AF" stroke="#1E3A8A" stroke-width="4"/>
-                        <path d="M35 30 Q60 20 85 30" fill="none" stroke="#60A5FA" stroke-width="3" stroke-opacity="0.6"/>
-                        <text x="60" y="58" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="700" letter-spacing="-1">C</text>
-                        <text x="60" y="78" text-anchor="middle" fill="#93C5FD" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600">CLAIMS</text>
-                    </svg>
-                    <div>
-                        <h1 class="font-semibold text-2xl tracking-tight text-gray-900 group-hover:text-blue-700 transition">Corbett Claims</h1>
-                        <p class="text-xs text-gray-500 -mt-1">Baton Rouge, LA</p>
-                    </div>
-                </a>
-            </div>
+            <!-- Logo matching the embroidered hat style -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="flex flex-col leading-none">
+                    <span class="logo-text text-3xl font-extrabold tracking-[-2px] text-[#1e3a5f] group-hover:text-[#0f2744] transition-colors">CORBETT</span>
+                    <span class="logo-script -mt-1 text-2xl text-[#1e3a5f] group-hover:text-[#0f2744] transition-colors">Claims</span>
+                </div>
+                <div class="hidden sm:block text-[10px] text-gray-400 font-medium tracking-[1px] pl-1 self-end mb-1">BATON ROUGE</div>
+            </a>
             
             <div class="hidden md:flex gap-8 text-sm font-medium">
                 <a href="#about" class="hover:text-blue-600 transition-colors">About</a>
@@ -34,97 +41,93 @@
                 <a href="#services" class="hover:text-blue-600 transition-colors">Services</a>
                 <a href="#contact" class="hover:text-blue-600 transition-colors">Contact</a>
             </div>
-            <a href="#contact" class="md:hidden px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">Contact Us</a>
+            <a href="#contact" class="md:hidden px-4 py-2 bg-[#1e3a5f] text-white text-sm font-medium rounded-lg hover:bg-[#0f2744] transition">Contact</a>
         </div>
     </nav>
 
-    <!-- Hero Section - Aligned with top claims sites -->
-    <header class="bg-gradient-to-br from-blue-800 via-blue-700 to-blue-900 text-white">
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-br from-[#1e3a5f] via-[#1e3a5f] to-[#0f2744] text-white">
         <div class="max-w-5xl mx-auto px-6 py-20 md:py-24 text-center">
             <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur rounded-full text-sm mb-6">
                 <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                <span>~30+ Years Serving Baton Rouge</span>
+                <span>~30+ Years • Baton Rouge, LA</span>
             </div>
             
             <h1 class="text-5xl md:text-6xl font-bold tracking-tighter mb-6 leading-tight">
                 Expert Help with Your<br>Auto Insurance Claims
             </h1>
             <p class="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto mb-10">
-                Your partner in collision repair and navigating insurance claims. 
-                Local expertise to help maximize your recovery.
+                Your trusted local partner for collision repair and navigating insurance claims.
             </p>
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="#contact" 
-                   class="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-900 font-semibold rounded-2xl text-lg hover:bg-gray-100 active:bg-gray-200 transition shadow-lg">
+                <a href="#contact" class="inline-flex items-center justify-center px-8 py-4 bg-white text-[#1e3a5f] font-semibold rounded-2xl text-lg hover:bg-gray-100 active:bg-gray-200 transition shadow-lg">
                     Get Help with Your Claim
                 </a>
-                <a href="#why-us" 
-                   class="inline-flex items-center justify-center px-8 py-4 border-2 border-white/70 hover:bg-white/10 font-semibold rounded-2xl text-lg transition">
+                <a href="#why-us" class="inline-flex items-center justify-center px-8 py-4 border-2 border-white/70 hover:bg-white/10 font-semibold rounded-2xl text-lg transition">
                     Why Choose Us
                 </a>
             </div>
-            <p class="mt-6 text-sm text-blue-200">Free estimates • Insurance assistance • Local & trusted</p>
         </div>
     </header>
 
-    <!-- Trust / Stats Bar - Common in top claims sites -->
+    <!-- Trust Bar -->
     <div class="bg-white border-b">
         <div class="max-w-5xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-                <div class="text-4xl font-bold text-blue-700">30+</div>
+                <div class="text-4xl font-bold text-[#1e3a5f]">30+</div>
                 <div class="text-sm text-gray-500 mt-1">Years of Experience</div>
             </div>
             <div>
-                <div class="text-4xl font-bold text-blue-700">Local</div>
+                <div class="text-4xl font-bold text-[#1e3a5f]">Local</div>
                 <div class="text-sm text-gray-500 mt-1">Baton Rouge Experts</div>
             </div>
             <div>
-                <div class="text-4xl font-bold text-blue-700">Full Service</div>
+                <div class="text-4xl font-bold text-[#1e3a5f]">Full Service</div>
                 <div class="text-sm text-gray-500 mt-1">Repair + Claims Support</div>
             </div>
             <div>
-                <div class="text-4xl font-bold text-blue-700">Trusted</div>
-                <div class="text-sm text-gray-500 mt-1">No Public Complaints</div>
+                <div class="text-4xl font-bold text-[#1e3a5f]">Trusted</div>
+                <div class="text-sm text-gray-500 mt-1">Clean Local Reputation</div>
             </div>
         </div>
     </div>
 
-    <!-- Why Us Section - Aligned with advocacy & trust focus -->
+    <!-- Why Us -->
     <section id="why-us" class="max-w-5xl mx-auto px-6 py-16">
         <div class="text-center mb-12">
             <h2 class="text-4xl font-bold tracking-tight">Why Choose Corbett Claims?</h2>
-            <p class="text-gray-600 mt-3 max-w-2xl mx-auto">We combine expert collision repair with dedicated insurance claims assistance — all under one local roof.</p>
+            <p class="text-gray-600 mt-3 max-w-2xl mx-auto">Decades of local experience combining quality collision repair with dedicated insurance claims support.</p>
         </div>
 
         <div class="grid md:grid-cols-3 gap-6">
             <div class="bg-white p-8 rounded-3xl border border-gray-100">
-                <div class="text-blue-600 text-3xl mb-4">🛡️</div>
+                <div class="text-[#1e3a5f] text-3xl mb-4">🛡️</div>
                 <h3 class="font-semibold text-xl mb-3">Your Local Advocate</h3>
-                <p class="text-gray-600">Decades of experience helping Baton Rouge drivers navigate insurance claims alongside quality repairs. We know the local process.</p>
+                <p class="text-gray-600">Long-time Baton Rouge business helping drivers navigate insurance claims with honesty and expertise.</p>
             </div>
             <div class="bg-white p-8 rounded-3xl border border-gray-100">
-                <div class="text-blue-600 text-3xl mb-4">🔧</div>
-                <h3 class="font-semibold text-xl mb-3">Full-Service Approach</h3>
-                <p class="text-gray-600">From free estimates and appraisals to collision repair, towing, and direct insurance company assistance — we handle it end-to-end.</p>
+                <div class="text-[#1e3a5f] text-3xl mb-4">🔧</div>
+                <h3 class="font-semibold text-xl mb-3">Full-Service Shop</h3>
+                <p class="text-gray-600">Collision repair, appraisals, towing, mechanical work, and direct insurance claims assistance — all in one place.</p>
             </div>
             <div class="bg-white p-8 rounded-3xl border border-gray-100">
-                <div class="text-blue-600 text-3xl mb-4">✅</div>
+                <div class="text-[#1e3a5f] text-3xl mb-4">✅</div>
                 <h3 class="font-semibold text-xl mb-3">Proven & Trusted</h3>
-                <p class="text-gray-600">Long-standing local business with a clean reputation. No public complaints or issues found. Focused on quality work and fair outcomes.</p>
+                <p class="text-gray-600">Established local business with a strong reputation. Focused on quality work and helping customers through the claims process.</p>
             </div>
         </div>
     </section>
 
-    <!-- About Section -->
+    <!-- About -->
     <section id="about" class="bg-white py-16">
         <div class="max-w-5xl mx-auto px-6">
             <div class="grid md:grid-cols-12 gap-12 items-center">
                 <div class="md:col-span-7">
                     <h2 class="text-4xl font-bold tracking-tight mb-6">About Corbett Claims Service</h2>
                     <div class="prose prose-gray max-w-none text-gray-600">
-                        <p>Corbett Claims Service (Corbett Claim Service, Inc.) is a long-established local business in Baton Rouge, Louisiana, specializing in automotive collision repair and insurance claims assistance.</p>
-                        <p>Owned and operated by Ronnie (Ronald) Corbett, we have served the community for over 30 years with quality workmanship, fair dealings, and dedicated support through the insurance claims process.</p>
+                        <p>Corbett Claims Service is a long-established local auto collision repair and insurance claims assistance business in Baton Rouge, Louisiana.</p>
+                        <p>With over 30 years serving the community, we provide quality repairs and dedicated support helping customers navigate their insurance claims.</p>
                     </div>
                 </div>
                 <div class="md:col-span-5 bg-gray-50 p-8 rounded-3xl">
@@ -132,7 +135,7 @@
                     <ul class="space-y-3 text-sm">
                         <li class="flex justify-between border-b pb-3"><span class="text-gray-500">Owner</span> <span class="font-medium">Ronnie Corbett</span></li>
                         <li class="flex justify-between border-b pb-3"><span class="text-gray-500">Location</span> <span class="font-medium">Baton Rouge, LA</span></li>
-                        <li class="flex justify-between border-b pb-3"><span class="text-gray-500">Experience</span> <span class="font-medium">~30+ Years</span></li>
+                        <li class="flex justify-between border-b pb-3"><span class="text-gray-500">Experience</span> <span class="font-medium">30+ Years</span></li>
                         <li class="flex justify-between"><span class="text-gray-500">Status</span> <span class="font-medium text-green-600">Active & Operating</span></li>
                     </ul>
                 </div>
@@ -140,104 +143,85 @@
         </div>
     </section>
 
-    <!-- Services Section -->
+    <!-- Services -->
     <section id="services" class="max-w-5xl mx-auto px-6 py-16">
         <div class="text-center mb-12">
             <h2 class="text-4xl font-bold tracking-tight">Our Services</h2>
-            <p class="text-gray-600 mt-3">Comprehensive support for your vehicle after an incident</p>
+            <p class="text-gray-600 mt-3">Quality collision repair and dedicated claims support</p>
         </div>
 
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="group bg-white border border-gray-100 hover:border-blue-200 p-8 rounded-3xl transition">
+            <div class="group bg-white border border-gray-100 hover:border-[#1e3a5f] p-8 rounded-3xl transition">
                 <div class="text-4xl mb-5">🚗</div>
                 <h3 class="font-semibold text-2xl mb-3">Collision Repair & Body Work</h3>
-                <p class="text-gray-600">Full-service automotive collision specialist delivering quality repairs at reasonable prices.</p>
+                <p class="text-gray-600">Full-service automotive collision repair with attention to quality and detail.</p>
             </div>
             
-            <div class="group bg-white border border-gray-100 hover:border-blue-200 p-8 rounded-3xl transition">
+            <div class="group bg-white border border-gray-100 hover:border-[#1e3a5f] p-8 rounded-3xl transition">
                 <div class="text-4xl mb-5">📋</div>
                 <h3 class="font-semibold text-2xl mb-3">Insurance Claims Assistance</h3>
-                <p class="text-gray-600">Direct support with insurance companies, claim processing, documentation, and special interest appraisals.</p>
+                <p class="text-gray-600">Support with insurance documentation, processing, and appraisals to help with your claim.</p>
             </div>
             
-            <div class="group bg-white border border-gray-100 hover:border-blue-200 p-8 rounded-3xl transition">
+            <div class="group bg-white border border-gray-100 hover:border-[#1e3a5f] p-8 rounded-3xl transition">
                 <div class="text-4xl mb-5">🔧</div>
                 <h3 class="font-semibold text-2xl mb-3">Additional Services</h3>
                 <ul class="text-gray-600 space-y-2 text-sm">
-                    <li class="flex items-center gap-2"><span class="text-blue-600">•</span> Free estimates</li>
-                    <li class="flex items-center gap-2"><span class="text-blue-600">•</span> Lifetime warranty on work</li>
-                    <li class="flex items-center gap-2"><span class="text-blue-600">•</span> Full mechanical repairs</li>
-                    <li class="flex items-center gap-2"><span class="text-blue-600">•</span> Towing & glass replacement</li>
-                    <li class="flex items-center gap-2"><span class="text-blue-600">•</span> Motorcycle repair & detailing</li>
-                    <li class="flex items-center gap-2"><span class="text-blue-600">•</span> Paintless Dent Repair (PDR)</li>
+                    <li>• Free estimates</li>
+                    <li>• Lifetime warranty available</li>
+                    <li>• Mechanical repairs</li>
+                    <li>• Towing & glass replacement</li>
+                    <li>• Detailing & Paintless Dent Repair</li>
                 </ul>
             </div>
         </div>
     </section>
 
-    <!-- Contact Section -->
+    <!-- Contact -->
     <section id="contact" class="bg-white py-16 border-t">
         <div class="max-w-5xl mx-auto px-6">
             <div class="grid md:grid-cols-2 gap-12">
                 <div>
-                    <h2 class="text-4xl font-bold tracking-tight mb-4">Ready to Get Started?</h2>
-                    <p class="text-gray-600 text-lg mb-8">Contact us today for a free estimate or help with your insurance claim. We're here to support you through the process.</p>
+                    <h2 class="text-4xl font-bold tracking-tight mb-4">Get in Touch</h2>
+                    <p class="text-gray-600 text-lg mb-8">Contact us for a free estimate or assistance with your insurance claim.</p>
                     
                     <div class="space-y-6">
-                        <div class="flex gap-4">
-                            <div class="mt-1 text-blue-600 text-2xl">📞</div>
-                            <div>
-                                <div class="font-semibold">Call Us</div>
-                                <a href="tel:2256632217" class="text-blue-600 hover:underline text-lg">(225) 663-2217</a>
-                            </div>
+                        <div>
+                            <div class="font-semibold">Phone</div>
+                            <a href="tel:2256632217" class="text-[#1e3a5f] hover:underline text-lg">(225) 663-2217</a>
                         </div>
-                        <div class="flex gap-4">
-                            <div class="mt-1 text-blue-600 text-2xl">✉️</div>
-                            <div>
-                                <div class="font-semibold">Email</div>
-                                <a href="mailto:assignments@corbettclaims.net" class="text-blue-600 hover:underline">assignments@corbettclaims.net</a>
-                            </div>
+                        <div>
+                            <div class="font-semibold">Email</div>
+                            <a href="mailto:assignments@corbettclaims.net" class="text-[#1e3a5f] hover:underline">assignments@corbettclaims.net</a>
                         </div>
-                        <div class="flex gap-4">
-                            <div class="mt-1 text-blue-600 text-2xl">📍</div>
-                            <div>
-                                <div class="font-semibold">Mailing Address</div>
-                                <p>PO Box 84333, Baton Rouge, LA 70884</p>
-                            </div>
+                        <div>
+                            <div class="font-semibold">Mailing Address</div>
+                            <p>PO Box 84333, Baton Rouge, LA 70884</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="bg-gray-50 p-8 rounded-3xl">
-                    <h3 class="font-semibold text-xl mb-6">Hours & Info</h3>
-                    <div class="space-y-4 text-sm">
+                    <h3 class="font-semibold text-xl mb-6">Hours</h3>
+                    <div class="space-y-3 text-sm">
                         <div class="flex justify-between"><span>Monday – Friday</span> <span class="font-medium">9:00 AM – 6:00 PM</span></div>
-                        <div class="flex justify-between text-gray-400"><span>Saturday & Sunday</span> <span>Closed</span></div>
+                        <div class="flex justify-between text-gray-400"><span>Weekends</span> <span>Closed</span></div>
                     </div>
-                    <div class="mt-6 pt-6 border-t text-xs text-gray-500">
-                        Accepts major credit cards, debit, and checks. Spanish spoken.
+                    <div class="mt-8 pt-6 border-t text-xs text-gray-500">
+                        Major credit cards, debit & checks accepted. Spanish spoken.
                     </div>
-                    <div class="mt-6">
-                        <a href="#contact" class="block w-full text-center py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl transition">
-                            Contact Us for a Free Estimate
-                        </a>
-                    </div>
+                    <a href="#contact" class="mt-6 block w-full text-center py-3.5 bg-[#1e3a5f] hover:bg-[#0f2744] text-white font-semibold rounded-2xl transition">
+                        Contact for Free Estimate
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Research Note (kept for transparency) -->
-    <section id="research" class="max-w-5xl mx-auto px-6 py-12 text-sm text-gray-500">
-        <div class="border-t pt-8">
-            <p><strong>Research Note:</strong> This is an independent informational site based on publicly available data (May 2026). No affiliation with the business. Always verify current details directly. No public complaints or issues were found in research.</p>
-        </div>
-    </section>
-
     <footer class="bg-gray-900 text-gray-400 py-8 text-center text-sm">
         <div class="max-w-5xl mx-auto px-6">
-            <p>Independent research & informational project • <a href="https://github.com/mcorbett51090/corbett-claims-baton-rouge" class="hover:text-white underline">GitHub Repository</a></p>
-            <p class="mt-1">Information subject to change. Verify directly with the business. &copy; 2026</p>
+            <p>Independent informational project • <a href="https://github.com/mcorbett51090/corbett-claims-baton-rouge" class="hover:text-white underline">View on GitHub</a></p>
+            <p class="mt-1">Verify all details directly with the business.</p>
         </div>
     </footer>
 </body>

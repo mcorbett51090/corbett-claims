@@ -5,181 +5,198 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Corbett Claims Service | Baton Rouge, LA</title>
     <link rel="stylesheet" href="styles.css">
-    <meta name="description" content="Professional auto collision repair and insurance claims assistance in Baton Rouge, Louisiana.">
 </head>
 <body>
+
     <!-- Navbar -->
-    <nav class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="flex items-center gap-3 group">
-                <div class="flex flex-col leading-none">
-                    <span class="logo-text text-3xl">CORBETT</span>
-                    <span class="logo-script -mt-1 text-2xl">Claims</span>
+    <nav>
+        <div style="max-width:1200px; margin:0 auto; padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center;">
+            <a href="#" style="display:flex; align-items:center; gap:12px; text-decoration:none;">
+                <div>
+                    <div class="logo-text">CORBETT</div>
+                    <div class="logo-script" style="margin-top:-4px;">Claims</div>
                 </div>
-                <div class="hidden sm:block text-[10px] text-gray-400 tracking-[1px] pl-1 self-end mb-1">BATON ROUGE</div>
+                <div style="font-size:10px; color:#9ca3af; letter-spacing:1px; align-self:flex-end; margin-bottom:4px;">BATON ROUGE</div>
             </a>
 
-            <div class="hidden md:flex gap-8 text-sm font-medium">
+            <div class="desktop-nav" style="display:none; gap:2rem; font-size:0.95rem;">
                 <a href="#about">About</a>
                 <a href="#why-us">Why Us</a>
                 <a href="#services">Services</a>
                 <a href="#contact">Contact</a>
             </div>
 
-            <button id="menu-btn" class="md:hidden p-2" aria-label="Menu">
-                ☰
-            </button>
+            <button id="menu-btn" style="background:none; border:none; font-size:1.5rem; cursor:pointer; display:block;">☰</button>
 
-            <a href="#contact" class="hidden md:inline-flex btn">Get Estimate</a>
+            <a href="#contact" class="btn" style="display:none;">Get Estimate</a>
         </div>
 
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden border-t px-6 py-4">
-            <div class="flex flex-col gap-3 text-sm">
+        <div id="mobile-menu" style="display:none; padding:1rem 1.5rem; border-top:1px solid #eee;">
+            <div style="display:flex; flex-direction:column; gap:12px;">
                 <a href="#about">About</a>
                 <a href="#why-us">Why Us</a>
                 <a href="#services">Services</a>
                 <a href="#contact">Contact</a>
-                <a href="#contact" class="btn mt-2 text-center">Get Free Estimate</a>
+                <a href="#contact" class="btn" style="text-align:center; margin-top:8px;">Get Free Estimate</a>
             </div>
         </div>
     </nav>
 
     <!-- Hero -->
-    <header class="text-white py-20">
-        <div class="max-w-5xl mx-auto px-6 text-center">
-            <div class="inline-block px-4 py-1 bg-white/10 rounded-full text-sm mb-6">
+    <header style="color:white; text-align:center; padding:4rem 1.5rem;">
+        <div style="max-width:800px; margin:0 auto;">
+            <div style="display:inline-block; background:rgba(255,255,255,0.15); padding:6px 16px; border-radius:9999px; font-size:0.875rem; margin-bottom:1.5rem;">
                 ~30+ Years Serving Baton Rouge
             </div>
-            <h1 class="text-5xl md:text-6xl font-bold tracking-tighter mb-6">
+
+            <h1 style="font-size:2.8rem; line-height:1.1; margin-bottom:1.5rem; color:white;">
                 Expert Help with Your<br>Auto Insurance Claims
             </h1>
-            <p class="text-xl max-w-2xl mx-auto mb-10 text-blue-100">
+
+            <p style="font-size:1.2rem; max-width:600px; margin:0 auto 2rem; opacity:0.9;">
                 Your trusted local partner for collision repair and navigating insurance claims.
             </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="#contact" class="btn text-lg px-8 py-4">Get Help with Your Claim</a>
-                <a href="#why-us" class="btn-secondary text-lg px-8 py-4">Why Choose Us</a>
+
+            <div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
+                <a href="#contact" class="btn" style="padding:16px 32px; font-size:1.1rem; width:100%; max-width:280px;">Get Help with Your Claim</a>
+                <a href="#why-us" class="btn btn-secondary" style="padding:16px 32px; width:100%; max-width:280px;">Why Choose Us</a>
             </div>
         </div>
     </header>
 
     <!-- Trust Bar -->
-    <div class="trust-bar py-8">
-        <div class="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div><div class="trust-number">30+</div><div class="text-sm text-gray-500">Years of Experience</div></div>
-            <div><div class="trust-number">Local</div><div class="text-sm text-gray-500">Baton Rouge Experts</div></div>
-            <div><div class="trust-number">Full Service</div><div class="text-sm text-gray-500">Repair + Claims</div></div>
-            <div><div class="trust-number">Trusted</div><div class="text-sm text-gray-500">Strong Reputation</div></div>
+    <div class="trust-bar">
+        <div style="max-width:1100px; margin:0 auto; padding:0 1.5rem; display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:2rem; text-align:center;">
+            <div>
+                <div class="trust-number">30+</div>
+                <div style="color:#6b7280; font-size:0.9rem;">Years of Experience</div>
+            </div>
+            <div>
+                <div class="trust-number">Local</div>
+                <div style="color:#6b7280; font-size:0.9rem;">Baton Rouge Experts</div>
+            </div>
+            <div>
+                <div class="trust-number">Full Service</div>
+                <div style="color:#6b7280; font-size:0.9rem;">Repair + Claims</div>
+            </div>
+            <div>
+                <div class="trust-number">Trusted</div>
+                <div style="color:#6b7280; font-size:0.9rem;">Strong Reputation</div>
+            </div>
         </div>
     </div>
 
     <!-- Why Us -->
-    <section id="why-us" class="max-w-5xl mx-auto px-6 py-16">
-        <div class="text-center mb-12">
-            <h2 class="section-title">Why Choose Corbett Claims?</h2>
-        </div>
-        <div class="grid md:grid-cols-3 gap-6">
+    <section id="why-us" style="max-width:1100px; margin:0 auto; padding:4rem 1.5rem;">
+        <h2 class="section-title" style="text-align:center; margin-bottom:2.5rem;">Why Choose Corbett Claims?</h2>
+        
+        <div style="display:grid; gap:1.5rem;">
             <div class="card">
-                <div class="text-3xl mb-4">🛡️</div>
-                <h3 class="font-semibold text-xl mb-3">Your Local Advocate</h3>
-                <p class="text-gray-600">Long-time Baton Rouge business helping drivers navigate insurance claims with honesty and expertise.</p>
+                <div style="font-size:2rem; margin-bottom:1rem;">🛡️</div>
+                <h3 style="margin:0 0 0.75rem 0; font-size:1.35rem;">Your Local Advocate</h3>
+                <p style="color:#4b5563; margin:0;">Long-time Baton Rouge business helping drivers navigate insurance claims with honesty and expertise.</p>
             </div>
             <div class="card">
-                <div class="text-3xl mb-4">🔧</div>
-                <h3 class="font-semibold text-xl mb-3">Full-Service Shop</h3>
-                <p class="text-gray-600">Collision repair, appraisals, towing, mechanical work, and direct insurance claims assistance — all in one place.</p>
+                <div style="font-size:2rem; margin-bottom:1rem;">🔧</div>
+                <h3 style="margin:0 0 0.75rem 0; font-size:1.35rem;">Full-Service Shop</h3>
+                <p style="color:#4b5563; margin:0;">Collision repair, appraisals, towing, mechanical work, and direct insurance claims assistance — all in one place.</p>
             </div>
             <div class="card">
-                <div class="text-3xl mb-4">✅</div>
-                <h3 class="font-semibold text-xl mb-3">Proven & Trusted</h3>
-                <p class="text-gray-600">Established local business with a strong reputation and focus on quality work.</p>
+                <div style="font-size:2rem; margin-bottom:1rem;">✅</div>
+                <h3 style="margin:0 0 0.75rem 0; font-size:1.35rem;">Proven & Trusted</h3>
+                <p style="color:#4b5563; margin:0;">Established local business with a strong reputation. Focused on quality work.</p>
             </div>
         </div>
     </section>
 
     <!-- Services -->
-    <section id="services" class="max-w-5xl mx-auto px-6 py-16 bg-white">
-        <div class="text-center mb-12">
-            <h2 class="section-title">Our Services</h2>
-        </div>
-        <div class="grid md:grid-cols-3 gap-6">
-            <div class="card">
-                <div class="text-3xl mb-4">🚗</div>
-                <h3 class="font-semibold text-xl mb-3">Collision Repair</h3>
-                <p class="text-gray-600">Full-service automotive collision repair with attention to quality and detail.</p>
-            </div>
-            <div class="card">
-                <div class="text-3xl mb-4">📋</div>
-                <h3 class="font-semibold text-xl mb-3">Claims Assistance</h3>
-                <p class="text-gray-600">Support with insurance documentation, processing, and appraisals.</p>
-            </div>
-            <div class="card">
-                <div class="text-3xl mb-4">🔧</div>
-                <h3 class="font-semibold text-xl mb-3">Additional Services</h3>
-                <ul class="text-gray-600 text-sm space-y-1 mt-2">
-                    <li>• Free estimates</li>
-                    <li>• Lifetime warranty</li>
-                    <li>• Mechanical repairs & towing</li>
-                    <li>• Detailing & Paintless Dent Repair</li>
-                </ul>
+    <section id="services" style="background:white; padding:4rem 1.5rem;">
+        <div style="max-width:1100px; margin:0 auto;">
+            <h2 class="section-title" style="text-align:center; margin-bottom:2.5rem;">Our Services</h2>
+            
+            <div style="display:grid; gap:1.5rem;">
+                <div class="card">
+                    <div style="font-size:2rem; margin-bottom:1rem;">🚗</div>
+                    <h3 style="margin:0 0 0.5rem 0;">Collision Repair</h3>
+                    <p style="color:#4b5563; margin:0;">Full-service automotive collision repair with attention to quality and detail.</p>
+                </div>
+                <div class="card">
+                    <div style="font-size:2rem; margin-bottom:1rem;">📋</div>
+                    <h3 style="margin:0 0 0.5rem 0;">Claims Assistance</h3>
+                    <p style="color:#4b5563; margin:0;">Support with insurance documentation, processing, and appraisals.</p>
+                </div>
+                <div class="card">
+                    <div style="font-size:2rem; margin-bottom:1rem;">🔧</div>
+                    <h3 style="margin:0 0 0.5rem 0;">Additional Services</h3>
+                    <ul style="color:#4b5563; padding-left:1.2rem; margin:0.5rem 0 0;">
+                        <li>Free estimates</li>
+                        <li>Lifetime warranty available</li>
+                        <li>Mechanical repairs & towing</li>
+                        <li>Detailing & Paintless Dent Repair</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Feedback -->
-    <section class="py-16">
-        <div class="max-w-5xl mx-auto px-6 text-center">
-            <h2 class="section-title mb-4">Customer Feedback</h2>
-            <p class="text-gray-600 max-w-md mx-auto">We’re currently building our online reviews. Your feedback is appreciated!</p>
-            <a href="https://www.google.com/search?q=Corbett+Claims+Service+Baton+Rouge" target="_blank" class="btn mt-6">Leave a Google Review</a>
-        </div>
+    <section style="padding:4rem 1.5rem; text-align:center; max-width:700px; margin:0 auto;">
+        <h2 class="section-title">Customer Feedback</h2>
+        <p style="color:#4b5563; max-width:400px; margin:0 auto 1.5rem;">
+            We're currently building our online reviews. Your feedback helps us improve!
+        </p>
+        <a href="https://www.google.com/search?q=Corbett+Claims+Service+Baton+Rouge" target="_blank" class="btn">Leave a Google Review</a>
     </section>
 
     <!-- Contact -->
-    <section id="contact" class="bg-white py-16 border-t">
-        <div class="max-w-5xl mx-auto px-6 grid md:grid-cols-2 gap-12">
+    <section id="contact" style="background:white; padding:4rem 1.5rem; border-top:1px solid #e5e7eb;">
+        <div style="max-width:1100px; margin:0 auto; display:grid; gap:3rem;">
             <div>
-                <h2 class="section-title mb-4">Get in Touch</h2>
-                <p class="text-gray-600 mb-8">Contact us for a free estimate or help with your insurance claim.</p>
-                
-                <div class="space-y-4">
-                    <div>
-                        <div class="text-sm text-gray-500">PHONE</div>
-                        <a href="tel:2256632217" class="text-2xl font-semibold text-[#1e3a5f]">(225) 663-2217</a>
+                <h2 class="section-title">Ready to Get Started?</h2>
+                <p style="color:#4b5563; font-size:1.1rem; max-width:420px;">
+                    Contact us today for a free estimate or help with your insurance claim.
+                </p>
+
+                <div style="margin-top:2rem; line-height:2;">
+                    <div><strong>Phone</strong><br>
+                        <a href="tel:2256632217" style="color:var(--primary); font-size:1.4rem; font-weight:600;">(225) 663-2217</a>
                     </div>
-                    <div>
-                        <div class="text-sm text-gray-500">EMAIL</div>
-                        <a href="mailto:assignments@corbettclaims.net" class="text-[#1e3a5f]">assignments@corbettclaims.net</a>
+                    <div style="margin-top:1rem;"><strong>Email</strong><br>
+                        <a href="mailto:assignments@corbettclaims.net" style="color:var(--primary);">assignments@corbettclaims.net</a>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-gray-50 p-8 rounded-3xl">
-                <h3 class="font-semibold mb-4">Hours</h3>
-                <p>Monday – Friday: 9:00 AM – 6:00 PM<br>Weekends: Closed</p>
-                <p class="mt-4 text-sm text-gray-500">Credit cards, debit & checks accepted • Spanish spoken</p>
-                
-                <a href="tel:2256632217" class="btn mt-6 w-full">Call Now for a Free Estimate</a>
+            <div style="background:#f9fafb; padding:2rem; border-radius:1rem;">
+                <h3 style="margin-top:0;">Hours</h3>
+                <p style="margin:0.5rem 0;">Monday – Friday: 9:00 AM – 6:00 PM<br>Weekends: Closed</p>
+                <p style="font-size:0.9rem; color:#6b7280; margin-top:1rem;">Credit cards, debit & checks accepted • Spanish spoken</p>
+
+                <a href="tel:2256632217" class="btn" style="margin-top:1.5rem; display:block; text-align:center;">Call Now for a Free Estimate</a>
             </div>
         </div>
     </section>
 
     <!-- Floating Call Button -->
-    <a href="tel:2256632217" class="md:hidden floating-btn btn">
-        📞 Call Now
-    </a>
+    <a href="tel:2256632217" class="floating-btn">📞 Call Now</a>
 
-    <footer class="py-8 text-center text-sm">
-        <p>Independent informational site • <a href="https://github.com/mcorbett51090/corbett-claims-baton-rouge">View on GitHub</a></p>
+    <footer>
+        <p>Independent informational site • <a href="https://github.com/mcorbett51090/corbett-claims-baton-rouge" style="color:#9ca3af;">View on GitHub</a></p>
     </footer>
 
     <script>
-        // Mobile menu
         const btn = document.getElementById('menu-btn');
         const menu = document.getElementById('mobile-menu');
+
         if (btn && menu) {
-            btn.onclick = () => menu.classList.toggle('hidden');
+            btn.addEventListener('click', () => {
+                if (menu.style.display === 'block') {
+                    menu.style.display = 'none';
+                } else {
+                    menu.style.display = 'block';
+                }
+            });
         }
     </script>
 </body>

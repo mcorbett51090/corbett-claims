@@ -56,7 +56,8 @@ tracking = 6
 corbett_total_w = cw + tracking * (len(corbett) - 1)
 
 # Vertical layout: overlap "Claims" upward into the bottom of CORBETT
-overlap = 55
+# Small overlap — Claims should *kiss* CORBETT, not bury it.
+overlap = 18
 divider_gap = 40
 tag_gap = 36
 divider_w = 240
@@ -78,12 +79,20 @@ draw_tracked((W - corbett_total_w) // 2 + shadow_offset, y_start - c_top + shado
 draw_tracked((W - corbett_total_w) // 2, y_start - c_top,
              corbett, corbett_font, WHITE)
 
-# Render "Claims" on a transparent layer so we can overlap and add a soft shadow
-pad = 60
+# Render "Claims" on a transparent layer with a navy outline so it stays
+# visually distinct from CORBETT where the two letterforms meet.
+pad = 80
+stroke_w = 6  # thick navy ring around "Claims" separates it from CORBETT
 claims_layer = Image.new("RGBA", (lw + pad * 2, lh + pad * 2), (0, 0, 0, 0))
 cdraw = ImageDraw.Draw(claims_layer)
-cdraw.text((pad, pad - l_top), claims, font=claims_font, fill=(0, 0, 0, 90))   # shadow
-cdraw.text((pad - 4, pad - l_top - 4), claims, font=claims_font, fill=WHITE)   # main
+
+# Soft drop shadow underneath
+cdraw.text((pad + 5, pad - l_top + 5), claims, font=claims_font,
+           fill=(0, 0, 0, 110),
+           stroke_width=stroke_w, stroke_fill=(0, 0, 0, 110))
+# Main glyph: white fill with a navy stroke
+cdraw.text((pad, pad - l_top), claims, font=claims_font, fill=WHITE,
+           stroke_width=stroke_w, stroke_fill=PRIMARY_DARK)
 
 claims_x = (W - claims_layer.width) // 2
 claims_y = y_start + ch - overlap - pad

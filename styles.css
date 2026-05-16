@@ -389,6 +389,18 @@ header.hero::before {
     margin-bottom: 1.5rem;
 }
 
+.leaflet-tooltip.state-tooltip {
+    background: rgba(30, 58, 95, 0.92);
+    color: #fff;
+    border: 0;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.leaflet-tooltip.state-tooltip::before { display: none; }
+
 .area-chip-row {
     display: flex;
     flex-wrap: wrap;

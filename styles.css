@@ -1,4 +1,4 @@
-/* Corbett Claims - Self-contained professional styles */
+/* Corbett Claims - Clean Self-Contained Mobile-First Styles */
 
 :root {
     --primary: #1e3a5f;
@@ -9,13 +9,16 @@ body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     line-height: 1.6;
     color: #111827;
+    margin: 0;
+    padding: 0;
 }
 
 /* Logo */
 .logo-text {
     font-weight: 800;
-    letter-spacing: -1px;
+    letter-spacing: -1.5px;
     color: var(--primary);
+    font-size: 1.75rem;
 }
 
 .logo-script {
@@ -23,26 +26,52 @@ body {
     font-style: italic;
     font-weight: 700;
     color: var(--primary);
+    font-size: 1.5rem;
 }
 
 /* Navigation */
+nav {
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
 nav a {
     color: #374151;
-    transition: color 0.2s;
+    text-decoration: none;
 }
 
 nav a:hover {
     color: var(--primary);
 }
 
-/* Hero */
+/* Hero Section */
 header {
-    background: linear-gradient(to bottom right, var(--primary), var(--primary-dark));
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 4rem 0;
 }
 
-/* Trust numbers */
+header h1 {
+    color: white;
+    font-size: 2.5rem;
+    line-height: 1.1;
+}
+
+@media (min-width: 768px) {
+    header h1 {
+        font-size: 3.5rem;
+    }
+}
+
+/* Trust Bar */
+.trust-bar {
+    background: white;
+    padding: 2rem 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
 .trust-number {
-    font-size: 2.25rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--primary);
 }
@@ -51,28 +80,27 @@ header {
 .card {
     background: white;
     border: 1px solid #e5e7eb;
-    border-radius: 1.5rem;
-    padding: 2rem;
-    transition: all 0.2s;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
 }
 
-.card:hover {
-    border-color: #bfdbfe;
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05);
+@media (min-width: 768px) {
+    .card {
+        padding: 2rem;
+    }
 }
 
 /* Buttons */
 .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.875rem 2rem;
+    display: inline-block;
     background: var(--primary);
     color: white;
-    font-weight: 600;
-    border-radius: 1rem;
+    padding: 14px 28px;
+    border-radius: 9999px;
     text-decoration: none;
-    transition: all 0.2s;
+    font-weight: 600;
+    text-align: center;
 }
 
 .btn:hover {
@@ -81,48 +109,45 @@ header {
 
 .btn-secondary {
     background: transparent;
-    border: 2px solid rgba(255,255,255,0.7);
+    border: 2px solid white;
     color: white;
 }
 
-.btn-secondary:hover {
-    background: rgba(255,255,255,0.1);
-}
-
-/* Section titles */
+/* Section Titles */
 .section-title {
-    font-size: 2.25rem;
+    font-size: 2rem;
     font-weight: 700;
-    letter-spacing: -0.025em;
+    margin-bottom: 1rem;
 }
 
-/* Mobile menu animation */
+/* Mobile Menu */
 #mobile-menu {
-    animation: slideDown 0.2s ease;
+    display: none;
 }
 
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+#mobile-menu.show {
+    display: block;
 }
 
-/* Floating call button */
+/* Floating Button */
 .floating-btn {
     position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    z-index: 50;
-}
-
-/* Testimonials */
-.testimonial {
-    background: #f9fafb;
-    border-radius: 1.5rem;
-    padding: 2rem;
+    bottom: 20px;
+    right: 20px;
+    background: var(--primary);
+    color: white;
+    padding: 14px 20px;
+    border-radius: 9999px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    font-weight: 600;
 }
 
 /* Footer */
 footer {
     background: #111827;
     color: #9ca3af;
+    padding: 2rem 0;
+    text-align: center;
+    font-size: 0.9rem;
 }

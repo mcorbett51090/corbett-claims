@@ -4,7 +4,7 @@
     "legalName": "Corbett Claim Service, Inc.",
     "type": "Automotive Collision Repair and Insurance Claims Assistance",
     "description": "Local Baton Rouge business specializing in auto body repair, collision services, appraisals, and assisting customers with insurance claims for vehicles.",
-    "owner": "Ronnie (Ronald) Corbett",
+    "owners": ["Ronnie (Ronald) Corbett", "Annie Corbett"],
     "status": "Active",
     "yearsActive": "30+",
     "location": {
@@ -18,7 +18,7 @@
       ]
     },
     "contact": {
-      "phone": ["(225) 663-2217", "(225) 662-2217"],
+      "phone": ["(225) 663-2217"],
       "email": "assignments@corbettclaims.net",
       "website": null
     },
@@ -69,7 +69,7 @@
   "project": {
     "name": "Corbett Claims Baton Rouge Research & Website",
     "description": "Deep research compiled into JSON and a simple static website.",
-    "repo": "https://github.com/mcorbett51090/corbett-claims-baton-rouge",
+    "repo": "https://github.com/mcorbett51090/corbett-claims",
     "createdBy": "Grok (xAI) per user request"
   }
 }

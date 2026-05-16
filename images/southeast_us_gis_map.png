@@ -1,1 +1,1 @@
-iVBORw0KGgoAAAANSUhEUgAADd4AAAk8CAYAAABX5wzqAAAAOn... (full base64 would be here in real call)
+$(cat /tmp/map.b64)

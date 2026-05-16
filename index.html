@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
     <meta name="description" content="Professional auto collision repair and insurance claims assistance in Baton Rouge, Louisiana. Local experts helping with vehicle insurance claims and repairs.">
-    <!-- v6 - Made more resilient with fallback styles -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@600&display=swap');
         
@@ -16,13 +15,6 @@
         
         .nav-link { transition: color 0.2s; }
         .nav-link:hover { color: #1e3a5f; }
-
-        /* Fallback styles if Tailwind CDN fails */
-        .fallback-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
@@ -203,25 +195,24 @@
         </div>
     </section>
 
-    <!-- Testimonials -->
+    <!-- Testimonials / Reviews -->
     <section class="bg-white py-16 border-t">
         <div class="max-w-5xl mx-auto px-6">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold tracking-tight">What Drivers Say</h2>
-                <p class="text-gray-600 mt-2">Real feedback from local customers we’ve helped</p>
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold tracking-tight">Customer Feedback</h2>
+                <p class="text-gray-600 mt-2">We’re building our online reviews. Your feedback helps us improve!</p>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="bg-gray-50 p-8 rounded-3xl">
-                    <div class="flex items-center gap-1 text-yellow-400 mb-4">★★★★★</div>
-                    <p class="text-gray-700 italic">“They handled everything from the repair to dealing with my insurance. Made a stressful situation much easier.”</p>
-                    <div class="mt-4 text-sm font-medium">— Local Baton Rouge Customer</div>
-                </div>
-                <div class="bg-gray-50 p-8 rounded-3xl">
-                    <div class="flex items-center gap-1 text-yellow-400 mb-4">★★★★★</div>
-                    <p class="text-gray-700 italic">“Honest, professional, and they actually helped me get more from my claim than I expected. Highly recommend.”</p>
-                    <div class="mt-4 text-sm font-medium">— Satisfied Driver</div>
-                </div>
+            <div class="max-w-2xl mx-auto text-center bg-gray-50 p-8 rounded-3xl">
+                <p class="text-gray-600 mb-6">
+                    We currently don’t have public Google reviews yet, but we strive to provide quality service and support to every customer.
+                </p>
+                <a href="https://www.google.com/search?q=Corbett+Claims+Service+Baton+Rouge" 
+                   target="_blank"
+                   class="inline-flex items-center px-6 py-3 bg-[#1e3a5f] text-white font-semibold rounded-2xl hover:bg-[#0f2744] transition">
+                    Leave a Google Review
+                </a>
+                <p class="text-xs text-gray-500 mt-4">(Search for us on Google to leave feedback)</p>
             </div>
         </div>
     </section>
@@ -277,44 +268,19 @@
     </footer>
 
     <script>
-        // Tailwind config
-        function initializeTailwind() {
-            if (typeof tailwind !== 'undefined') {
-                tailwind.config = {
-                    theme: {
-                        extend: {
-                            colors: {
-                                primary: '#1e3a5f'
-                            }
-                        }
-                    }
-                };
-            }
-        }
-        
         // Mobile menu toggle
-        function initMobileMenu() {
-            const menuBtn = document.getElementById('menu-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
 
-            if (menuBtn && mobileMenu) {
-                menuBtn.addEventListener('click', () => {
-                    mobileMenu.classList.toggle('hidden');
-                });
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
 
-                document.querySelectorAll('#mobile-menu a').forEach(link => {
-                    link.addEventListener('click', () => {
-                        mobileMenu.classList.add('hidden');
-                    });
-                });
-            }
-        }
-
-        // Initialize everything
-        window.onload = function() {
-            initializeTailwind();
-            initMobileMenu();
-        };
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
     </script>
 </body>
 </html>

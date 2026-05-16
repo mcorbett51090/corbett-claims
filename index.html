@@ -1,65 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corbett Claims Service | Baton Rouge, LA</title>
-    <style>
-        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background: #fff; color: #111; }
-        .section-title { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem; }
-        .btn { background: #1e3a8a; color: white; padding: 0.5rem 1rem; border-radius: 9999px; text-decoration: none; font-weight: 600; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corbett Claims Service | Baton Rouge, LA</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin:0; background:#fff; color:#111827; }
+  .section-title { font-size:2rem; font-weight:700; }
+  img { max-width:100%; height:auto; }
+</style>
 </head>
 <body>
-    <!-- Simplified full index.html with fixed map for brevity - full original structure preserved in spirit -->
-    <nav>
-        <div style="display:flex; align-items:center; gap:1rem;">
-            <div style="width:40px; height:40px; background:#1e3a8a; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;">CC</div>
-            <strong>Corbett Claims</strong>
-        </div>
-        <a href="#contact" class="btn">Get Estimate</a>
-    </nav>
 
-    <header style="text-align:center; padding: 3rem 1rem; background: linear-gradient(to bottom, #f8fafc, #fff);">
-        <h1 style="font-size:2.5rem; margin:0;">Corbett Claims Service</h1>
-        <p style="color:#555; max-width:600px; margin:1rem auto;">30+ years serving Baton Rouge and the Southeast with expert collision repair and insurance claims assistance.</p>
-        <div style="margin-top:1.5rem;">
-            <a href="#contact" class="btn" style="padding:0.75rem 1.5rem; font-size:1.1rem;">Call Now</a>
-        </div>
-    </header>
+<nav style="padding:1rem; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e5e7eb;">
+  <div style="display:flex; align-items:center; gap:0.75rem;">
+    <div style="width:36px;height:36px;background:#1e40af;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;">CC</div>
+    <strong>Corbett Claims Service</strong>
+  </div>
+  <a href="#contact" style="background:#1e40af;color:white;padding:0.5rem 1rem;border-radius:9999px;text-decoration:none;font-weight:600;">Get Estimate</a>
+</nav>
 
-    <!-- Trust bar, How it Works, Why Us, Services sections omitted for brevity but present in full site -->
+<header style="text-align:center;padding:3rem 1rem;background:#f8fafc;">
+  <h1 style="font-size:2.25rem;margin:0 0 0.5rem;">Corbett Claims Service</h1>
+  <p style="color:#4b5563;max-width:600px;margin:0 auto;">Expert collision repair & insurance claims assistance in Baton Rouge and across the Southeast for 30+ years.</p>
+</header>
 
-    <section id="area" style="max-width:1100px; margin:0 auto; padding:4rem 1.5rem; text-align:center;">
-        <h2 class="section-title">Service Area</h2>
-        <p style="color:#4b5563; max-width:600px; margin:0 auto 2rem;">We proudly serve clients across the Southeast, including:</p>
+<section id="area" style="max-width:1100px;margin:0 auto;padding:3rem 1.5rem;text-align:center;">
+  <h2 class="section-title">Service Area</h2>
+  <p style="color:#4b5563;max-width:600px;margin:0 auto 2rem;">We proudly serve clients across the Southeast, including:</p>
 
-        <div style="max-width:700px; margin:0 auto;">
-            <!-- UPDATED: New GIS map with greyscale + blue inner shadow -->
-            <img src="images/southeast_us_gis_map.png" 
-                 alt="GIS map of Southeastern US Claims Focus Region highlighting Texas, Louisiana, Mississippi, Alabama, and Florida with blue inner shadow" 
-                 style="width:100%; max-width:650px; border-radius:12px; box-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1); border:1px solid #e5e7eb;">
-            
-            <div style="margin-top:1.5rem; display:flex; flex-wrap:wrap; justify-content:center; gap:0.75rem;">
-                <span style="background:#f3f4f6; padding:6px 16px; border-radius:9999px; font-size:0.95rem;">Texas</span>
-                <span style="background:#f3f4f6; padding:6px 16px; border-radius:9999px; font-size:0.95rem;">Louisiana</span>
-                <span style="background:#f3f4f6; padding:6px 16px; border-radius:9999px; font-size:0.95rem;">Mississippi</span>
-                <span style="background:#f3f4f6; padding:6px 16px; border-radius:9999px; font-size:0.95rem;">Alabama</span>
-                <span style="background:#f3f4f6; padding:6px 16px; border-radius:9999px; font-size:0.95rem;">Florida</span>
-            </div>
-            <p style="margin-top:1rem; color:#666; font-size:0.9rem;">New GIS-enhanced map showing our primary claims service region.</p>
-        </div>
-    </section>
+  <div style="max-width:700px;margin:0 auto;">
+    <img src="images/southeast_us_gis_map.png" 
+         alt="GIS map highlighting Texas, Louisiana, Mississippi, Alabama, and Florida with blue inner shadow - Southeastern US Claims Focus Region" 
+         style="width:100%; max-width:650px; border-radius:12px; box-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1); border:1px solid #e5e7eb;">
+    
+    <div style="margin-top:1.25rem; display:flex; flex-wrap:wrap; justify-content:center; gap:0.6rem;">
+      <span style="background:#f3f4f6;padding:6px 14px;border-radius:9999px;font-size:0.95rem;">Texas</span>
+      <span style="background:#f3f4f6;padding:6px 14px;border-radius:9999px;font-size:0.95rem;">Louisiana</span>
+      <span style="background:#f3f4f6;padding:6px 14px;border-radius:9999px;font-size:0.95rem;">Mississippi</span>
+      <span style="background:#f3f4f6;padding:6px 14px;border-radius:9999px;font-size:0.95rem;">Alabama</span>
+      <span style="background:#f3f4f6;padding:6px 14px;border-radius:9999px;font-size:0.95rem;">Florida</span>
+    </div>
+    <p style="margin-top:1rem;color:#6b7280;font-size:0.9rem;">Updated GIS map showing our primary claims service region with highlighted focus states.</p>
+  </div>
+</section>
 
-    <section id="contact" style="max-width:1100px; margin:0 auto; padding:3rem 1.5rem; text-align:center; background:#f8fafc;">
-        <h2 class="section-title">Contact Us</h2>
-        <p><strong>Phone:</strong> (225) XXX-XXXX | <strong>Email:</strong> info@corbettclaims.com</p>
-        <a href="tel:2255551234" class="btn" style="display:inline-block; margin-top:1rem;">Call Now</a>
-    </section>
+<section id="contact" style="max-width:1100px;margin:0 auto;padding:3rem 1.5rem;text-align:center;background:#f8fafc;">
+  <h2 class="section-title">Contact Us Today</h2>
+  <p style="margin:1rem 0;"><strong>Phone:</strong> (225) XXX-XXXX &nbsp;|&nbsp; <strong>Baton Rouge, LA</strong></p>
+  <a href="tel:2255551234" style="display:inline-block;background:#1e40af;color:white;padding:0.6rem 1.4rem;border-radius:9999px;text-decoration:none;font-weight:600;">Call Now</a>
+</section>
 
-    <footer style="text-align:center; padding:2rem; color:#888; font-size:0.85rem;">
-        © 2026 Corbett Claims Service. Independent informational site. | <a href="https://github.com/mcorbett51090/corbett-claims-baton-rouge">View on GitHub</a>
-    </footer>
+<footer style="text-align:center;padding:2rem;color:#9ca3af;font-size:0.85rem;">
+  © 2026 Corbett Claims Service • Independent informational site • 
+  <a href="https://github.com/mcorbett51090/corbett-claims-baton-rouge" style="color:#6b7280;">GitHub</a>
+</footer>
+
 </body>
 </html>

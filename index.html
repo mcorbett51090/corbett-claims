@@ -84,7 +84,7 @@
             </div>
             <div>
                 <div class="trust-number">Trusted</div>
-                <div style="color:#6b7280; font-size:0.9rem; margin-top:4px;">Strong Local Reputation</div>
+                <div style="color:#6b7280; font-size:0.9rem; margin-top:4px;">Strong Reputation</div>
             </div>
         </div>
     </div>
@@ -170,8 +170,35 @@
         </div>
     </section>
 
+    <!-- FAQ -->
+    <section style="max-width:900px; margin:0 auto; padding:4rem 1.5rem; background:white;">
+        <h2 class="section-title" style="text-align:center; margin-bottom:2.5rem;">Frequently Asked Questions</h2>
+        
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+            <details class="faq-item">
+                <summary>Do you work directly with insurance companies?</summary>
+                <p>Yes. We assist with documentation and communication to help make the claims process smoother for you.</p>
+            </details>
+            
+            <details class="faq-item">
+                <summary>Do you offer free estimates?</summary>
+                <p>Yes, we provide free estimates for collision repair and insurance claims support.</p>
+            </details>
+            
+            <details class="faq-item">
+                <summary>How long does the claims process usually take?</summary>
+                <p>It varies depending on the insurance company and complexity of the claim, but we work to move things along efficiently.</p>
+            </details>
+            
+            <details class="faq-item">
+                <summary>Do you offer towing services?</summary>
+                <p>Yes, towing is available as part of our full-service offerings.</p>
+            </details>
+        </div>
+    </section>
+
     <!-- Feedback -->
-    <section style="padding:4rem 1.5rem; text-align:center; background:white;">
+    <section style="padding:4rem 1.5rem; text-align:center;">
         <div style="max-width:700px; margin:0 auto;">
             <h2 class="section-title">Customer Feedback</h2>
             <p style="color:#4b5563; max-width:400px; margin:0 auto 1.5rem;">
@@ -190,7 +217,6 @@
             </div>
 
             <div style="display:grid; grid-template-columns:1fr; gap:2.5rem;">
-                <!-- Contact Form -->
                 <div>
                     <form action="https://formspree.io/f/xwkgvjqg" method="POST" style="display:flex; flex-direction:column; gap:1rem;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
@@ -203,15 +229,14 @@
                     </form>
                 </div>
 
-                <!-- Direct Contact -->
                 <div style="background:#f9fafb; padding:2rem; border-radius:1rem;">
                     <h3 style="margin-top:0;">Or Call Us Directly</h3>
                     <div style="margin:1.5rem 0;">
-                        <strong style="display:block; margin-bottom:4px;">Phone</strong>
+                        <strong>Phone</strong><br>
                         <a href="tel:2256632217" style="font-size:1.5rem; color:#1e3a5f; font-weight:600; text-decoration:none;">(225) 663-2217</a>
                     </div>
                     <div>
-                        <strong style="display:block; margin-bottom:4px;">Email</strong>
+                        <strong>Email</strong><br>
                         <a href="mailto:assignments@corbettclaims.net" style="color:#1e3a5f; text-decoration:none;">assignments@corbettclaims.net</a>
                     </div>
 
@@ -253,6 +278,13 @@
         if (btn && menu) {
             btn.addEventListener('click', () => {
                 menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+            });
+
+            // Close mobile menu when clicking a link
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    menu.style.display = 'none';
+                });
             });
         }
     </script>

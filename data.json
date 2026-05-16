@@ -1,0 +1,75 @@
+{
+  "business": {
+    "name": "Corbett Claims Service",
+    "legalName": "Corbett Claim Service, Inc.",
+    "type": "Automotive Collision Repair and Insurance Claims Assistance",
+    "description": "Local Baton Rouge business specializing in auto body repair, collision services, appraisals, and assisting customers with insurance claims for vehicles.",
+    "owner": "Ronnie (Ronald) Corbett",
+    "status": "Active",
+    "yearsActive": "30+",
+    "location": {
+      "city": "Baton Rouge",
+      "state": "Louisiana",
+      "country": "USA",
+      "mailingAddress": "PO Box 84333, Baton Rouge, LA 70884",
+      "physicalAddresses": [
+        "414 Long Meadow Drive, Baton Rouge, LA 70810",
+        "2635 University Club Dr, Baton Rouge, LA 70810 (possible)"
+      ]
+    },
+    "contact": {
+      "phone": ["(225) 663-2217", "(225) 662-2217"],
+      "email": "assignments@corbettclaims.net",
+      "website": null
+    },
+    "services": [
+      "Auto body and collision repair",
+      "Insurance claims assistance and processing",
+      "Special interest appraisals",
+      "Free estimates",
+      "Lifetime warranty",
+      "Full service mechanical repairs",
+      "Towing",
+      "Automotive glass replacement",
+      "Motorcycle repair",
+      "Detailing",
+      "Paintless Dent Repair (PDR)"
+    ],
+    "hours": {
+      "monday": "9:00 AM - 6:00 PM",
+      "tuesday": "9:00 AM - 6:00 PM",
+      "wednesday": "9:00 AM - 6:00 PM",
+      "thursday": "9:00 AM - 6:00 PM",
+      "friday": "9:00 AM - 6:00 PM",
+      "saturday": "Closed",
+      "sunday": "Closed"
+    },
+    "paymentMethods": ["Visa", "MasterCard", "Discover", "American Express", "Check", "Debit Card"],
+    "languages": ["English", "Spanish"],
+    "onlinePresence": {
+      "officialWebsite": null,
+      "directories": ["Manta", "Carwise", "Alignable", "Bizapedia", "LinkedIn"],
+      "reviews": "None publicly available or rated",
+      "socialMedia": "Minimal or none prominent"
+    },
+    "reputation": {
+      "complaints": "None found in public searches",
+      "scams": "None reported",
+      "lawsuits": "None prominently associated in searches",
+      "notes": "Low-profile legitimate local business with limited digital footprint. No red flags identified."
+    },
+    "researchDate": "2026-05-15",
+    "sources": [
+      "Public business directories (Manta, Carwise, Bizapedia)",
+      "LinkedIn profiles",
+      "Web searches for reviews/complaints",
+      "Louisiana Secretary of State references"
+    ]
+  },
+  "project": {
+    "name": "Corbett Claims Baton Rouge Research & Website",
+    "description": "Deep research compiled into JSON and a simple static website.",
+    "repo": "https://github.com/mcorbett51090/corbett-claims-baton-rouge",
+    "createdBy": "Grok (xAI) per user request"
+  }
+}

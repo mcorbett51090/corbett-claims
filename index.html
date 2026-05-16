@@ -9,6 +9,8 @@
     <meta property="og:description" content="Local experts helping with auto collision repair and insurance claims assistance across the Southeast. Free estimates available.">
     
     <link rel="stylesheet" href="styles.css">
+    <!-- Leaflet CSS for interactive map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 </head>
 <body>
 
@@ -209,25 +211,28 @@
         </div>
     </section>
 
-    <!-- Service Area -->
+    <!-- Service Area (Interactive Map) -->
     <section id="area" style="max-width:1100px; margin:0 auto; padding:4rem 1.5rem;">
         <div style="text-align:center; margin-bottom:2rem;">
             <h2 class="section-title">Service Area</h2>
-            <p style="color:#4b5563;">We proudly serve clients across the Southeast, including:</p>
+            <p style="color:#4b5563;">We proudly serve clients across the Southeast. Explore the interactive map below:</p>
         </div>
 
-        <div style="max-width:700px; margin:0 auto; text-align:center;">
-            <img src="images/southeast_us_gis_map.png" 
-                 alt="GIS-style map of the Southeastern US highlighting service area in Texas, Louisiana, Mississippi, Alabama, and Florida" 
-                 style="width:100%; max-width:650px; border-radius:12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #e5e7eb;">
+        <div style="max-width:800px; margin:0 auto;">
+            <!-- Interactive Leaflet Map -->
+            <div id="service-map" style="height: 420px; width: 100%; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #e5e7eb; margin-bottom: 1.5rem;"></div>
             
-            <div style="margin-top:1.5rem; display:flex; flex-wrap:wrap; justify-content:center; gap:1.5rem; font-size:1rem;">
+            <div style="margin-top:1rem; display:flex; flex-wrap:wrap; justify-content:center; gap:1rem; font-size:1rem;">
                 <span style="background:#f3f4f6; padding:6px 16px; border-radius:9999px;">Texas</span>
                 <span style="background:#f3f4f6; padding:6px 16px; border-radius:9999px;">Louisiana</span>
                 <span style="background:#f3f4f6; padding:6px 16px; border-radius:9999px;">Mississippi</span>
                 <span style="background:#f3f4f6; padding:6px 16px; border-radius:9999px;">Alabama</span>
                 <span style="background:#f3f4f6; padding:6px 16px; border-radius:9999px;">Florida</span>
             </div>
+            
+            <p style="margin-top:1rem; color:#4b5563; font-size:0.95rem; text-align:center;">
+                Click anywhere on the map or the highlighted region for more details about our coverage.
+            </p>
         </div>
     </section>
 
@@ -281,7 +286,10 @@
         </div>
     </footer>
 
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
+        // Mobile menu toggle
         const btn = document.getElementById('menu-btn');
         const menu = document.getElementById('mobile-menu');
 
@@ -296,6 +304,51 @@
                 });
             });
         }
+
+        // Interactive Leaflet Service Area Map
+        function initServiceMap() {
+            const mapContainer = document.getElementById('service-map');
+            if (!mapContainer) return;
+
+            const map = L.map('service-map').setView([30.8, -90.5], 5);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Approximate polygon highlighting the core Southeast service area
+            const serviceArea = L.polygon([
+                [33.5, -106.5], // NW Texas
+                [26.0, -106.5], // SW Texas
+                [25.5, -80.0],  // South Florida
+                [31.0, -81.0],  // Georgia/Florida border
+                [35.0, -88.0],  // North Alabama/Mississippi
+                [36.5, -94.5]   // North Texas/Arkansas
+            ], {
+                color: '#1e3a5f',
+                weight: 2,
+                fillColor: '#3b82f6',
+                fillOpacity: 0.25
+            }).addTo(map);
+
+            serviceArea.bindPopup(
+                "<strong>Primary Service Area</strong><br>" +
+                "We proudly serve Texas, Louisiana, Mississippi, Alabama, and Florida.<br><br>" +
+                "Full coverage across these states with local expertise from our Baton Rouge base."
+            );
+
+            // Click anywhere on the map for general info
+            map.on('click', function() {
+                serviceArea.openPopup();
+            });
+
+            // Optional: Add a marker for Baton Rouge HQ
+            L.marker([30.4515, -91.1871]).addTo(map)
+                .bindPopup("<strong>Baton Rouge Headquarters</strong><br>Corbett Claims Service<br>Local experts serving the Southeast");
+        }
+
+        // Initialize map when page loads
+        window.addEventListener('load', initServiceMap);
     </script>
 </body>
 </html>

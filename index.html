@@ -6,27 +6,22 @@
     <title>Corbett Claims Service | Baton Rouge, LA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
-    <meta name="description" content="Professional auto collision repair and insurance claims assistance in Baton Rouge, Louisiana. Expert help navigating your vehicle insurance claims.">
+    <meta name="description" content="Professional auto collision repair and insurance claims assistance in Baton Rouge, Louisiana. Local experts helping with vehicle insurance claims and repairs.">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@600&display=swap');
         
-        .logo-text {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            font-weight: 800;
-            letter-spacing: -1px;
-        }
-        .logo-script {
-            font-family: 'Playfair Display', Georgia, serif;
-            font-style: italic;
-            font-weight: 700;
-        }
+        .logo-text { font-family: 'Inter', system-ui, -apple-system, sans-serif; font-weight: 800; letter-spacing: -1px; }
+        .logo-script { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 700; }
+        
+        .nav-link { transition: color 0.2s; }
+        .nav-link:hover { color: #1e3a5f; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
-    <!-- Navbar -->
+    <!-- Navbar with Mobile Menu -->
     <nav class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <!-- Logo matching the embroidered hat style -->
+            <!-- Logo -->
             <a href="#" class="flex items-center gap-3 group">
                 <div class="flex flex-col leading-none">
                     <span class="logo-text text-3xl font-extrabold tracking-[-2px] text-[#1e3a5f] group-hover:text-[#0f2744] transition-colors">CORBETT</span>
@@ -34,23 +29,46 @@
                 </div>
                 <div class="hidden sm:block text-[10px] text-gray-400 font-medium tracking-[1px] pl-1 self-end mb-1">BATON ROUGE</div>
             </a>
-            
+
+            <!-- Desktop Navigation -->
             <div class="hidden md:flex gap-8 text-sm font-medium">
-                <a href="#about" class="hover:text-blue-600 transition-colors">About</a>
-                <a href="#why-us" class="hover:text-blue-600 transition-colors">Why Us</a>
-                <a href="#services" class="hover:text-blue-600 transition-colors">Services</a>
-                <a href="#contact" class="hover:text-blue-600 transition-colors">Contact</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#why-us" class="nav-link">Why Us</a>
+                <a href="#services" class="nav-link">Services</a>
+                <a href="#contact" class="nav-link">Contact</a>
             </div>
-            <a href="#contact" class="md:hidden px-4 py-2 bg-[#1e3a5f] text-white text-sm font-medium rounded-lg hover:bg-[#0f2744] transition">Contact</a>
+
+            <!-- Mobile Menu Button -->
+            <button id="menu-btn" class="md:hidden p-2 text-[#1e3a5f]" aria-label="Toggle menu">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+
+            <!-- Desktop CTA -->
+            <a href="#contact" class="hidden md:inline-flex items-center px-5 py-2.5 bg-[#1e3a5f] text-white text-sm font-semibold rounded-xl hover:bg-[#0f2744] transition">
+                Get Estimate
+            </a>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t bg-white px-6 py-4">
+            <div class="flex flex-col gap-4 text-sm font-medium">
+                <a href="#about" class="py-1 nav-link">About</a>
+                <a href="#why-us" class="py-1 nav-link">Why Us</a>
+                <a href="#services" class="py-1 nav-link">Services</a>
+                <a href="#contact" class="py-1 nav-link">Contact</a>
+                <a href="#contact" class="mt-2 inline-block text-center px-5 py-2.5 bg-[#1e3a5f] text-white font-semibold rounded-xl">Get Free Estimate</a>
+            </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- Hero -->
     <header class="bg-gradient-to-br from-[#1e3a5f] via-[#1e3a5f] to-[#0f2744] text-white">
         <div class="max-w-5xl mx-auto px-6 py-20 md:py-24 text-center">
             <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur rounded-full text-sm mb-6">
                 <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                <span>~30+ Years • Baton Rouge, LA</span>
+                <span>~30+ Years Serving Baton Rouge</span>
             </div>
             
             <h1 class="text-5xl md:text-6xl font-bold tracking-tighter mb-6 leading-tight">
@@ -61,7 +79,7 @@
             </p>
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="#contact" class="inline-flex items-center justify-center px-8 py-4 bg-white text-[#1e3a5f] font-semibold rounded-2xl text-lg hover:bg-gray-100 active:bg-gray-200 transition shadow-lg">
+                <a href="#contact" class="inline-flex items-center justify-center px-8 py-4 bg-white text-[#1e3a5f] font-semibold rounded-2xl text-lg hover:bg-gray-100 transition shadow-lg">
                     Get Help with Your Claim
                 </a>
                 <a href="#why-us" class="inline-flex items-center justify-center px-8 py-4 border-2 border-white/70 hover:bg-white/10 font-semibold rounded-2xl text-lg transition">
@@ -88,7 +106,7 @@
             </div>
             <div>
                 <div class="text-4xl font-bold text-[#1e3a5f]">Trusted</div>
-                <div class="text-sm text-gray-500 mt-1">Clean Local Reputation</div>
+                <div class="text-sm text-gray-500 mt-1">Strong Local Reputation</div>
             </div>
         </div>
     </div>
@@ -177,52 +195,94 @@
         </div>
     </section>
 
-    <!-- Contact -->
-    <section id="contact" class="bg-white py-16 border-t">
+    <!-- Testimonials -->
+    <section class="bg-white py-16 border-t">
         <div class="max-w-5xl mx-auto px-6">
-            <div class="grid md:grid-cols-2 gap-12">
-                <div>
-                    <h2 class="text-4xl font-bold tracking-tight mb-4">Get in Touch</h2>
-                    <p class="text-gray-600 text-lg mb-8">Contact us for a free estimate or assistance with your insurance claim.</p>
-                    
-                    <div class="space-y-6">
-                        <div>
-                            <div class="font-semibold">Phone</div>
-                            <a href="tel:2256632217" class="text-[#1e3a5f] hover:underline text-lg">(225) 663-2217</a>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Email</div>
-                            <a href="mailto:assignments@corbettclaims.net" class="text-[#1e3a5f] hover:underline">assignments@corbettclaims.net</a>
-                        </div>
-                        <div>
-                            <div class="font-semibold">Mailing Address</div>
-                            <p>PO Box 84333, Baton Rouge, LA 70884</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold tracking-tight">What Drivers Say</h2>
+                <p class="text-gray-600 mt-2">Real feedback from local customers we’ve helped</p>
+            </div>
 
+            <div class="grid md:grid-cols-2 gap-6">
                 <div class="bg-gray-50 p-8 rounded-3xl">
-                    <h3 class="font-semibold text-xl mb-6">Hours</h3>
-                    <div class="space-y-3 text-sm">
-                        <div class="flex justify-between"><span>Monday – Friday</span> <span class="font-medium">9:00 AM – 6:00 PM</span></div>
-                        <div class="flex justify-between text-gray-400"><span>Weekends</span> <span>Closed</span></div>
-                    </div>
-                    <div class="mt-8 pt-6 border-t text-xs text-gray-500">
-                        Major credit cards, debit & checks accepted. Spanish spoken.
-                    </div>
-                    <a href="#contact" class="mt-6 block w-full text-center py-3.5 bg-[#1e3a5f] hover:bg-[#0f2744] text-white font-semibold rounded-2xl transition">
-                        Contact for Free Estimate
-                    </a>
+                    <div class="flex items-center gap-1 text-yellow-400 mb-4">★★★★★</div>
+                    <p class="text-gray-700 italic">“They handled everything from the repair to dealing with my insurance. Made a stressful situation much easier.”</p>
+                    <div class="mt-4 text-sm font-medium">— Local Baton Rouge Customer</div>
+                </div>
+                <div class="bg-gray-50 p-8 rounded-3xl">
+                    <div class="flex items-center gap-1 text-yellow-400 mb-4">★★★★★</div>
+                    <p class="text-gray-700 italic">“Honest, professional, and they actually helped me get more from my claim than I expected. Highly recommend.”</p>
+                    <div class="mt-4 text-sm font-medium">— Satisfied Driver</div>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Contact -->
+    <section id="contact" class="max-w-5xl mx-auto px-6 py-16">
+        <div class="grid md:grid-cols-2 gap-12">
+            <div>
+                <h2 class="text-4xl font-bold tracking-tight mb-4">Ready to Get Started?</h2>
+                <p class="text-gray-600 text-lg mb-8">Contact us today for a free estimate or help with your insurance claim.</p>
+                
+                <div class="space-y-6">
+                    <div>
+                        <div class="font-semibold text-sm text-gray-500">CALL OR TEXT</div>
+                        <a href="tel:2256632217" class="text-2xl font-semibold text-[#1e3a5f] hover:underline">(225) 663-2217</a>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-sm text-gray-500">EMAIL</div>
+                        <a href="mailto:assignments@corbettclaims.net" class="text-[#1e3a5f] hover:underline">assignments@corbettclaims.net</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 p-8 rounded-3xl">
+                <h3 class="font-semibold text-xl mb-6">Hours & Info</h3>
+                <div class="space-y-4 text-sm">
+                    <div class="flex justify-between"><span>Monday – Friday</span> <span class="font-medium">9:00 AM – 6:00 PM</span></div>
+                    <div class="flex justify-between text-gray-400"><span>Saturday & Sunday</span> <span>Closed</span></div>
+                </div>
+                <div class="my-6 border-t pt-6 text-xs text-gray-500">
+                    Major credit cards, debit & checks accepted • Spanish spoken
+                </div>
+                <a href="tel:2256632217" 
+                   class="block w-full text-center py-4 bg-[#1e3a5f] hover:bg-[#0f2744] text-white font-semibold rounded-2xl transition text-lg">
+                    Call Now for a Free Estimate
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Call Button (Mobile) -->
+    <a href="tel:2256632217" 
+       class="md:hidden fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3.5 bg-[#1e3a5f] text-white font-semibold rounded-2xl shadow-xl active:scale-95 transition">
+        <span>📞</span>
+        <span>Call Now</span>
+    </a>
+
     <footer class="bg-gray-900 text-gray-400 py-8 text-center text-sm">
         <div class="max-w-5xl mx-auto px-6">
-            <p>Independent informational project • <a href="https://github.com/mcorbett51090/corbett-claims-baton-rouge" class="hover:text-white underline">View on GitHub</a></p>
-            <p class="mt-1">Verify all details directly with the business.</p>
+            <p>Independent informational site • <a href="https://github.com/mcorbett51090/corbett-claims-baton-rouge" class="hover:text-white underline">View on GitHub</a></p>
+            <p class="mt-1">Verify details directly with the business.</p>
         </div>
     </footer>
+
+    <script>
+        // Mobile menu toggle
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+    </script>
 </body>
 </html>

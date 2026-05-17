@@ -1,21 +1,20 @@
 {
   "business": {
-    "name": "Corbett Claims Service",
+    "name": "Corbett Claims",
     "legalName": "Corbett Claim Service, Inc.",
-    "type": "Automotive Collision Repair and Insurance Claims Assistance",
-    "description": "Local Baton Rouge business specializing in auto body repair, collision services, appraisals, and assisting customers with insurance claims for vehicles.",
+    "type": "Independent Auto and Heavy Equipment Appraisal",
+    "description": "Independent appraisal service founded in 2001 by Ronnie Corbett following 12 years as a staff adjuster at Allstate Insurance. Provides damage estimates and valuations on cars, motorcycles, RVs, motorhomes, and heavy farm equipment for insurance companies, attorneys, and private individuals.",
+    "founder": "Ronnie Corbett",
+    "founded": "2001",
+    "founderBackground": "12 years as a staff adjuster at Allstate Insurance prior to going independent",
     "owners": ["Ronnie (Ronald) Corbett", "Annie Corbett"],
     "status": "Active",
-    "yearsActive": "30+",
-    "location": {
+    "yearsActive": "25+ (since 2001) · 37+ years of combined appraisal experience",
+    "headquarters": {
       "city": "Baton Rouge",
       "state": "Louisiana",
       "country": "USA",
-      "mailingAddress": "PO Box 84333, Baton Rouge, LA 70884",
-      "physicalAddresses": [
-        "414 Long Meadow Drive, Baton Rouge, LA 70810",
-        "2635 University Club Dr, Baton Rouge, LA 70810 (possible)"
-      ]
+      "mailingAddress": "PO Box 84333, Baton Rouge, LA 70884"
     },
     "contact": {
       "phone": ["(225) 663-2217"],
@@ -23,18 +22,24 @@
       "website": null
     },
     "services": [
-      "Auto body and collision repair",
-      "Insurance claims assistance and processing",
-      "Special interest appraisals",
-      "Free estimates",
-      "Lifetime warranty",
-      "Full service mechanical repairs",
-      "Towing",
-      "Automotive glass replacement",
-      "Motorcycle repair",
-      "Detailing",
-      "Paintless Dent Repair (PDR)"
+      "Independent auto and light-truck appraisals",
+      "Motorcycle appraisals",
+      "RV and motorhome appraisals (Class A, B, C, travel trailers, fifth wheels)",
+      "Heavy farm equipment appraisals (tractors, combines, implements)",
+      "Damage estimates and total-loss valuations",
+      "Diminished value appraisals",
+      "On-site inspections"
     ],
+    "clientTypes": [
+      "Insurance companies",
+      "Attorneys",
+      "Private individuals and equipment owners"
+    ],
+    "coverageArea": {
+      "headquarters": "Baton Rouge, Louisiana",
+      "anchorStates": ["Louisiana", "Texas", "Florida", "Ohio", "Illinois", "Nevada"],
+      "regionalDescription": "Assignments accepted across the corridor from Texas to Florida and up to Ohio, Illinois, and Nevada"
+    },
     "hours": {
       "monday": "9:00 AM - 6:00 PM",
       "tuesday": "9:00 AM - 6:00 PM",
@@ -46,30 +51,17 @@
     },
     "paymentMethods": ["Visa", "MasterCard", "Discover", "American Express", "Check", "Debit Card"],
     "languages": ["English", "Spanish"],
-    "onlinePresence": {
-      "officialWebsite": null,
-      "directories": ["Manta", "Carwise", "Alignable", "Bizapedia", "LinkedIn"],
-      "reviews": "None publicly available or rated",
-      "socialMedia": "Minimal or none prominent"
-    },
-    "reputation": {
-      "complaints": "None found in public searches",
-      "scams": "None reported",
-      "lawsuits": "None prominently associated in searches",
-      "notes": "Low-profile legitimate local business with limited digital footprint. No red flags identified."
-    },
-    "researchDate": "2026-05-15",
-    "sources": [
-      "Public business directories (Manta, Carwise, Bizapedia)",
-      "LinkedIn profiles",
-      "Web searches for reviews/complaints",
-      "Louisiana Secretary of State references"
-    ]
+    "differentiators": [
+      "Truly independent — no ties to any insurer or repair shop",
+      "Carrier-side experience: founder spent 12 years as an Allstate adjuster before going independent",
+      "Broad equipment scope including heavy farm equipment, which many independent appraisers won't take on"
+    ],
+    "researchDate": "2026-05-17",
+    "sourceNote": "Profile updated 2026-05-17 from owner-provided business description (Ronnie Corbett)."
   },
   "project": {
-    "name": "Corbett Claims Baton Rouge Research & Website",
-    "description": "Deep research compiled into JSON and a simple static website.",
-    "repo": "https://github.com/mcorbett51090/corbett-claims",
-    "createdBy": "Grok (xAI) per user request"
+    "name": "Corbett Claims Website",
+    "description": "Static marketing site for Corbett Claims, an independent auto and heavy equipment appraisal service.",
+    "repo": "https://github.com/mcorbett51090/corbett-claims"
   }
 }

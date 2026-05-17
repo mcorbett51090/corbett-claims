@@ -37,7 +37,7 @@
     ],
     "coverageArea": {
       "headquarters": "Baton Rouge, Louisiana",
-      "anchorStates": ["Louisiana", "Texas", "Florida", "Ohio", "Illinois", "Nevada"],
+      "anchorStates": ["Louisiana", "Texas", "Mississippi", "Alabama", "Florida", "Ohio", "Illinois", "Nevada"],
       "regionalDescription": "Assignments accepted across the corridor from Texas to Florida and up to Ohio, Illinois, and Nevada"
     },
     "hours": {

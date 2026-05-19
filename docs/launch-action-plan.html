@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corbett Claims — Website Launch-Readiness Action Plan</title>
+<style>
+  /* ----- Reset & base ----- */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "San Francisco", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1f2937;
+    background: #ffffff;
+    line-height: 1.6;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4 { color: #0f2a4a; font-weight: 700; line-height: 1.25; margin: 0 0 .6em; }
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.55rem; margin-top: 1.6em; padding-top: .4em; border-top: 1px solid #e5e7eb; }
+  h2:first-of-type { border-top: none; padding-top: 0; }
+  h3 { font-size: 1.15rem; margin-top: 1.4em; color: #1e3a5f; }
+  h4 { font-size: 1rem; color: #1e3a5f; margin-top: 1em; }
+  p { margin: 0 0 1em; }
+  a { color: #1e3a5f; text-decoration: underline; text-underline-offset: 2px; }
+  a:hover { color: #0f2a4a; }
+  ul, ol { padding-left: 1.3em; margin: 0 0 1em; }
+  li { margin-bottom: .35em; }
+  code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: .9em; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #0f2a4a; }
+  hr { border: 0; border-top: 1px solid #e5e7eb; margin: 2.5em 0; }
+
+  /* ----- Layout ----- */
+  .page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  @media (min-width: 960px) {
+    .page {
+      grid-template-columns: 240px 1fr;
+      gap: 48px;
+      padding: 0 32px;
+    }
+  }
+
+  /* ----- Masthead ----- */
+  .masthead {
+    background: linear-gradient(135deg, #0f2a4a 0%, #1e3a5f 100%);
+    color: #f8fafc;
+    padding: 44px 24px 38px;
+    margin-bottom: 28px;
+  }
+  .masthead-inner { max-width: 1180px; margin: 0 auto; padding: 0 8px; }
+  .masthead .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    font-size: .78rem;
+    color: #93c5fd;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .masthead h1 { color: #ffffff; margin: 0 0 .4em; font-size: 2.1rem; }
+  .masthead .subtitle { color: #cbd5e1; font-size: 1.05rem; margin: 0; max-width: 720px; }
+  .masthead .meta { margin-top: 18px; font-size: .85rem; color: #93c5fd; }
+
+  /* ----- TOC ----- */
+  .toc {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 18px 18px 14px;
+    margin-bottom: 28px;
+  }
+  .toc-title {
+    text-transform: uppercase;
+    font-size: .72rem;
+    letter-spacing: .12em;
+    color: #6b7280;
+    margin: 0 0 10px;
+    font-weight: 700;
+  }
+  .toc ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: toc;
+  }
+  .toc li {
+    counter-increment: toc;
+    margin: 0;
+    padding: 0;
+  }
+  .toc a {
+    display: block;
+    padding: 6px 0;
+    color: #1e3a5f;
+    text-decoration: none;
+    font-size: .92rem;
+    border-bottom: 1px solid #eef2f7;
+  }
+  .toc li:last-child a { border-bottom: none; }
+  .toc a::before {
+    content: counter(toc) ".";
+    color: #94a3b8;
+    margin-right: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .toc a:hover { color: #0f2a4a; }
+  @media (min-width: 960px) {
+    .toc {
+      position: sticky;
+      top: 24px;
+      align-self: start;
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+    }
+  }
+
+  /* ----- Content column ----- */
+  .content { min-width: 0; padding-bottom: 64px; }
+  .content section { scroll-margin-top: 20px; }
+
+  /* ----- Callouts ----- */
+  .callout {
+    border-left: 4px solid #1e3a5f;
+    background: #f1f5f9;
+    padding: 14px 18px;
+    border-radius: 0 6px 6px 0;
+    margin: 1.2em 0;
+  }
+  .callout.recommend {
+    border-left-color: #047857;
+    background: #ecfdf5;
+  }
+  .callout.warn {
+    border-left-color: #b45309;
+    background: #fffbeb;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout .label {
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: .7rem;
+    letter-spacing: .1em;
+    font-weight: 700;
+    color: #0f2a4a;
+    margin-bottom: 4px;
+  }
+  .callout.recommend .label { color: #047857; }
+  .callout.warn .label { color: #b45309; }
+
+  /* ----- Checklist ----- */
+  .checklist {
+    list-style: none;
+    padding: 0;
+    margin: .4em 0 1.2em;
+  }
+  .checklist li {
+    position: relative;
+    padding: 6px 0 6px 30px;
+    border-bottom: 1px solid #eef2f7;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 11px;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid #94a3b8;
+    border-radius: 3px;
+    background: #ffffff;
+  }
+  .checklist li.done::before {
+    background: #047857;
+    border-color: #047857;
+  }
+  .checklist li.done::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 13px;
+    width: 8px;
+    height: 4px;
+    border-left: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    transform: rotate(-45deg);
+  }
+  .checklist .sub {
+    color: #6b7280;
+    font-size: .9rem;
+    display: block;
+    margin-top: 2px;
+  }
+
+  /* ----- Tables ----- */
+  .table-wrap { overflow-x: auto; margin: 1em 0 1.4em; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .92rem;
+    background: #ffffff;
+  }
+  th, td {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #f1f5f9;
+    color: #0f2a4a;
+    font-weight: 700;
+    font-size: .82rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  tbody tr:nth-child(even) td { background: #fafbfc; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* ----- Misc ----- */
+  .stars { color: #d97706; letter-spacing: 1px; font-size: .95rem; }
+  .pill {
+    display: inline-block;
+    background: #e0f2fe;
+    color: #075985;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+  }
+  .pill.good { background: #dcfce7; color: #166534; }
+  .pill.warn { background: #fef3c7; color: #92400e; }
+  .pill.miss { background: #fee2e2; color: #991b1b; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  @media (min-width: 720px) {
+    .two-col { grid-template-columns: 1fr 1fr; gap: 18px; }
+  }
+  .mini-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: #ffffff;
+  }
+  .mini-card h4 { margin-top: 0; }
+
+  /* SVG icon */
+  .icon-svg {
+    width: 18px; height: 18px; vertical-align: -3px; margin-right: 6px; color: #1e3a5f;
+  }
+
+  /* Footer */
+  footer.doc-footer {
+    border-top: 1px solid #e5e7eb;
+    padding: 18px 0 30px;
+    color: #6b7280;
+    font-size: .85rem;
+    text-align: center;
+  }
+  footer.doc-footer a { color: #6b7280; }
+
+  /* Print styles */
+  @media print {
+    body { font-size: 11pt; color: #000; }
+    .masthead { background: #0f2a4a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .toc { position: static !important; page-break-after: avoid; }
+    .page { display: block; padding: 0; }
+    .content { padding: 0; }
+    h2 { page-break-after: avoid; }
+    .callout, table, .mini-card { page-break-inside: avoid; }
+    a { color: #000; text-decoration: none; }
+    a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 9pt; color: #555; word-break: break-all; }
+    .toc a::before { color: #555; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="eyebrow">Launch-Readiness Action Plan</div>
+    <h1>Corbett Claims Website</h1>
+    <p class="subtitle">A plain-English roadmap to get <strong>corbettclaims.com / .net</strong> from "almost ready" to "open for business" — covering hosting, domain, email, SEO, and the first 30 days.</p>
+    <div class="meta">Prepared for Matt Corbett &middot; Repository: <a href="https://github.com/mcorbett51090/corbett-claims" style="color:#bfdbfe;">github.com/mcorbett51090/corbett-claims</a></div>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- Sticky TOC -->
+  <aside>
+    <nav class="toc" aria-label="Table of contents">
+      <p class="toc-title">Contents</p>
+      <ol>
+        <li><a href="#summary">Executive Summary</a></li>
+        <li><a href="#sec1">Site Readiness Checklist</a></li>
+        <li><a href="#sec2">Hosting Options</a></li>
+        <li><a href="#sec3">Should We Use Cloudflare?</a></li>
+        <li><a href="#sec4">Domain &amp; Email</a></li>
+        <li><a href="#sec5">SEO Essentials</a></li>
+        <li><a href="#sec6">Analytics, Monitoring &amp; Legal</a></li>
+        <li><a href="#sec7">Pre-Launch &amp; Launch-Day Checklist</a></li>
+        <li><a href="#sec8">Recurring Maintenance</a></li>
+        <li><a href="#sec9">Estimated First-Year Cost</a></li>
+        <li><a href="#sources">Sources</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <main class="content">
+
+    <!-- ============ EXECUTIVE SUMMARY ============ -->
+    <section id="summary">
+      <h2 style="border-top:none; padding-top:0; margin-top:0;">Executive Summary</h2>
+      <p>The Corbett Claims website is in better shape than most small-business pre-launch sites I've seen. The single-page <code>index.html</code> already has a strong content structure (How It Works, Services, Team, Service Area map, FAQ, Contact), structured-data markup for local search, a working Formspree contact form, and a mobile-friendly layout. What's missing is mostly <em>plumbing</em>: a real domain pointed at the site, a professional email address, analytics, a sitemap, a privacy policy, and — most important for an insurance/auto-collision business — a fully optimized Google Business Profile. Total realistic first-year cost is roughly <strong>$85–$110</strong> if you self-manage hosting and email forwarding, or <strong>$160–$185</strong> with a full Google Workspace mailbox.</p>
+
+      <div class="callout recommend">
+        <span class="label">Top Recommendation</span>
+        <p style="margin-top:6px;"><strong>Host on Cloudflare Pages via GitHub integration, with Google Workspace for email, prioritizing Google Business Profile setup before SEO content work.</strong></p>
+      </div>
+
+      <p>The order matters: Google Business Profile drives <em>far</em> more calls and assignments for a local service business than on-page SEO does. Get the profile claimed, optimized, and collecting reviews <em>before</em> spending time on meta tags and sitemaps.</p>
+    </section>
+
+    <!-- ============ 1. SITE READINESS ============ -->
+    <section id="sec1">
+      <h2>1. Site Readiness Checklist</h2>
+
+      <h3>What's already in the repo <span class="pill good">Strong start</span></h3>
+      <p>From reading <code>index.html</code>, <code>styles.css</code>, and the <code>scripts/</code> folder, the site already has:</p>
+      <ul>
+        <li>A complete single-page site with all the right sections: hero, How It Works (4 steps), Why Us, Services, Meet the Team (Ronnie &amp; Annie), Service Area with an interactive Leaflet map, Reviews CTA, FAQ (8 questions), and Contact.</li>
+        <li>Schema.org <code>ProfessionalService</code> structured data — name, founder, phone, email, address, hours, area served, services offered, payment methods, languages. <strong>This is excellent</strong> and most small-business sites don't have it.</li>
+        <li>Open Graph and Twitter card tags for social previews, with a dedicated <code>og-logo.png</code>.</li>
+        <li>A working <a href="https://formspree.io/">Formspree</a> contact form (endpoint <code>f/xwkgvjqg</code>) with honeypot anti-spam.</li>
+        <li>Responsive design with a hamburger mobile menu, a floating "Call Now" button, and a clear "Request an Appraisal" CTA.</li>
+        <li>An inline-SVG favicon, no broken external image dependencies for the logo, and a no-JS fallback image for the service-area map.</li>
+        <li>A <code>.nojekyll</code> file (signals GitHub Pages will serve the raw files without Jekyll processing) — so the repo is already deploy-ready in theory.</li>
+      </ul>
+
+      <h3>What's missing before launch <span class="pill miss">To do</span></h3>
+      <div class="two-col">
+        <div class="mini-card">
+          <h4>Site files</h4>
+          <ul>
+            <li>No <code>CNAME</code> file — so no custom domain is configured.</li>
+            <li>No <code>sitemap.xml</code>.</li>
+            <li>No <code>robots.txt</code>.</li>
+            <li>No <code>404.html</code> error page.</li>
+            <li>No <code>privacy.html</code> / <code>terms.html</code>.</li>
+            <li>README is one line — fine, but worth a sentence about deploy.</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h4>Content gaps</h4>
+          <ul>
+            <li>Reviews section says <em>"currently collecting reviews"</em> — needs at least 3–5 real testimonials before launch (carriers, attorneys, owners).</li>
+            <li>Two phone-number formats appear: <code>+1-225-663-2217</code> (schema) and <code>(225) 663-2217</code> (display). Both correct — just verify consistency.</li>
+            <li>Email in schema is <code>assignments@corbettclaims.net</code>; the domain in question for the website needs to match (see Section 4).</li>
+            <li>No physical street address on the page — only the PO Box. Google Business Profile will need a real service-area address.</li>
+            <li>No client logos or carrier logos (often a trust signal). Add only if you have permission to display them.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Things to test before launch</h3>
+      <ul class="checklist">
+        <li>Open the site on an actual phone (iPhone Safari + Android Chrome). Verify the hamburger menu opens, the floating "Call Now" button is reachable, and the service-area map renders.<span class="sub">The map uses Leaflet + OpenStreetMap tiles — confirm it loads on a fresh device.</span></li>
+        <li>Submit the contact form with a real test message. Confirm Formspree delivers to the assignments inbox and the honeypot doesn't block legitimate submissions.</li>
+        <li>Click every link in the desktop nav, the mobile menu, and the footer. Confirm each scrolls to the right section.</li>
+        <li>Tap the phone number on a mobile device. Confirm it opens the dialer.</li>
+        <li>Read the page top-to-bottom looking for Lorem ipsum, placeholder text, or stale dates. The footer currently shows "&copy; 2026 Corbett Claims" — keep that updated yearly.</li>
+        <li>Run <a href="https://pagespeed.web.dev/">Google PageSpeed Insights</a> on the live URL. Target Performance &ge; 85, Accessibility &ge; 90.</li>
+        <li>Validate the structured data with <a href="https://search.google.com/test/rich-results">Google's Rich Results Test</a>.</li>
+        <li>Spell-check the whole page. Have someone outside the business read it cold and flag anything confusing.</li>
+      </ul>
+    </section>
+
+    <!-- ============ 2. HOSTING ============ -->
+    <section id="sec2">
+      <h2>2. Hosting Options</h2>
+      <p>For a static informational site like this one — pure HTML, CSS, and JS, no database, no PHP — you don't need traditional shared hosting. Five realistic options, with honest trade-offs:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Year-1 cost</th>
+              <th>Ease (1–5)</th>
+              <th>Pros</th>
+              <th>Cons</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Cloudflare Pages</strong> <span class="pill good">Recommended</span></td>
+              <td class="num">$0</td>
+              <td><span class="stars">★★★★☆</span></td>
+              <td>Unlimited bandwidth on free tier, automatic SSL, global CDN (300+ locations), auto-deploys from GitHub on every push, 500 free builds/mo, free DDoS protection, Bot Fight Mode, free Web Analytics.</td>
+              <td>One-time setup of changing nameservers to Cloudflare (15-min job + up to 24-hr DNS propagation). Some advanced features are paywalled but you won't need them.</td>
+            </tr>
+            <tr>
+              <td><strong>Netlify</strong></td>
+              <td class="num">$0</td>
+              <td><span class="stars">★★★★★</span></td>
+              <td>Friendliest UI of any host. Drag-and-drop deploys, atomic rollbacks, built-in form handling (could replace Formspree). 100 GB/mo free bandwidth, free SSL.</td>
+              <td>100 GB soft cap on free tier (you won't hit it). Paid plans jump to $19/user/mo. No first-party DNS, so you still manage DNS elsewhere.</td>
+            </tr>
+            <tr>
+              <td><strong>Vercel</strong></td>
+              <td class="num">$0 (personal) / $20/user/mo (commercial)</td>
+              <td><span class="stars">★★★★☆</span></td>
+              <td>Excellent performance and developer experience, edge functions, instant rollbacks.</td>
+              <td>Free "Hobby" tier is officially personal-use only. A commercial site technically needs the Pro plan at $20/user/mo. Overkill for a static informational site.</td>
+            </tr>
+            <tr>
+              <td><strong>GitHub Pages</strong></td>
+              <td class="num">$0</td>
+              <td><span class="stars">★★★★☆</span></td>
+              <td>Already wired up — the <code>.nojekyll</code> file means the repo can be served directly. Free SSL via Let's Encrypt. Zero new accounts to create.</td>
+              <td>Soft 100 GB/mo bandwidth, no real CDN, slower outside North America, no analytics, no DDoS protection, no easy rollbacks. Fine as a fallback; not the best primary host.</td>
+            </tr>
+            <tr>
+              <td><strong>Bluehost / SiteGround</strong> (shared)</td>
+              <td class="num">$36–$120</td>
+              <td><span class="stars">★★☆☆☆</span></td>
+              <td>Familiar to anyone who's run a WordPress site. Email hosting often bundled.</td>
+              <td>Pays for capacity you don't need (PHP, MySQL, cPanel). Slower than CDN-backed options. Renewal pricing roughly doubles after year 1. <strong>Not recommended</strong> for a static HTML site in 2026.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout recommend">
+        <span class="label">Recommendation</span>
+        <p style="margin-top:6px;"><strong>Cloudflare Pages.</strong> It's free, it's faster than every other option for visitors outside Louisiana, the GitHub integration means a <code>git push</code> publishes the site automatically, and the same Cloudflare account gives you free DNS, SSL, DDoS protection, analytics, and (optionally) free email forwarding. The whole stack is one account and one bill (which is $0). GitHub Pages is a perfectly acceptable Plan B if you want to defer the nameserver change for now.</p>
+      </div>
+    </section>
+
+    <!-- ============ 3. CLOUDFLARE ============ -->
+    <section id="sec3">
+      <h2>3. Should We Use Cloudflare?</h2>
+      <p>Short answer: yes. Cloudflare is the single largest free upgrade you can give your website. Here's what it actually does, in plain English:</p>
+
+      <div class="two-col">
+        <div class="mini-card">
+          <h4>DNS (the phonebook)</h4>
+          <p>DNS turns <code>corbettclaims.com</code> into a server address. Cloudflare's DNS is one of the fastest in the world. Free. <strong>For Corbett Claims:</strong> people typing your domain reach the site quickly, anywhere in the country.</p>
+        </div>
+        <div class="mini-card">
+          <h4>CDN (a copy of your site, everywhere)</h4>
+          <p>Cloudflare caches your pages on 300+ servers globally. A visitor in Houston, Atlanta, or Phoenix loads the site from a nearby server, not Baton Rouge. <strong>For Corbett Claims:</strong> your service-area states (TX, MS, AL, FL, OH, IL, NV) all see a fast site.</p>
+        </div>
+        <div class="mini-card">
+          <h4>Free SSL (the padlock)</h4>
+          <p>Cloudflare automatically issues and renews the HTTPS certificate that makes browsers show the padlock. No expirations to remember. <strong>For Corbett Claims:</strong> the contact form looks trustworthy and Google won't flag the site as insecure.</p>
+        </div>
+        <div class="mini-card">
+          <h4>DDoS protection &amp; Bot Fight Mode</h4>
+          <p>Cloudflare absorbs malicious traffic before it reaches your site, and blocks known bad bots. Free. <strong>For Corbett Claims:</strong> spam form submissions and bandwidth-draining bots are filtered out automatically.</p>
+        </div>
+        <div class="mini-card">
+          <h4>Pages (the hosting itself)</h4>
+          <p>The actual website storage and delivery. Free. <strong>For Corbett Claims:</strong> every <code>git push</code> to the <code>main</code> branch redeploys the site in about 30 seconds.</p>
+        </div>
+        <div class="mini-card">
+          <h4>Web Analytics</h4>
+          <p>Privacy-friendly, no cookies, no banner needed in most jurisdictions. Free. <strong>For Corbett Claims:</strong> see how many people visited, where they came from, what pages they viewed — without the legal headache of Google Analytics.</p>
+        </div>
+      </div>
+
+      <h3>Recommended Cloudflare configuration</h3>
+      <ol>
+        <li><strong>Sign up</strong> for a free Cloudflare account at <a href="https://dash.cloudflare.com/sign-up">dash.cloudflare.com</a>.</li>
+        <li><strong>Add the domain</strong> (corbettclaims.com or .net) to Cloudflare. It will auto-import existing DNS records.</li>
+        <li><strong>Change nameservers</strong> at the domain registrar (where you bought the domain) to the two Cloudflare nameservers Cloudflare gives you. This is the one-time step that "moves" DNS to Cloudflare. Allow up to 24 hours for propagation — usually it's done within an hour.</li>
+        <li><strong>Connect the GitHub repo</strong> via Cloudflare Pages &rarr; "Connect to Git." Build command: leave blank. Build output directory: <code>/</code> (the root). It auto-deploys on every push.</li>
+        <li><strong>Add the custom domain</strong> to the Pages project. Cloudflare issues SSL automatically (1–5 minutes).</li>
+        <li><strong>Enable Bot Fight Mode</strong> (free) under Security &rarr; Bots.</li>
+        <li><strong>Enable Web Analytics</strong> (free) and paste the one-line snippet into <code>index.html</code> before <code>&lt;/body&gt;</code>.</li>
+        <li><strong>Set SSL/TLS mode to "Full (strict)"</strong> under SSL/TLS &rarr; Overview.</li>
+        <li><strong>Optional but recommended:</strong> turn on "Always Use HTTPS" and "Automatic HTTPS Rewrites" under SSL/TLS &rarr; Edge Certificates.</li>
+      </ol>
+
+      <div class="callout warn">
+        <span class="label">Gotcha</span>
+        <p style="margin-top:6px;">Changing nameservers is the one moment when DNS could briefly hiccup. Schedule it for an off-hours window (e.g., a Saturday morning). Keep a copy of your current DNS records before switching — especially any MX records for existing email — so nothing gets lost. Cloudflare's onboarding wizard imports most records automatically, but always double-check.</p>
+      </div>
+    </section>
+
+    <!-- ============ 4. DOMAIN & EMAIL ============ -->
+    <section id="sec4">
+      <h2>4. Domain &amp; Email</h2>
+
+      <h3>The domain</h3>
+      <p>The structured data on the current site references <code>assignments@corbettclaims.net</code>, which means the <strong>.net</strong> domain appears to already be owned. Decisions to make:</p>
+      <ul>
+        <li><strong>Do you also own <code>corbettclaims.com</code>?</strong> Most insurance carriers, attorneys, and individuals will type <code>.com</code> first. If you don't own it yet, buy it now (~$12/yr). Set <code>.net</code> to redirect to <code>.com</code>, or vice versa — pick whichever is "the real one" and make the other an alias.</li>
+        <li><strong>If you only want one</strong>, the <code>.com</code> is the conventional, trusted choice for U.S. small businesses. The <code>.net</code> still works fine but is less common today.</li>
+        <li><strong>Where to buy or transfer</strong>: <a href="https://www.cloudflare.com/products/registrar/">Cloudflare Registrar</a> (at-cost, ~$10.44/yr for .com, no markup, no upsells) is the best option once your domain is on Cloudflare DNS. <a href="https://porkbun.com/">Porkbun</a> and <a href="https://www.namecheap.com/">Namecheap</a> are also reputable. Avoid GoDaddy upsells.</li>
+        <li><strong>If you already own the .net through another registrar</strong>, you can leave it there and just change nameservers to Cloudflare. No need to transfer the registration unless you want to.</li>
+      </ul>
+
+      <h3>The email address</h3>
+      <p>You have three realistic options for a <code>@corbettclaims.com</code> mailbox:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Cost</th>
+              <th>What it gives you</th>
+              <th>Best for</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Cloudflare Email Routing</strong> (forwarding only)</td>
+              <td class="num">$0</td>
+              <td>Forwards <code>assignments@corbettclaims.com</code> &rarr; your existing Gmail/Yahoo/etc. inbox. You receive at your branded address, but replies go from the personal inbox unless you configure "Send as" in Gmail.</td>
+              <td>The leanest, cheapest starting point. Perfect if mail volume is low and you're fine with a small one-time setup of Gmail "Send mail as."</td>
+            </tr>
+            <tr>
+              <td><strong>Google Workspace Business Starter</strong> <span class="pill good">Recommended</span></td>
+              <td class="num">~$7/user/mo (annual) <br>~$84/yr per mailbox</td>
+              <td>Full Gmail with your domain, 30 GB storage, Google Calendar, Drive, Docs, Meet, customer support, professional "From" address.</td>
+              <td>A small business that takes email assignments seriously. Looks more professional and avoids the "sent via Gmail" quirks.</td>
+            </tr>
+            <tr>
+              <td><strong>Microsoft 365 Business Basic</strong></td>
+              <td class="num">~$6/user/mo (annual) <br>~$72/yr per mailbox</td>
+              <td>Outlook with your domain, 1 TB OneDrive, Teams, web-only Office apps.</td>
+              <td>Anyone already comfortable with Outlook or Excel-heavy workflows.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Why a branded email is worth $72–$84/year</h3>
+      <p>An adjuster at an insurance carrier or a paralegal at a law firm is far more likely to open and trust <code>assignments@corbettclaims.com</code> than <code>ronniec1962@gmail.com</code>. Branded email is also the cheapest credibility upgrade you can buy — for less than the cost of a tank of gas per month, every email you send reinforces that you're a real, established business. Suggested addresses:</p>
+      <ul>
+        <li><code>assignments@corbettclaims.com</code> &mdash; the public-facing inbox (matches the site)</li>
+        <li><code>ronnie@corbettclaims.com</code> &mdash; personal</li>
+        <li><code>annie@corbettclaims.com</code> &mdash; personal</li>
+        <li><code>billing@corbettclaims.com</code> &mdash; invoices (optional alias, free with Workspace)</li>
+      </ul>
+
+      <div class="callout">
+        <span class="label">Recommendation</span>
+        <p style="margin-top:6px;">Start with <strong>Google Workspace Business Starter</strong> on a single seat (~$7/mo) for <code>assignments@corbettclaims.com</code>. Use aliases for the other addresses so you don't pay per name. If you want to defer the cost for a few months, use Cloudflare Email Routing as a free stopgap — you can swap to Workspace later by just changing the MX records.</p>
+      </div>
+    </section>
+
+    <!-- ============ 5. SEO ============ -->
+    <section id="sec5">
+      <h2>5. SEO Essentials</h2>
+      <p>For a local service business — insurance appraiser, auto-collision specialist, anyone who serves a specific geography — SEO is mostly two things: <strong>(a) your Google Business Profile</strong>, and <strong>(b) basic on-page hygiene</strong>. Don't get lost in keyword research before doing those two.</p>
+
+      <h3>The single most important thing: Google Business Profile</h3>
+      <p>According to multiple local-search studies, optimized Google Business Profiles attract up to <strong>70% more visits</strong> than businesses without one — and for many local services, the GBP listing matters more than the website itself. Google's local ranking algorithm uses three factors: <em>Relevance</em> (does the business match the search?), <em>Distance</em> (how far from the searcher?), and <em>Prominence</em> (how well-known, how many reviews?).</p>
+
+      <ul class="checklist">
+        <li>Claim/create the listing at <a href="https://business.google.com/">business.google.com</a>. Free.</li>
+        <li>Verify by postcard (Google mails a code to your service address — takes 5–14 days).<span class="sub">Plan ahead: don't wait until launch day.</span></li>
+        <li>Set primary category: <em>Insurance agency</em> or <em>Appraiser</em> (try both; pick whichever shows higher search volume for "auto appraiser Baton Rouge").</li>
+        <li>Add secondary categories: <em>Insurance adjuster</em>, <em>Auto appraiser</em>, anything else relevant.</li>
+        <li>Fill in: hours (Mon–Fri 9–6), phone, website URL, full address, languages (English + Spanish), service area (all 8 states from your site).</li>
+        <li>Add 10+ high-quality photos: exterior, interior, work-in-progress, equipment, Ronnie and Annie.</li>
+        <li>Write a 750-character business description with the phrases customers search: "independent auto appraiser," "Baton Rouge," "heavy equipment appraisal," "RV appraisal."</li>
+        <li>Turn on Messaging and Q&amp;A so prospects can contact you directly from search results.</li>
+        <li>Ask your last 10 satisfied clients for a Google review. Send them the direct review link (Google generates one in the dashboard). <strong>Reviews are the single biggest local-SEO lever.</strong></li>
+      </ul>
+
+      <h3>On-page SEO (prioritized)</h3>
+      <ol>
+        <li><strong>Title tags &amp; meta descriptions:</strong> already present and well-written on the current page. As you add more pages (Services, FAQ, etc.), give each a unique title (60 chars) and description (155 chars).</li>
+        <li><strong>Schema.org LocalBusiness markup:</strong> already implemented as <code>ProfessionalService</code>. Consider adding <code>AutoBodyShop</code> or <code>InsuranceAgency</code> as a secondary <code>@type</code> if those keywords are valuable.</li>
+        <li><strong>Local citations (NAP consistency):</strong> "NAP" = Name, Address, Phone. Make sure these are <em>identical</em> on the website, GBP, Yelp, BBB, Yellow Pages, Foursquare, Angi, and any insurance-industry directories. Inconsistency hurts rankings.</li>
+        <li><strong>Sitemap.xml:</strong> add a simple <code>sitemap.xml</code> at the repo root listing every page. Submit it to Google Search Console.</li>
+        <li><strong>Robots.txt:</strong> add a minimal <code>robots.txt</code> allowing all crawlers and pointing to <code>sitemap.xml</code>.</li>
+        <li><strong>Mobile-friendly:</strong> already in good shape. Re-test with Google's <a href="https://search.google.com/test/mobile-friendly">Mobile-Friendly Test</a> after launch.</li>
+        <li><strong>Page speed:</strong> the page is large-ish at ~37 KB plus Leaflet (~150 KB). Optional: <code>loading="lazy"</code> on the team photo (already there), defer Leaflet load until the map is in viewport.</li>
+        <li><strong>Image alt text:</strong> the team photo and map fallback already have alt text. Keep that habit for any new images.</li>
+        <li><strong>Internal linking:</strong> when you add subpages (e.g., a "Heavy Equipment Appraisal" page), link to them from the main page and from each other.</li>
+      </ol>
+
+      <h3>First 30 days SEO actions</h3>
+      <ol>
+        <li><strong>Day 1–3:</strong> Claim Google Business Profile, request postcard verification, fill in everything you can immediately.</li>
+        <li><strong>Day 4–7:</strong> Submit the site to <a href="https://search.google.com/search-console">Google Search Console</a> and <a href="https://www.bing.com/webmasters">Bing Webmaster Tools</a>. Upload sitemap. Request indexing of the homepage.</li>
+        <li><strong>Day 7–14:</strong> Create listings on Yelp, BBB, Angi, Yellow Pages — with identical NAP info. List on insurance-industry directories: <em>Find an Appraiser</em> directories run by groups like the Independent Automotive Damage Appraisers Association if you're a member.</li>
+        <li><strong>Day 14–21:</strong> Postcard arrives → verify GBP → ask 10 past clients for Google reviews via the direct review link. One good email blast can produce 5–10 reviews if you make it easy.</li>
+        <li><strong>Day 21–30:</strong> Add the first GBP post (a 300-word update about a recent project or a seasonal reminder), upload 10+ photos, respond to any reviews that have come in.</li>
+      </ol>
+    </section>
+
+    <!-- ============ 6. ANALYTICS / LEGAL ============ -->
+    <section id="sec6">
+      <h2>6. Analytics, Monitoring &amp; Legal</h2>
+
+      <h3>Analytics</h3>
+      <p>Two realistic options for an informational site:</p>
+      <ul>
+        <li><strong>Cloudflare Web Analytics</strong> <span class="pill good">Recommended</span> — Free, no cookies, no tracking pixels, doesn't require a cookie banner in most jurisdictions. Shows visits, page views, top pages, referrers, countries, devices. Less detail than Google Analytics, but more than enough for a small-business informational site. One-line script tag.</li>
+        <li><strong>Google Analytics 4</strong> — Free, much more detailed (conversion funnels, audience segments). Requires a cookie banner if you have any EU or California visitors. Slightly heavier on the page. Better if you're running paid ads and need conversion tracking.</li>
+      </ul>
+
+      <h3>Uptime monitoring</h3>
+      <p><a href="https://uptimerobot.com/">UptimeRobot</a> free tier checks your site every 5 minutes from multiple regions and emails you if it goes down. Takes 90 seconds to set up. No reason not to have it.</p>
+
+      <h3>Accessibility</h3>
+      <p>The current site is in good shape: semantic HTML, ARIA labels on the menu, alt text on images, sufficient color contrast in the brand palette. Quick wins after launch:</p>
+      <ul>
+        <li>Run a free <a href="https://wave.webaim.org/">WAVE accessibility scan</a> on the live URL.</li>
+        <li>Test keyboard navigation: can you tab through the whole page and reach every link/button?</li>
+        <li>Make sure the contact form's error states (Formspree's default) are readable by screen readers.</li>
+      </ul>
+
+      <h3>Legal: Privacy Policy, Terms, Cookie Banner</h3>
+      <p>For a Louisiana small business with a contact form that collects names, phone numbers, and email addresses, here's the realistic legal picture:</p>
+      <ul>
+        <li><strong>Privacy Policy:</strong> strongly recommended even though there's no specific Louisiana statute requiring one for a small claims-services business. Any time you collect personal information through a form, you should disclose what you do with it. Use a free generator like <a href="https://termly.io/">Termly</a> or <a href="https://www.iubenda.com/">Iubenda</a>. Add as <code>privacy.html</code>, link in the footer.</li>
+        <li><strong>Terms of Service:</strong> optional for an informational site. If you start taking online payments or formal assignment requests via the site, add one.</li>
+        <li><strong>Cookie banner:</strong> not legally required for U.S.-only traffic <em>if you're not using tracking cookies</em>. Cloudflare Web Analytics doesn't use cookies, so no banner needed. The moment you add Google Analytics, you'll want a banner.</li>
+        <li><strong>CCPA (California) and GDPR (EU):</strong> almost certainly not in scope for a Baton Rouge claims business serving the South. CCPA technically only applies to businesses with $25M+ revenue or 100K+ California consumers. GDPR applies if you deliberately target EU users — which you don't. A short privacy policy covering the basics is sufficient.</li>
+        <li><strong>ADA accessibility lawsuits:</strong> a real risk for any U.S. business website. Mitigation is straightforward: keep the site accessible (alt text, semantic HTML, keyboard navigation, sufficient contrast). The current site is already in good shape; the WAVE scan above is the main check.</li>
+      </ul>
+    </section>
+
+    <!-- ============ 7. LAUNCH CHECKLIST ============ -->
+    <section id="sec7">
+      <h2>7. Pre-Launch &amp; Launch-Day Checklist</h2>
+      <p>A concrete sequence. Each item should take 10–30 minutes. The whole thing can be done in a weekend if everything cooperates.</p>
+
+      <h3>Pre-launch (the week before)</h3>
+      <ul class="checklist">
+        <li><strong>Confirm the domain.</strong> Buy <code>corbettclaims.com</code> if you don't own it. Decide on .com vs .net as primary.<span class="sub">~$12/yr at Cloudflare Registrar or similar.</span></li>
+        <li><strong>Create a Cloudflare account.</strong> Add your domain. Note the two assigned nameservers.</li>
+        <li><strong>Change nameservers at your registrar</strong> to the Cloudflare ones. Wait for propagation (usually &lt;1 hour, up to 24 hours).</li>
+        <li><strong>Set up Cloudflare Pages.</strong> Connect the GitHub repo. Build command: blank. Output: <code>/</code>. Test that the *.pages.dev preview URL works.</li>
+        <li><strong>Add the custom domain</strong> to the Pages project. Confirm SSL goes green (1–5 minutes after the DNS change is live).</li>
+        <li><strong>Add a <code>CNAME</code> file</strong> to the repo if you ever want to switch to GitHub Pages — not needed if you're staying on Cloudflare Pages.</li>
+        <li><strong>Add <code>sitemap.xml</code> and <code>robots.txt</code></strong> to the repo. Commit and push.</li>
+        <li><strong>Set up Google Workspace</strong> (or Cloudflare Email Routing as the free starter). Update DNS MX records. Verify by sending and receiving a test email.</li>
+        <li><strong>Create a <code>privacy.html</code> page</strong> using Termly or a similar generator. Link in the footer.</li>
+        <li><strong>Final content sweep:</strong> spellcheck, dates correct, phone numbers match everywhere, no Lorem ipsum.</li>
+      </ul>
+
+      <h3>Launch day</h3>
+      <ul class="checklist">
+        <li><strong>Confirm DNS is fully propagated</strong> by visiting <code>corbettclaims.com</code> in an incognito window. Should load the site, padlock should show.</li>
+        <li><strong>Test the contact form</strong> one more time with a real submission. Confirm delivery.</li>
+        <li><strong>Test on mobile</strong> — iPhone Safari, Android Chrome. Tap "Call Now," tap the email link, fill out the form.</li>
+        <li><strong>Set up Google Search Console</strong> &rarr; verify ownership via DNS TXT record (Cloudflare makes this trivial) &rarr; submit sitemap &rarr; "Request indexing" on the homepage.</li>
+        <li><strong>Set up Bing Webmaster Tools</strong> — import settings from Search Console with one click.</li>
+        <li><strong>Install Cloudflare Web Analytics</strong> — paste the snippet into <code>index.html</code> before <code>&lt;/body&gt;</code>.</li>
+        <li><strong>Run Google Lighthouse</strong> on the live URL. Aim for Performance &ge; 85, Accessibility &ge; 90, Best Practices &ge; 90, SEO &ge; 95.</li>
+        <li><strong>Verify Open Graph preview</strong> at <a href="https://www.opengraph.xyz/">opengraph.xyz</a> — share preview should show the og-logo image.</li>
+        <li><strong>Validate structured data</strong> at <a href="https://search.google.com/test/rich-results">Google Rich Results Test</a>.</li>
+        <li><strong>Set up UptimeRobot</strong> with a 5-minute check on the homepage URL.</li>
+        <li><strong>Submit to Google Business Profile.</strong> If verification postcard hasn't arrived yet, at least pre-fill everything.</li>
+      </ul>
+
+      <h3>The first week after launch</h3>
+      <ul class="checklist">
+        <li><strong>Soft-launch to friends &amp; family / repeat clients.</strong> Ask them to "try to break it" — every weird browser, every screen size.</li>
+        <li><strong>Email past 10 clients</strong> with a friendly note about the new site and a direct GBP review link.</li>
+        <li><strong>Announce on social</strong> if you have any presence (Facebook, LinkedIn). One post with a screenshot of the site.</li>
+        <li><strong>Create Yelp, BBB, Angi listings</strong> with consistent NAP info.</li>
+        <li><strong>Check analytics</strong> after 48 hours — confirm tracking is firing and you're seeing real visits.</li>
+      </ul>
+    </section>
+
+    <!-- ============ 8. RECURRING MAINTENANCE ============ -->
+    <section id="sec8">
+      <h2>8. Recurring Maintenance</h2>
+      <p>A static informational site is one of the lowest-maintenance things in business. Realistically:</p>
+
+      <h3>Monthly (15 minutes)</h3>
+      <ul>
+        <li>Skim the analytics — top pages, top referrers, anything weird.</li>
+        <li>Glance at Google Search Console for crawl errors or new keywords.</li>
+        <li>Check Google Business Profile for new reviews → reply to every one (positive or negative).</li>
+        <li>Post one GBP update (a recent project, a seasonal reminder, a photo).</li>
+      </ul>
+
+      <h3>Quarterly (1 hour)</h3>
+      <ul>
+        <li>Run a broken-link check with a free tool like <a href="https://www.deadlinkchecker.com/">Dead Link Checker</a>.</li>
+        <li>Update business hours or contact info if anything has changed.</li>
+        <li>Add 2–3 new photos to GBP.</li>
+        <li>Refresh any "as of [year]" copy in the footer.</li>
+        <li>Confirm the SSL certificate is auto-renewing (it should — but verify the padlock).</li>
+      </ul>
+
+      <h3>Yearly</h3>
+      <ul>
+        <li>Renew the domain registration (set to auto-renew at the registrar — but verify the credit card on file is current).</li>
+        <li>Bump the footer copyright year (currently shows 2026).</li>
+        <li>Review the privacy policy for any changes in your data practices.</li>
+        <li>Re-run Lighthouse and the WAVE accessibility scan.</li>
+        <li>Audit content: is anything stale? Have services changed? Add a fresh testimonial or two.</li>
+      </ul>
+
+      <h3>Dependencies to keep an eye on</h3>
+      <p>The site uses two external libraries: <a href="https://unpkg.com/leaflet@1.9.4/">Leaflet 1.9.4</a> (pinned via subresource integrity hashes — safe) and Google Fonts. Leaflet rarely needs updating for a static map like this. If you ever bump the version, update the <code>integrity=</code> hashes too.</p>
+    </section>
+
+    <!-- ============ 9. COST ============ -->
+    <section id="sec9">
+      <h2>9. Estimated First-Year Cost</h2>
+
+      <h3>Lean configuration (recommended starter)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Item</th><th>Provider</th><th class="num">Year 1</th><th class="num">Year 3 total</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Domain registration</td><td>Cloudflare Registrar / Porkbun</td><td class="num">$12</td><td class="num">$36</td></tr>
+            <tr><td>Website hosting</td><td>Cloudflare Pages (free tier)</td><td class="num">$0</td><td class="num">$0</td></tr>
+            <tr><td>DNS &amp; CDN &amp; DDoS</td><td>Cloudflare (free)</td><td class="num">$0</td><td class="num">$0</td></tr>
+            <tr><td>SSL certificate</td><td>Cloudflare (free, auto-renew)</td><td class="num">$0</td><td class="num">$0</td></tr>
+            <tr><td>Email (1 mailbox)</td><td>Google Workspace Business Starter</td><td class="num">$84</td><td class="num">$252</td></tr>
+            <tr><td>Contact form</td><td>Formspree (already in use, free tier)</td><td class="num">$0</td><td class="num">$0</td></tr>
+            <tr><td>Analytics</td><td>Cloudflare Web Analytics (free)</td><td class="num">$0</td><td class="num">$0</td></tr>
+            <tr><td>Uptime monitoring</td><td>UptimeRobot (free)</td><td class="num">$0</td><td class="num">$0</td></tr>
+            <tr><td>Google Business Profile</td><td>Google (free)</td><td class="num">$0</td><td class="num">$0</td></tr>
+            <tr><td>Privacy policy generator</td><td>Termly (free tier)</td><td class="num">$0</td><td class="num">$0</td></tr>
+            <tr><td><strong>Total</strong></td><td></td><td class="num"><strong>$96</strong></td><td class="num"><strong>$288</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Ultra-lean configuration (defer the mailbox)</h3>
+      <p>If you want to keep the first year under $20: skip Google Workspace, use Cloudflare Email Routing (free) to forward <code>assignments@corbettclaims.com</code> to your existing personal inbox, and use Gmail's "Send mail as" to reply from the branded address. Year 1: <strong>~$12</strong>. Switch to Workspace later when revenue justifies it.</p>
+
+      <h3>Where money is worth spending vs. saving</h3>
+      <div class="two-col">
+        <div class="mini-card">
+          <h4>Worth paying for</h4>
+          <ul>
+            <li><strong>Domain registration</strong> ($12/yr) — non-negotiable.</li>
+            <li><strong>Branded email</strong> ($72–$84/yr) — biggest credibility-per-dollar upgrade.</li>
+            <li><strong>Time</strong> on Google Business Profile optimization — free, but spend the hours.</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h4>Don't pay for</h4>
+          <ul>
+            <li><strong>Shared hosting</strong> packages ($60–$200/yr) — unnecessary for static HTML.</li>
+            <li><strong>SEO agencies</strong> ($500–$2,000/mo) — at this stage, GBP + reviews + basic on-page hygiene do more than any agency will.</li>
+            <li><strong>"Website builders"</strong> like Wix/Squarespace ($192–$420/yr) — you already have a hand-built site that's better.</li>
+            <li><strong>Premium Cloudflare plans</strong> ($25–$250/mo) — free tier is more than enough.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SOURCES ============ -->
+    <section id="sources">
+      <h2>Sources</h2>
+      <ul>
+        <li>Corbett Claims repository — <a href="https://github.com/mcorbett51090/corbett-claims">github.com/mcorbett51090/corbett-claims</a> (README, index.html, styles.css, scripts/ folder, images/ folder)</li>
+        <li>Cloudflare Pages pricing &amp; free tier — <a href="https://developers.cloudflare.com/pages/functions/pricing/">developers.cloudflare.com/pages/functions/pricing</a> and <a href="https://www.cloudflare.com/plans/developer-platform/">cloudflare.com/plans/developer-platform</a></li>
+        <li>Cloudflare Email Routing — <a href="https://developers.cloudflare.com/email-routing/">developers.cloudflare.com/email-routing</a></li>
+        <li>Cloudflare Registrar — <a href="https://www.cloudflare.com/products/registrar/">cloudflare.com/products/registrar</a></li>
+        <li>Google Workspace pricing — <a href="https://workspace.google.com/pricing">workspace.google.com/pricing</a></li>
+        <li>Google Business Profile — <a href="https://business.google.com/">business.google.com</a> and Google's tips at <a href="https://support.google.com/business/answer/7091">support.google.com/business/answer/7091</a></li>
+        <li>Google's SEO starter guide — <a href="https://developers.google.com/search/docs/fundamentals/seo-starter-guide">developers.google.com/search/docs/fundamentals/seo-starter-guide</a></li>
+        <li>Google Search Console — <a href="https://search.google.com/search-console">search.google.com/search-console</a></li>
+        <li>Google Rich Results Test — <a href="https://search.google.com/test/rich-results">search.google.com/test/rich-results</a></li>
+        <li>Google PageSpeed Insights — <a href="https://pagespeed.web.dev/">pagespeed.web.dev</a></li>
+        <li>WAVE accessibility scanner — <a href="https://wave.webaim.org/">wave.webaim.org</a></li>
+        <li>UptimeRobot — <a href="https://uptimerobot.com/">uptimerobot.com</a></li>
+        <li>Formspree (already in use) — <a href="https://formspree.io/">formspree.io</a></li>
+        <li>Schema.org LocalBusiness types — <a href="https://schema.org/LocalBusiness">schema.org/LocalBusiness</a></li>
+      </ul>
+    </section>
+
+  </main>
+</div>
+
+<footer class="doc-footer">
+  Generated on May 19, 2026, by Claude &middot; For Corbett Claim Service, Inc. &middot; Baton Rouge, LA
+</footer>
+
+</body>
+</html>

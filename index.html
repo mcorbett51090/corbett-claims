@@ -5,27 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Corbett Claims | Independent Auto & Heavy Equipment Appraisal | Baton Rouge, LA</title>
 
-    <meta name="description" content="Independent appraisal service for autos, motorcycles, RVs, motorhomes, and heavy farm equipment. Founded 2001 by ex-Allstate adjuster Ronnie Corbett. Serving insurance companies, attorneys, and individuals from Texas to Florida and up to Ohio, Illinois, and Nevada.">
+    <meta name="description" content="An appraiser who knows both sides of the claim. 12 years inside Allstate, 25+ years independent. Damage estimates, total-loss valuations, and diminished-value appraisals on autos, motorcycles, RVs, and heavy farm equipment.">
 
     <!-- Social preview (host-agnostic: relative URLs are absolutized at runtime by the script below) -->
     <link rel="canonical" href="./">
     <meta property="og:type" content="website">
     <meta property="og:url" content="./">
-    <meta property="og:title" content="Corbett Claims | Independent Appraisal | Baton Rouge, LA">
-    <meta property="og:description" content="Independent appraiser for autos, motorcycles, RVs, motorhomes, and heavy farm equipment. Serving insurance companies, attorneys, and individuals across the country.">
+    <meta property="og:title" content="An appraiser who knows both sides of the claim | Corbett Claims">
+    <meta property="og:description" content="12 years inside Allstate. 25+ years independent. Independent appraisals on autos, motorcycles, RVs, motorhomes, and heavy farm equipment.">
     <meta property="og:image" content="images/og-logo.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Corbett Claims — Independent Auto and Heavy Equipment Appraisal, Baton Rouge LA">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Corbett Claims | Independent Appraisal | Baton Rouge, LA">
-    <meta name="twitter:description" content="Independent appraiser for autos, motorcycles, RVs, motorhomes, and heavy farm equipment.">
+    <meta name="twitter:title" content="An appraiser who knows both sides of the claim | Corbett Claims">
+    <meta name="twitter:description" content="12 years inside Allstate. 25+ years independent. Damage estimates, total-loss valuations, and diminished value on autos, motorcycles, RVs, and heavy equipment.">
     <meta name="twitter:image" content="images/og-logo.png">
     <script>
         // Make social-preview meta tags fully qualified against the current host.
-        // Social crawlers that don't run JS still get relative URLs, which modern
-        // Facebook/Twitter/LinkedIn crawlers resolve against the page URL. This block
-        // makes browser-based preview tools and JS-aware bots see absolute URLs.
         (function () {
             var here = new URL('.', window.location.href).href;
             document.querySelectorAll(
@@ -46,10 +43,13 @@
     <!-- Brand fonts: Montserrat Black for "CORBETT", Playfair Display Bold Italic for "Claims" -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;900&family=Playfair+Display:ital,wght@1,700&display=swap">
 
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- Leaflet CSS loaded async; map is below the fold -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""></noscript>
 
     <!-- LocalBusiness structured data -->
     <script type="application/ld+json">
@@ -60,10 +60,7 @@
       "alternateName": "Corbett Claim Service, Inc.",
       "description": "Independent auto and heavy equipment appraisal service. Founded in 2001 by Ronnie Corbett following 12 years as a staff adjuster at Allstate Insurance. Provides estimates on cars, motorcycles, RVs, motorhomes, and heavy farm equipment for insurance companies, attorneys, and private individuals.",
       "foundingDate": "2001",
-      "founder": {
-        "@type": "Person",
-        "name": "Ronnie Corbett"
-      },
+      "founder": { "@type": "Person", "name": "Ronnie Corbett" },
       "telephone": "+1-225-663-2217",
       "email": "assignments@corbettclaims.net",
       "image": "images/og-logo.png",
@@ -75,11 +72,7 @@
         "postalCode": "70884",
         "addressCountry": "US"
       },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": 30.4515,
-        "longitude": -91.1871
-      },
+      "geo": { "@type": "GeoCoordinates", "latitude": 30.4515, "longitude": -91.1871 },
       "openingHoursSpecification": [{
         "@type": "OpeningHoursSpecification",
         "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
@@ -110,10 +103,12 @@
 </head>
 <body>
 
+    <a href="#main" class="skip-link">Skip to main content</a>
+
     <!-- Navbar -->
-    <nav>
+    <nav aria-label="Primary">
         <div class="container-wide nav-inner">
-            <a href="#" class="nav-brand" aria-label="Corbett Claims home">
+            <a href="#top" class="nav-brand" aria-label="Corbett Claims home">
                 <span class="brand-stack">
                     <span class="logo-text">CORBETT</span>
                     <span class="logo-script">Claims</span>
@@ -135,7 +130,7 @@
             <a href="#contact" class="btn nav-cta">Request Appraisal</a>
         </div>
 
-        <div id="mobile-menu">
+        <div id="mobile-menu" hidden>
             <div class="mobile-menu-inner">
                 <a href="#how">How It Works</a>
                 <a href="#why-us">Why Us</a>
@@ -149,15 +144,17 @@
         </div>
     </nav>
 
-    <!-- Hero -->
-    <header class="hero">
-        <div class="hero-inner">
-            <div class="hero-badge">Independent Appraiser • Since 2001 • Ex-Allstate</div>
+    <main id="main">
 
-            <h1>Independent Auto &amp; Heavy<br>Equipment Appraisals</h1>
+    <!-- Hero -->
+    <header class="hero" id="top">
+        <div class="hero-inner">
+            <div class="hero-badge">Independent Appraiser · Since 2001 · Ex-Allstate Adjuster</div>
+
+            <h1>An appraiser who knows<br>both sides of the claim.</h1>
 
             <p class="lede">
-                Honest, independent estimates on cars, motorcycles, RVs, motorhomes, and heavy farm equipment — for insurance companies, attorneys, and individual owners.
+                12 years inside Allstate. 25+ years independent. Damage estimates, total-loss valuations, and diminished-value appraisals on autos, motorcycles, RVs, motorhomes, and heavy farm equipment — for insurance companies, attorneys, and individual owners.
             </p>
 
             <div class="hero-ctas">
@@ -165,7 +162,7 @@
                 <a href="#how" class="btn btn-secondary btn-lg">How It Works</a>
             </div>
 
-            <div class="hero-meta">Based in Baton Rouge · Assignments accepted across TX, LA, MS, AL, FL, OH, IL, NV</div>
+            <div class="hero-meta">Based in Baton Rouge · Assignments accepted across TX, LA, MS, AL, FL, OH, IL, NV · We respond within 1 business day</div>
         </div>
     </header>
 
@@ -191,32 +188,49 @@
         </div>
     </div>
 
-    <!-- How It Works -->
+    <!-- How It Works — interactive timeline -->
     <section id="how" class="container">
         <div class="section-head">
             <h2 class="section-title">How It Works</h2>
+            <p>Click any step to see what to expect at that stage.</p>
         </div>
 
-        <div class="steps-grid">
-            <div class="step">
+        <div class="steps-grid" id="steps-grid">
+            <div class="step" role="button" tabindex="0" aria-expanded="false" aria-controls="step-detail-1" data-step="1">
                 <div class="step-num">1</div>
                 <h3>Send the Request</h3>
                 <p>An insurance carrier, attorney, or owner sends us the assignment details.</p>
+                <div class="step-detail" id="step-detail-1">
+                    Send by phone, email, or the form below. We confirm receipt and gather any missing details (location, equipment, urgency) within one business day. Photos and police reports are welcome but not required up front.
+                </div>
+                <span class="step-toggle-hint">Details</span>
             </div>
-            <div class="step">
+            <div class="step" role="button" tabindex="0" aria-expanded="false" aria-controls="step-detail-2" data-step="2">
                 <div class="step-num">2</div>
                 <h3>On-Site Inspection</h3>
                 <p>We inspect the vehicle or equipment in person and document the condition and damage.</p>
+                <div class="step-detail" id="step-detail-2">
+                    Inspections are typically scheduled within 3–5 business days of assignment, sooner for rush or court-deadline work. We photograph all damage, measure where applicable, note pre-existing condition, and verify VIN / serial numbers on heavy equipment.
+                </div>
+                <span class="step-toggle-hint">Details</span>
             </div>
-            <div class="step">
+            <div class="step" role="button" tabindex="0" aria-expanded="false" aria-controls="step-detail-3" data-step="3">
                 <div class="step-num">3</div>
                 <h3>Independent Report</h3>
                 <p>You receive a detailed, impartial appraisal with photos and supporting valuations.</p>
+                <div class="step-detail" id="step-detail-3">
+                    Written report typically delivered within 48 hours of inspection. Includes itemized damage estimate or total-loss valuation, comparable-vehicle research where relevant, and high-resolution photo documentation.
+                </div>
+                <span class="step-toggle-hint">Details</span>
             </div>
-            <div class="step">
+            <div class="step" role="button" tabindex="0" aria-expanded="false" aria-controls="step-detail-4" data-step="4">
                 <div class="step-num">4</div>
                 <h3>Follow-Up Support</h3>
                 <p>We're available to answer questions, clarify findings, or testify when needed.</p>
+                <div class="step-detail" id="step-detail-4">
+                    Carrier or attorney has questions on a valuation? We're on call to walk through the report. Court testimony available for litigation work — Ronnie has been deposed and has testified as an expert witness.
+                </div>
+                <span class="step-toggle-hint">Details</span>
             </div>
         </div>
     </section>
@@ -230,17 +244,23 @@
 
             <div class="card-grid">
                 <div class="card">
-                    <div class="card-icon">⚖️</div>
+                    <div class="card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v18M5 7h14M7 7l-3 7a4 4 0 0 0 8 0L9 7M17 7l-3 7a4 4 0 0 0 8 0l-3-7"/></svg>
+                    </div>
                     <h3>Truly Independent</h3>
                     <p>No ties to any insurer or repair shop. Our only job is an honest valuation.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">🚜</div>
+                    <div class="card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 17h2l2-5h10l2 5h2M5 17a2 2 0 1 0 4 0 2 2 0 1 0-4 0M15 17a2 2 0 1 0 4 0 2 2 0 1 0-4 0M7 12V7h6l4 5"/></svg>
+                    </div>
                     <h3>Broad Specialty</h3>
                     <p>From everyday vehicles to motorcycles, RVs, motorhomes, and heavy farm equipment.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">✅</div>
+                    <div class="card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2 4 6v6c0 5 3.5 9 8 10 4.5-1 8-5 8-10V6l-8-4z"/><path d="m9 12 2 2 4-4"/></svg>
+                    </div>
                     <h3>Insider Experience</h3>
                     <p>Founder Ronnie Corbett spent 12 years as a staff adjuster at Allstate before going independent in 2001.</p>
                 </div>
@@ -257,24 +277,30 @@
 
             <div class="card-grid">
                 <div class="card">
-                    <div class="card-icon">🚗</div>
+                    <div class="card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 13l2-6h14l2 6M3 13v5h2v-2h14v2h2v-5M3 13h18"/><circle cx="7" cy="15" r="1.2"/><circle cx="17" cy="15" r="1.2"/></svg>
+                    </div>
                     <h3>Autos &amp; Motorcycles</h3>
                     <p>Cars, light trucks, and motorcycles — damage estimates, total-loss valuations, and diminished-value appraisals.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">🚐</div>
+                    <div class="card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 8h13l3 4v6h-3M3 8v10h2M3 8l2-3h8l2 3M8 18a2 2 0 1 0 4 0 2 2 0 1 0-4 0M15 18a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/></svg>
+                    </div>
                     <h3>RVs &amp; Motorhomes</h3>
                     <p>Class A, B, and C motorhomes, travel trailers, and fifth wheels — accurate, defensible appraisals.</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">🚜</div>
+                    <div class="card-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 16a3 3 0 1 0 6 0 3 3 0 1 0-6 0M16 16a2 2 0 1 0 4 0 2 2 0 1 0-4 0M5 16l-2-4h6l3-6h4l2 6h2v4M11 12V6"/></svg>
+                    </div>
                     <h3>Heavy Farm Equipment</h3>
                     <p>Tractors, combines, and implements — specialized valuations few independent appraisers will take on.</p>
                 </div>
             </div>
 
             <p style="margin-top:1.5rem; color:var(--muted); font-size:0.95rem; text-align:center; max-width:680px; margin-left:auto; margin-right:auto;">
-                We work for insurance companies, attorneys, and private owners. Assignments accepted by phone or email.
+                We work for insurance companies, attorneys, and private owners. Assignments accepted by phone, email, or the structured request form below.
             </p>
         </div>
     </section>
@@ -292,7 +318,10 @@
                     <div class="team-avatar">
                         <img src="images/ronnie-annie.jpg"
                              alt="Ronnie and Annie Corbett"
-                             loading="lazy">
+                             width="160"
+                             height="160"
+                             loading="lazy"
+                             decoding="async">
                     </div>
                     <h3 class="team-name">Ronnie and Annie Corbett</h3>
                     <p class="team-role">Co-Owners</p>
@@ -310,11 +339,36 @@
         <div class="container">
             <div class="section-head">
                 <h2 class="section-title">Service Area</h2>
-                <p>Headquartered in Baton Rouge and traveling for assignments across the country. Explore our anchor states on the map below.</p>
+                <p>Headquartered in Baton Rouge and traveling for assignments across the country.</p>
             </div>
 
             <div style="max-width:800px; margin:0 auto;">
-                <div id="service-map" role="region" aria-label="Service area map"></div>
+
+                <!-- State picker (Phase 4) -->
+                <div class="state-picker">
+                    <div class="state-picker-row">
+                        <div class="field">
+                            <label for="state-picker-select">Where is the vehicle or equipment located?</label>
+                            <select id="state-picker-select" aria-describedby="state-picker-result">
+                                <option value="">Select a state…</option>
+                                <option value="anchor" data-name="Louisiana">Louisiana (HQ)</option>
+                                <option value="anchor" data-name="Texas">Texas</option>
+                                <option value="anchor" data-name="Mississippi">Mississippi</option>
+                                <option value="anchor" data-name="Alabama">Alabama</option>
+                                <option value="anchor" data-name="Florida">Florida</option>
+                                <option value="anchor" data-name="Ohio">Ohio</option>
+                                <option value="anchor" data-name="Illinois">Illinois</option>
+                                <option value="anchor" data-name="Nevada">Nevada</option>
+                                <option disabled>──────────</option>
+                                <option value="other" data-name="Other">Somewhere else</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="state-picker-result" class="state-picker-result" aria-live="polite"></div>
+                </div>
+
+                <!-- Map — visual reinforcement, marked aria-hidden because the chip row + picker cover the AT-equivalent content -->
+                <div id="service-map" aria-hidden="true"></div>
 
                 <noscript>
                     <img src="images/southeast_us_gis_map.png"
@@ -376,6 +430,10 @@
                     <p>Fees depend on the assignment type, the equipment involved, and the travel required. Contact us with the details and we'll quote you up front.</p>
                 </details>
                 <details class="faq-item">
+                    <summary>How fast do you respond?</summary>
+                    <p>We respond to assignment requests within one business day. Inspections are typically scheduled within 3–5 business days, and written reports are delivered within 48 hours of inspection. For urgent or court-deadline work, call us at (225) 663-2217 and we'll move faster.</p>
+                </details>
+                <details class="faq-item">
                     <summary>What areas do you serve?</summary>
                     <p>We're headquartered in Baton Rouge, Louisiana, and regularly accept assignments across Louisiana, Texas, Mississippi, Alabama, Florida, Ohio, Illinois, and Nevada — essentially from Texas to Florida and up to Ohio, Illinois, and Nevada. Reach out and we'll confirm coverage for your location.</p>
                 </details>
@@ -399,33 +457,127 @@
         </div>
     </section>
 
-    <!-- Contact -->
+    <!-- Contact — smart form -->
     <section id="contact" class="section-alt" style="border-top:1px solid var(--border);">
         <div class="container" style="max-width:900px;">
             <div class="section-head">
                 <h2 class="section-title">Request an Appraisal</h2>
-                <p>Tell us about the assignment, or call us directly for a quote.</p>
+                <p>Tell us about the assignment, or call us directly for a quote. We respond within one business day.</p>
             </div>
 
             <div class="contact-grid">
-                <form class="contact-form" action="https://formspree.io/f/xwkgvjqg" method="POST">
+                <form class="contact-form" id="appraisal-form" action="https://formspree.io/f/xwkgvjqg" method="POST" enctype="multipart/form-data" novalidate>
+
+                    <div class="form-progress" aria-hidden="true">
+                        <div class="form-progress-bar" id="form-progress-bar"></div>
+                    </div>
+                    <div class="form-progress-meta" aria-hidden="true">
+                        <span id="form-progress-label">Let's get started</span>
+                        <span id="form-progress-pct">0%</span>
+                    </div>
+
                     <div class="form-row">
                         <div class="field">
-                            <label for="name">Your Name</label>
-                            <input id="name" type="text" name="name" autocomplete="name" required aria-required="true">
+                            <label for="name">Your Name <span class="required-mark" aria-hidden="true">*</span></label>
+                            <input id="name" type="text" name="name" autocomplete="name" required aria-describedby="name-error" data-validate="required">
+                            <span class="field-error" id="name-error" aria-live="polite"></span>
                         </div>
                         <div class="field">
-                            <label for="phone">Phone Number</label>
-                            <input id="phone" type="tel" name="phone" autocomplete="tel" required aria-required="true">
+                            <label for="phone">Phone Number <span class="required-mark" aria-hidden="true">*</span></label>
+                            <input id="phone" type="tel" name="phone" autocomplete="tel" required aria-describedby="phone-hint phone-error" data-validate="phone" placeholder="(225) 555-0100">
+                            <span class="field-hint" id="phone-hint">We'll only call about your assignment.</span>
+                            <span class="field-error" id="phone-error" aria-live="polite"></span>
                         </div>
                     </div>
+
                     <div class="field">
-                        <label for="email">Email Address</label>
-                        <input id="email" type="email" name="email" autocomplete="email" required aria-required="true">
+                        <label for="email">Email Address <span class="required-mark" aria-hidden="true">*</span></label>
+                        <input id="email" type="email" name="email" autocomplete="email" required aria-describedby="email-error" data-validate="email">
+                        <span class="field-error" id="email-error" aria-live="polite"></span>
                     </div>
+
+                    <div class="form-row">
+                        <div class="field">
+                            <label for="equipment-type">Equipment Type <span class="required-mark" aria-hidden="true">*</span></label>
+                            <select id="equipment-type" name="equipment_type" required aria-describedby="equipment-error" data-validate="required">
+                                <option value="">Select equipment…</option>
+                                <option>Auto / Light truck</option>
+                                <option>Motorcycle</option>
+                                <option>RV / Motorhome / Trailer</option>
+                                <option>Heavy farm equipment</option>
+                                <option>Other</option>
+                            </select>
+                            <span class="field-error" id="equipment-error" aria-live="polite"></span>
+                        </div>
+                        <div class="field">
+                            <label for="assignment-type">Assignment Type <span class="required-mark" aria-hidden="true">*</span></label>
+                            <select id="assignment-type" name="assignment_type" required aria-describedby="assignment-error" data-validate="required">
+                                <option value="">Select assignment…</option>
+                                <option>Damage estimate</option>
+                                <option>Total-loss valuation</option>
+                                <option>Diminished-value appraisal</option>
+                                <option>Pre-purchase inspection</option>
+                                <option>Court / expert witness</option>
+                                <option>Other</option>
+                            </select>
+                            <span class="field-error" id="assignment-error" aria-live="polite"></span>
+                        </div>
+                    </div>
+
+                    <!-- Conditional reveal: heavy equipment -->
+                    <div class="field" id="field-equipment-detail" hidden>
+                        <label for="equipment-detail">Make, Model, &amp; Hours / Mileage</label>
+                        <input id="equipment-detail" type="text" name="equipment_detail" placeholder="e.g. John Deere 8R 410, 2,400 hrs">
+                        <span class="field-hint">Helps us scope the appraisal accurately.</span>
+                    </div>
+
+                    <!-- Conditional reveal: RV class/length -->
+                    <div class="field" id="field-rv-detail" hidden>
+                        <label for="rv-detail">RV Class &amp; Length</label>
+                        <input id="rv-detail" type="text" name="rv_detail" placeholder="e.g. Class A, 36 ft">
+                    </div>
+
+                    <!-- Conditional reveal: diminished value -->
+                    <div class="field" id="field-preloss" hidden>
+                        <label for="preloss-condition">Pre-loss Condition (Diminished Value)</label>
+                        <textarea id="preloss-condition" name="preloss_condition" rows="2" placeholder="Brief description of vehicle condition before the loss — mileage, service records, modifications, etc."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="field">
+                            <label for="location">Vehicle / Equipment Location <span class="required-mark" aria-hidden="true">*</span></label>
+                            <input id="location" type="text" name="location" required aria-describedby="location-hint location-error" data-validate="required" placeholder="City, State or ZIP">
+                            <span class="field-hint" id="location-hint">Where the inspection would take place.</span>
+                            <span class="field-error" id="location-error" aria-live="polite"></span>
+                        </div>
+                        <div class="field">
+                            <label for="urgency">Urgency</label>
+                            <select id="urgency" name="urgency">
+                                <option>Standard</option>
+                                <option>Rush (within a few days)</option>
+                                <option>Court / deadline date</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Conditional reveal: court date -->
+                    <div class="field" id="field-court-date" hidden>
+                        <label for="court-date">Court / Deadline Date</label>
+                        <input id="court-date" type="date" name="court_date">
+                    </div>
+
                     <div class="field">
-                        <label for="message">Tell us about the vehicle, equipment, or assignment</label>
-                        <textarea id="message" name="message" rows="4" placeholder="e.g. 2019 Class A motorhome, total-loss appraisal needed in Tampa FL" required aria-required="true"></textarea>
+                        <label for="attachments">Photos or Documents <span style="color:var(--muted); font-weight:400;">(optional)</span></label>
+                        <div class="file-upload">
+                            <input id="attachments" type="file" name="attachments" multiple accept="image/*,.pdf,.doc,.docx" aria-describedby="attachments-hint">
+                            <span class="file-upload-label" id="attachments-hint">Photos of damage, police report, or any document up to 10 MB each.</span>
+                            <ul class="file-list" id="file-list" aria-live="polite"></ul>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="message">Anything Else?</label>
+                        <textarea id="message" name="message" rows="3" placeholder="Optional — add anything we should know."></textarea>
                     </div>
 
                     <!-- Honeypot: hidden from humans, bots fill it -->
@@ -434,8 +586,9 @@
                         <input type="text" id="company" name="_gotcha" tabindex="-1" autocomplete="off">
                     </div>
 
-                    <button type="submit" class="btn" style="padding:15px;">Send Message</button>
-                    <p class="form-note">By submitting, you agree to be contacted about your inquiry. We don't share your info.</p>
+                    <button type="submit" class="btn" id="form-submit" style="padding:15px;">Send Request</button>
+                    <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
+                    <p class="form-note">We respond within one business day. By submitting, you agree to be contacted about your inquiry. We don't share your info.</p>
                 </form>
 
                 <div class="contact-card">
@@ -464,7 +617,9 @@
         </div>
     </section>
 
-    <a href="tel:2256632217" class="floating-btn" aria-label="Call Corbett Claims">📞 Call Now</a>
+    </main>
+
+    <a href="tel:2256632217" class="floating-btn" id="floating-btn" aria-label="Call Corbett Claims at (225) 663-2217"><span aria-hidden="true">📞</span> Call Now</a>
 
     <footer>
         <div class="footer-inner">
@@ -472,93 +627,338 @@
         </div>
     </footer>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Leaflet deferred — lazy-init on map scroll-into-view -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+
     <script>
-        const btn = document.getElementById('menu-btn');
-        const menu = document.getElementById('mobile-menu');
+        // ---------- Mobile menu ----------
+        (function () {
+            const btn = document.getElementById('menu-btn');
+            const menu = document.getElementById('mobile-menu');
+            if (!btn || !menu) return;
 
-        if (btn && menu) {
+            function openMenu() {
+                menu.hidden = false;
+                btn.setAttribute('aria-expanded', 'true');
+                btn.setAttribute('aria-label', 'Close menu');
+                const firstLink = menu.querySelector('a');
+                if (firstLink) firstLink.focus();
+            }
+            function closeMenu(returnFocus) {
+                menu.hidden = true;
+                btn.setAttribute('aria-expanded', 'false');
+                btn.setAttribute('aria-label', 'Open menu');
+                if (returnFocus) btn.focus();
+            }
+
             btn.addEventListener('click', () => {
-                const isOpen = menu.style.display === 'block';
-                menu.style.display = isOpen ? 'none' : 'block';
-                btn.setAttribute('aria-expanded', String(!isOpen));
+                if (menu.hidden) openMenu(); else closeMenu(false);
             });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !menu.hidden) closeMenu(true);
+            });
+            menu.querySelectorAll('a').forEach((link) => {
+                link.addEventListener('click', () => closeMenu(false));
+            });
+        })();
 
-            document.querySelectorAll('#mobile-menu a').forEach(link => {
-                link.addEventListener('click', () => {
-                    menu.style.display = 'none';
-                    btn.setAttribute('aria-expanded', 'false');
+        // ---------- Interactive timeline (How It Works) ----------
+        (function () {
+            const steps = document.querySelectorAll('.steps-grid .step');
+            steps.forEach((step) => {
+                function toggle() {
+                    const expanded = step.getAttribute('aria-expanded') === 'true';
+                    step.setAttribute('aria-expanded', String(!expanded));
+                }
+                step.addEventListener('click', toggle);
+                step.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggle();
+                    }
                 });
             });
-        }
+        })();
 
-        function initServiceMap() {
-            const mapContainer = document.getElementById('service-map');
-            if (!mapContainer || typeof L === 'undefined') return;
+        // ---------- State picker ----------
+        (function () {
+            const select = document.getElementById('state-picker-select');
+            const result = document.getElementById('state-picker-result');
+            if (!select || !result) return;
 
-            const map = L.map('service-map', { scrollWheelZoom: false }).setView([37, -97], 4);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-
-            // Lower-48 context layer — every unserved state in light gray so the
-            // map reads as a continuous US, not a scatter of floating polygons.
-            // Loaded async; failure to load just means OSM tiles show through.
-            fetch('us-states.geojson')
-                .then(r => r.ok ? r.json() : null)
-                .then(data => {
-                    if (!data) return;
-                    L.geoJSON(data, {
-                        style: () => ({
-                            color: '#9ca3af',
-                            weight: 0.8,
-                            fillColor: '#f3f4f6',
-                            fillOpacity: 0.55,
-                            interactive: false
-                        })
-                    }).addTo(map).bringToBack();
-                })
-                .catch(() => {});
-
-            // Real outlines for TX, LA, MS, AL, FL, OH, IL, NV (simplified to ~3-decimal precision)
-            const serviceStates = {"type":"FeatureCollection","features":[{"type":"Feature","id":"01","properties":{"name":"Alabama"},"geometry":{"type":"Polygon","coordinates":[[[-87.359,35.001],[-85.607,34.985],[-85.431,34.125],[-85.185,32.86],[-85.07,32.58],[-84.96,32.422],[-85.004,32.323],[-84.889,32.263],[-85.059,32.137],[-85.054,32.011],[-85.141,31.841],[-85.043,31.54],[-85.114,31.277],[-85.004,31.003],[-85.497,30.998],[-87.6,30.998],[-87.633,30.866],[-87.409,30.674],[-87.447,30.51],[-87.37,30.428],[-87.518,30.28],[-87.655,30.247],[-87.907,30.412],[-87.934,30.658],[-88.011,30.685],[-88.104,30.499],[-88.137,30.318],[-88.394,30.368],[-88.471,31.896],[-88.241,33.796],[-88.099,34.892],[-88.203,34.996],[-87.359,35.001]]]}},{"type":"Feature","id":"28","properties":{"name":"Mississippi"},"geometry":{"type":"Polygon","coordinates":[[[-88.471,34.996],[-88.203,34.996],[-88.099,34.892],[-88.241,33.796],[-88.471,31.896],[-88.394,30.368],[-88.504,30.324],[-88.745,30.346],[-88.844,30.412],[-89.085,30.368],[-89.419,30.253],[-89.523,30.181],[-89.643,30.286],[-89.682,30.45],[-89.846,30.669],[-89.747,30.998],[-91.637,30.998],[-91.566,31.069],[-91.637,31.266],[-91.516,31.277],[-91.5,31.644],[-91.401,31.622],[-91.341,31.846],[-91.106,31.989],[-90.985,32.219],[-91.007,32.515],[-91.155,32.641],[-91.144,32.843],[-91.073,32.887],[-91.166,33.002],[-91.089,33.139],[-91.144,33.347],[-91.056,33.429],[-91.231,33.561],[-91.073,33.867],[-90.892,34.026],[-90.952,34.136],[-90.744,34.3],[-90.75,34.366],[-90.569,34.421],[-90.585,34.618],[-90.481,34.662],[-90.41,34.831],[-90.251,34.908],[-90.311,34.996],[-88.471,34.996]]]}},{"type":"Feature","id":"12","properties":{"name":"Florida"},"geometry":{"type":"Polygon","coordinates":[[[-85.497,30.998],[-85.004,31.003],[-84.867,30.713],[-83.498,30.647],[-82.216,30.57],[-82.167,30.357],[-82.047,30.362],[-82.003,30.565],[-82.041,30.751],[-81.948,30.828],[-81.718,30.746],[-81.444,30.707],[-81.384,30.275],[-81.258,29.787],[-80.968,29.146],[-80.524,28.462],[-80.59,28.412],[-80.568,28.095],[-80.382,27.739],[-80.091,27.021],[-80.031,26.797],[-80.037,26.567],[-80.146,25.74],[-80.239,25.723],[-80.338,25.466],[-80.305,25.384],[-80.497,25.197],[-80.573,25.241],[-80.76,25.165],[-81.077,25.121],[-81.17,25.225],[-81.127,25.378],[-81.351,25.822],[-81.526,25.904],[-81.68,25.844],[-81.8,26.09],[-81.833,26.293],[-82.041,26.517],[-82.09,26.665],[-82.058,26.879],[-82.173,26.917],[-82.145,26.791],[-82.249,26.758],[-82.567,27.301],[-82.693,27.438],[-82.392,27.837],[-82.589,27.815],[-82.72,27.689],[-82.852,27.887],[-82.677,28.434],[-82.644,28.889],[-82.764,28.998],[-82.802,29.146],[-82.994,29.179],[-83.219,29.42],[-83.399,29.519],[-83.41,29.667],[-83.536,29.721],[-83.64,29.886],[-84.024,30.105],[-84.358,30.056],[-84.342,29.902],[-84.451,29.93],[-84.867,29.743],[-85.311,29.7],[-85.3,29.809],[-85.404,29.94],[-85.924,30.236],[-86.297,30.362],[-86.631,30.395],[-86.91,30.373],[-87.518,30.28],[-87.37,30.428],[-87.447,30.51],[-87.409,30.674],[-87.633,30.866],[-87.6,30.998],[-85.497,30.998]]]}},{"type":"Feature","id":"22","properties":{"name":"Louisiana"},"geometry":{"type":"Polygon","coordinates":[[[-93.608,33.019],[-91.166,33.002],[-91.073,32.887],[-91.144,32.843],[-91.155,32.641],[-91.007,32.515],[-90.985,32.219],[-91.106,31.989],[-91.341,31.846],[-91.401,31.622],[-91.5,31.644],[-91.516,31.277],[-91.637,31.266],[-91.566,31.069],[-91.637,30.998],[-89.747,30.998],[-89.846,30.669],[-89.682,30.45],[-89.643,30.286],[-89.523,30.181],[-89.818,30.045],[-89.84,29.946],[-89.599,29.88],[-89.495,30.039],[-89.287,29.88],[-89.304,29.754],[-89.424,29.7],[-89.649,29.749],[-89.621,29.656],[-89.698,29.513],[-89.506,29.387],[-89.2,29.349],[-89.09,29.201],[-89.002,29.179],[-89.161,29.009],[-89.336,29.042],[-89.484,29.218],[-89.851,29.311],[-89.851,29.48],[-90.032,29.426],[-90.021,29.283],[-90.103,29.152],[-90.235,29.13],[-90.333,29.278],[-90.563,29.283],[-90.645,29.13],[-90.799,29.086],[-90.963,29.179],[-91.095,29.19],[-91.221,29.437],[-91.445,29.546],[-91.533,29.53],[-91.62,29.738],[-91.883,29.71],[-91.889,29.836],[-92.146,29.716],[-92.113,29.623],[-92.31,29.535],[-92.617,29.579],[-92.973,29.716],[-93.225,29.776],[-93.767,29.727],[-93.839,29.689],[-93.926,29.787],[-93.691,30.143],[-93.767,30.335],[-93.696,30.439],[-93.729,30.576],[-93.63,30.68],[-93.526,30.937],[-93.543,31.151],[-93.817,31.556],[-93.822,31.775],[-94.041,31.994],[-94.041,33.019],[-93.608,33.019]]]}},{"type":"Feature","id":"48","properties":{"name":"Texas"},"geometry":{"type":"Polygon","coordinates":[[[-101.813,36.502],[-100.0,36.502],[-100.0,34.563],[-99.923,34.574],[-99.699,34.382],[-99.578,34.415],[-99.261,34.404],[-99.189,34.212],[-98.987,34.223],[-98.768,34.136],[-98.571,34.147],[-98.488,34.065],[-98.362,34.158],[-98.171,34.114],[-98.089,34.004],[-97.946,33.988],[-97.87,33.851],[-97.694,33.982],[-97.459,33.906],[-97.371,33.824],[-97.256,33.862],[-97.174,33.736],[-96.922,33.961],[-96.851,33.846],[-96.632,33.846],[-96.424,33.774],[-96.347,33.687],[-96.15,33.84],[-95.936,33.889],[-95.838,33.835],[-95.602,33.933],[-95.547,33.878],[-95.29,33.873],[-95.224,33.961],[-94.967,33.862],[-94.868,33.747],[-94.485,33.637],[-94.381,33.544],[-94.184,33.594],[-94.041,33.55],[-94.041,33.019],[-94.041,31.994],[-93.822,31.775],[-93.817,31.556],[-93.543,31.151],[-93.526,30.937],[-93.63,30.68],[-93.729,30.576],[-93.696,30.439],[-93.767,30.335],[-93.691,30.143],[-93.926,29.787],[-93.839,29.689],[-94.003,29.683],[-94.523,29.546],[-94.709,29.623],[-94.742,29.787],[-94.874,29.672],[-94.967,29.7],[-95.016,29.557],[-94.912,29.497],[-94.896,29.311],[-95.082,29.113],[-95.383,28.867],[-95.985,28.604],[-96.046,28.648],[-96.226,28.582],[-96.232,28.642],[-96.478,28.599],[-96.593,28.725],[-96.665,28.697],[-96.402,28.44],[-96.593,28.358],[-96.774,28.407],[-96.802,28.226],[-97.026,28.04],[-97.256,27.695],[-97.404,27.333],[-97.514,27.361],[-97.541,27.229],[-97.426,27.262],[-97.481,26.999],[-97.557,26.988],[-97.563,26.841],[-97.47,26.758],[-97.442,26.457],[-97.333,26.353],[-97.305,26.161],[-97.218,25.992],[-97.524,25.888],[-97.65,26.019],[-97.886,26.068],[-98.198,26.057],[-98.467,26.222],[-98.669,26.238],[-98.823,26.37],[-99.031,26.413],[-99.173,26.539],[-99.266,26.841],[-99.447,27.021],[-99.425,27.175],[-99.507,27.339],[-99.48,27.481],[-99.606,27.64],[-99.71,27.657],[-99.88,27.799],[-99.934,27.98],[-100.082,28.144],[-100.296,28.281],[-100.4,28.582],[-100.498,28.664],[-100.63,28.905],[-100.674,29.103],[-100.8,29.245],[-101.013,29.371],[-101.063,29.459],[-101.26,29.535],[-101.413,29.754],[-101.851,29.804],[-102.114,29.793],[-102.339,29.869],[-102.388,29.765],[-102.629,29.732],[-102.81,29.524],[-102.919,29.19],[-102.98,29.185],[-103.116,28.987],[-103.281,28.982],[-103.527,29.135],[-104.146,29.382],[-104.267,29.513],[-104.508,29.639],[-104.677,29.924],[-104.688,30.181],[-104.858,30.39],[-104.896,30.57],[-105.006,30.685],[-105.395,30.855],[-105.603,31.085],[-105.773,31.167],[-105.954,31.364],[-106.205,31.469],[-106.381,31.731],[-106.529,31.786],[-106.644,31.901],[-106.616,32.0],[-103.067,32.0],[-103.067,33.002],[-103.045,34.015],[-103.04,36.502],[-103.001,36.502],[-101.813,36.502]]]}},{"type":"Feature","id":"39","properties":{"name":"Ohio"},"geometry":{"type":"Polygon","coordinates":[[[-80.519,41.979],[-80.519,40.637],[-80.666,40.582],[-80.595,40.473],[-80.601,40.319],[-80.738,40.078],[-80.831,39.711],[-81.22,39.388],[-81.346,39.344],[-81.455,39.41],[-81.57,39.268],[-81.685,39.273],[-81.811,39.081],[-81.784,38.966],[-81.888,38.873],[-82.036,39.027],[-82.222,38.786],[-82.173,38.632],[-82.293,38.578],[-82.331,38.446],[-82.594,38.424],[-82.731,38.561],[-82.846,38.589],[-82.89,38.758],[-83.033,38.725],[-83.142,38.627],[-83.52,38.704],[-83.679,38.632],[-83.903,38.769],[-84.216,38.808],[-84.232,38.895],[-84.435,39.103],[-84.818,39.103],[-84.802,40.5],[-84.807,41.694],[-83.454,41.732],[-83.065,41.595],[-82.934,41.513],[-82.835,41.59],[-82.616,41.431],[-82.479,41.382],[-82.014,41.513],[-81.74,41.486],[-81.444,41.672],[-81.012,41.853],[-80.519,41.979]]]}},{"type":"Feature","id":"17","properties":{"name":"Illinois"},"geometry":{"type":"Polygon","coordinates":[[[-90.64,42.51],[-88.789,42.494],[-87.803,42.494],[-87.836,42.302],[-87.682,42.077],[-87.524,41.71],[-87.529,39.35],[-87.639,39.169],[-87.513,38.956],[-87.496,38.78],[-87.622,38.638],[-87.655,38.506],[-87.836,38.293],[-87.951,38.276],[-87.923,38.15],[-88.0,38.101],[-88.06,37.866],[-88.027,37.8],[-88.159,37.657],[-88.066,37.482],[-88.477,37.389],[-88.515,37.285],[-88.422,37.154],[-88.548,37.071],[-88.915,37.225],[-89.03,37.214],[-89.183,37.039],[-89.134,36.984],[-89.293,36.995],[-89.517,37.28],[-89.435,37.345],[-89.517,37.537],[-89.517,37.69],[-89.84,37.904],[-89.95,37.882],[-90.059,38.013],[-90.355,38.216],[-90.35,38.375],[-90.18,38.632],[-90.207,38.725],[-90.109,38.846],[-90.251,38.917],[-90.47,38.961],[-90.585,38.868],[-90.662,38.928],[-90.728,39.257],[-91.062,39.47],[-91.368,39.728],[-91.494,40.034],[-91.505,40.237],[-91.418,40.38],[-91.401,40.56],[-91.122,40.67],[-91.095,40.823],[-90.963,40.922],[-90.947,41.097],[-91.111,41.239],[-91.045,41.415],[-90.656,41.464],[-90.344,41.59],[-90.311,41.743],[-90.18,41.809],[-90.142,42.001],[-90.169,42.127],[-90.394,42.225],[-90.421,42.329],[-90.64,42.51]]]}},{"type":"Feature","id":"32","properties":{"name":"Nevada"},"geometry":{"type":"Polygon","coordinates":[[[-117.028,42.001],[-114.043,41.995],[-114.048,37.0],[-114.048,36.195],[-114.152,36.025],[-114.251,36.02],[-114.372,36.14],[-114.739,36.102],[-114.678,35.516],[-114.596,35.324],[-114.574,35.138],[-114.634,35.001],[-115.85,35.971],[-116.54,36.502],[-117.499,37.219],[-118.715,38.101],[-120.002,38.999],[-119.996,40.265],[-120.002,41.995],[-118.698,41.99],[-117.028,42.001]]]}}]};
-
-            const styleBase = {
-                color: '#1e3a5f',
-                weight: 2,
-                fillColor: '#3b82f6',
-                fillOpacity: 0.28
-            };
-            const styleHover = {
-                color: '#1e3a5f',
-                weight: 2.5,
-                fillColor: '#1e3a5f',
-                fillOpacity: 0.45
-            };
-
-            const serviceLayer = L.geoJSON(serviceStates, {
-                style: () => styleBase,
-                onEachFeature: (feature, layer) => {
-                    const name = feature.properties.name;
-                    layer.bindPopup(
-                        "<strong>" + name + "</strong><br>" +
-                        "Part of our regular service area.<br>" +
-                        "Call (225) 663-2217 to request an appraisal."
-                    );
-                    layer.bindTooltip(name, { sticky: true, direction: 'center', className: 'state-tooltip' });
-                    layer.on('mouseover', () => layer.setStyle(styleHover));
-                    layer.on('mouseout', () => serviceLayer.resetStyle(layer));
+            select.addEventListener('change', () => {
+                const opt = select.options[select.selectedIndex];
+                const tier = opt.value;
+                const name = opt.getAttribute('data-name') || '';
+                if (!tier) {
+                    result.removeAttribute('data-state');
+                    result.textContent = '';
+                    return;
                 }
-            }).addTo(map);
+                if (tier === 'anchor') {
+                    result.setAttribute('data-state', 'anchor');
+                    result.innerHTML = '<strong>' + name + ' is part of our regular service area.</strong> Call <a href="tel:2256632217">(225) 663-2217</a> or send a request below — we respond within one business day.';
+                } else {
+                    result.setAttribute('data-state', 'outside');
+                    result.innerHTML = '<strong>Outside our anchor states, but call us to discuss.</strong> We sometimes accept assignments outside the regular footprint depending on equipment type and urgency. Call <a href="tel:2256632217">(225) 663-2217</a>.';
+                }
+            });
+        })();
 
-            const hqMarker = L.marker([30.4515, -91.1871]).addTo(map)
-                .bindPopup("<strong>Baton Rouge Headquarters</strong><br>Corbett Claims<br>Independent auto &amp; heavy equipment appraisals");
+        // ---------- Floating CTA: hide when contact section is visible ----------
+        (function () {
+            const btn = document.getElementById('floating-btn');
+            const contact = document.getElementById('contact');
+            if (!btn || !contact || !('IntersectionObserver' in window)) return;
 
-            map.fitBounds(serviceLayer.getBounds().extend(hqMarker.getLatLng()), { padding: [30, 30] });
-        }
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    btn.hidden = entry.isIntersecting;
+                });
+            }, { threshold: 0.15 });
+            io.observe(contact);
+        })();
 
-        window.addEventListener('load', initServiceMap);
+        // ---------- Smart form ----------
+        (function () {
+            const form = document.getElementById('appraisal-form');
+            if (!form) return;
+
+            const equipmentSel = document.getElementById('equipment-type');
+            const assignmentSel = document.getElementById('assignment-type');
+            const urgencySel = document.getElementById('urgency');
+            const fieldEquipmentDetail = document.getElementById('field-equipment-detail');
+            const fieldRvDetail = document.getElementById('field-rv-detail');
+            const fieldPreloss = document.getElementById('field-preloss');
+            const fieldCourtDate = document.getElementById('field-court-date');
+            const fileInput = document.getElementById('attachments');
+            const fileList = document.getElementById('file-list');
+            const status = document.getElementById('form-status');
+            const submitBtn = document.getElementById('form-submit');
+            const progressBar = document.getElementById('form-progress-bar');
+            const progressPct = document.getElementById('form-progress-pct');
+            const progressLabel = document.getElementById('form-progress-label');
+
+            // ----- Conditional reveals -----
+            function syncConditionalFields() {
+                const eq = equipmentSel.value;
+                const as = assignmentSel.value;
+                const ur = urgencySel.value;
+                fieldEquipmentDetail.hidden = eq !== 'Heavy farm equipment';
+                fieldRvDetail.hidden = eq !== 'RV / Motorhome / Trailer';
+                fieldPreloss.hidden = as !== 'Diminished-value appraisal';
+                fieldCourtDate.hidden = !/Court/.test(ur);
+            }
+            [equipmentSel, assignmentSel, urgencySel].forEach((el) => {
+                el.addEventListener('change', () => { syncConditionalFields(); updateProgress(); });
+            });
+
+            // ----- Phone auto-formatting -----
+            const phoneInput = document.getElementById('phone');
+            phoneInput.addEventListener('input', (e) => {
+                const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                let formatted = digits;
+                if (digits.length > 6) {
+                    formatted = '(' + digits.slice(0, 3) + ') ' + digits.slice(3, 6) + '-' + digits.slice(6);
+                } else if (digits.length > 3) {
+                    formatted = '(' + digits.slice(0, 3) + ') ' + digits.slice(3);
+                } else if (digits.length > 0) {
+                    formatted = '(' + digits;
+                }
+                e.target.value = formatted;
+            });
+
+            // ----- File list -----
+            fileInput.addEventListener('change', () => {
+                fileList.innerHTML = '';
+                Array.from(fileInput.files).forEach((file) => {
+                    const li = document.createElement('li');
+                    const sizeKb = Math.round(file.size / 1024);
+                    li.textContent = file.name + ' (' + (sizeKb > 1024 ? (sizeKb / 1024).toFixed(1) + ' MB' : sizeKb + ' KB') + ')';
+                    fileList.appendChild(li);
+                });
+            });
+
+            // ----- Validation -----
+            function validateField(el) {
+                const rule = el.getAttribute('data-validate');
+                const errorEl = document.getElementById(el.id + '-error');
+                const value = (el.value || '').trim();
+                let error = '';
+                if (rule === 'required' && !value) {
+                    error = 'This field is required.';
+                } else if (rule === 'phone') {
+                    const digits = value.replace(/\D/g, '');
+                    if (!digits) error = 'Phone number is required.';
+                    else if (digits.length < 10) error = 'Please enter a 10-digit phone number.';
+                } else if (rule === 'email') {
+                    if (!value) error = 'Email is required.';
+                    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Please enter a valid email address.';
+                }
+                if (errorEl) errorEl.textContent = error;
+                if (error) el.setAttribute('aria-invalid', 'true');
+                else el.removeAttribute('aria-invalid');
+                return !error;
+            }
+            form.querySelectorAll('[data-validate]').forEach((el) => {
+                el.addEventListener('blur', () => { validateField(el); updateProgress(); });
+                el.addEventListener('input', () => {
+                    if (el.getAttribute('aria-invalid') === 'true') validateField(el);
+                    updateProgress();
+                });
+            });
+
+            // ----- Progress meter -----
+            function updateProgress() {
+                const required = form.querySelectorAll('[data-validate]');
+                let filled = 0;
+                required.forEach((el) => {
+                    const v = (el.value || '').trim();
+                    if (v) filled++;
+                });
+                const pct = required.length ? Math.round((filled / required.length) * 100) : 0;
+                progressBar.style.width = pct + '%';
+                progressPct.textContent = pct + '%';
+                if (pct === 0) progressLabel.textContent = "Let's get started";
+                else if (pct < 50) progressLabel.textContent = 'Good start';
+                else if (pct < 100) progressLabel.textContent = 'Almost there';
+                else progressLabel.textContent = 'Ready to send';
+            }
+
+            // ----- Submit -----
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                let allValid = true;
+                form.querySelectorAll('[data-validate]').forEach((el) => {
+                    if (!validateField(el)) allValid = false;
+                });
+                if (!allValid) {
+                    status.setAttribute('data-state', 'error');
+                    status.textContent = 'Please fix the highlighted fields and try again.';
+                    const firstInvalid = form.querySelector('[aria-invalid="true"]');
+                    if (firstInvalid) firstInvalid.focus();
+                    return;
+                }
+
+                status.setAttribute('data-state', 'loading');
+                status.textContent = 'Sending your request…';
+                submitBtn.disabled = true;
+
+                try {
+                    const fd = new FormData(form);
+                    const res = await fetch(form.action, {
+                        method: 'POST',
+                        body: fd,
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    if (res.ok) {
+                        status.setAttribute('data-state', 'success');
+                        status.innerHTML = '<strong>Request received.</strong> We respond within one business day. For urgent work, call <a href="tel:2256632217">(225) 663-2217</a>.';
+                        form.reset();
+                        fileList.innerHTML = '';
+                        syncConditionalFields();
+                        updateProgress();
+                    } else {
+                        throw new Error('Form server returned ' + res.status);
+                    }
+                } catch (err) {
+                    status.setAttribute('data-state', 'error');
+                    status.innerHTML = "Sorry — something went wrong sending the form. Please call <a href=\"tel:2256632217\">(225) 663-2217</a> or email <a href=\"mailto:assignments@corbettclaims.net\">assignments@corbettclaims.net</a>.";
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
+
+            // Init
+            syncConditionalFields();
+            updateProgress();
+        })();
+
+        // ---------- Service map — lazy init on scroll into view ----------
+        (function () {
+            const mapContainer = document.getElementById('service-map');
+            if (!mapContainer) return;
+
+            let inited = false;
+            async function initServiceMap() {
+                if (inited) return;
+                inited = true;
+                if (typeof L === 'undefined') {
+                    // Leaflet hasn't finished loading yet — wait and retry once
+                    await new Promise((r) => setTimeout(r, 300));
+                    if (typeof L === 'undefined') return;
+                }
+
+                const map = L.map('service-map', { scrollWheelZoom: false }).setView([37, -97], 4);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+
+                // Lower-48 context layer
+                fetch('us-states.geojson')
+                    .then((r) => r.ok ? r.json() : null)
+                    .then((data) => {
+                        if (!data) return;
+                        L.geoJSON(data, {
+                            style: () => ({
+                                color: '#9ca3af',
+                                weight: 0.8,
+                                fillColor: '#f3f4f6',
+                                fillOpacity: 0.55,
+                                interactive: false
+                            })
+                        }).addTo(map).bringToBack();
+                    })
+                    .catch(() => {});
+
+                const styleBase = { color: '#1e3a5f', weight: 2, fillColor: '#3b82f6', fillOpacity: 0.28 };
+                const styleHover = { color: '#1e3a5f', weight: 2.5, fillColor: '#1e3a5f', fillOpacity: 0.45 };
+
+                let serviceLayer;
+                try {
+                    const res = await fetch('service-states.geojson');
+                    if (!res.ok) throw new Error('GeoJSON fetch failed');
+                    const serviceStates = await res.json();
+
+                    serviceLayer = L.geoJSON(serviceStates, {
+                        style: () => styleBase,
+                        onEachFeature: (feature, layer) => {
+                            const name = feature.properties.name;
+                            layer.bindPopup(
+                                "<strong>" + name + "</strong><br>" +
+                                "Part of our regular service area.<br>" +
+                                "Call (225) 663-2217 to request an appraisal."
+                            );
+                            layer.bindTooltip(name, { sticky: true, direction: 'center', className: 'state-tooltip' });
+                            layer.on('mouseover', () => layer.setStyle(styleHover));
+                            layer.on('mouseout', () => serviceLayer.resetStyle(layer));
+                        }
+                    }).addTo(map);
+                } catch (e) {
+                    return;
+                }
+
+                const hqMarker = L.marker([30.4515, -91.1871]).addTo(map)
+                    .bindPopup("<strong>Baton Rouge Headquarters</strong><br>Corbett Claims<br>Independent auto &amp; heavy equipment appraisals");
+
+                map.fitBounds(serviceLayer.getBounds().extend(hqMarker.getLatLng()), { padding: [30, 30] });
+            }
+
+            if ('IntersectionObserver' in window) {
+                const io = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            initServiceMap();
+                            io.disconnect();
+                        }
+                    });
+                }, { rootMargin: '200px 0px' });
+                io.observe(mapContainer);
+            } else {
+                window.addEventListener('load', initServiceMap);
+            }
+        })();
     </script>
 </body>
 </html>

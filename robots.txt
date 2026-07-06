@@ -1,0 +1,21 @@
+# Corbett Claims — robots policy
+# Static marketing site. All content is public and crawlable.
+
+User-agent: *
+Allow: /
+
+# AI answer-engine crawlers — explicitly allowed (we want AI-search visibility
+# for a local service business). Remove a line to opt an engine out.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Sitemap: https://mcorbett51090.github.io/corbett-claims/sitemap.xml

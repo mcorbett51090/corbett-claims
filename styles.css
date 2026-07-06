@@ -15,6 +15,8 @@
 
 html {
     scroll-behavior: smooth;
+    /* Keep focused elements / anchor targets clear of the sticky nav (WCAG 2.4.11). */
+    scroll-padding-top: 72px;
 }
 
 /* Skip link — first interactive element, visible only when focused */
@@ -606,7 +608,7 @@ header.hero::before {
 input, textarea, select {
     width: 100%;
     box-sizing: border-box;
-    border: 1px solid #9ca3af;
+    border: 1px solid #6b7280;
     border-radius: 10px;
     padding: 14px;
     font-size: 1rem;
@@ -719,7 +721,7 @@ select[aria-invalid="true"] {
     font-weight: 600;
     text-decoration: none;
 }
-.contact-card a { color: var(--primary); text-decoration: none; }
+.contact-card a { color: var(--primary); text-decoration: underline; }
 .contact-card .stack { margin-bottom: 1.25rem; }
 .contact-card .divider {
     margin-top: 1.75rem;
@@ -730,7 +732,7 @@ select[aria-invalid="true"] {
 
 /* ---------- File upload ---------- */
 .file-upload {
-    border: 2px dashed #9ca3af;
+    border: 2px dashed #6b7280;
     border-radius: 10px;
     padding: 1rem;
     background: var(--soft-bg);
@@ -923,4 +925,38 @@ footer .footer-inner {
     .form-row { grid-template-columns: 1fr; }
     .section-title { font-size: 1.85rem; }
     .container { padding: 3rem 1.25rem; }
+}
+
+/* ---------- Print ---------- */
+@media print {
+    nav,
+    #menu-btn,
+    #mobile-menu,
+    .nav-cta,
+    .floating-btn,
+    #service-map,
+    .hero-ctas,
+    .contact-form,
+    .state-picker,
+    .skip-link {
+        display: none !important;
+    }
+    * {
+        background: transparent !important;
+        color: #000 !important;
+        box-shadow: none !important;
+    }
+    body { font-size: 12pt; line-height: 1.4; }
+    a { color: #000 !important; text-decoration: underline; }
+    a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; word-break: break-all; }
+    a[href^="tel:"]::after,
+    a[href^="mailto:"]::after,
+    .nav-brand a::after { content: ""; }
+    .container,
+    .container-wide { max-width: 100% !important; }
+    section,
+    .trust-bar { padding: 1rem 0 !important; }
+    .card,
+    .faq-item,
+    .team-member { break-inside: avoid; }
 }

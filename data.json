@@ -7,9 +7,12 @@
     "founder": "Ronnie Corbett",
     "founded": "2001",
     "founderBackground": "12 years as a staff adjuster at Allstate Insurance prior to going independent",
-    "owners": ["Ronnie (Ronald) Corbett", "Annie Corbett"],
+    "owners": [
+      "Ronnie (Ronald) Corbett",
+      "Annie Corbett"
+    ],
     "status": "Active",
-    "yearsActive": "25+ (since 2001) · 37+ years of combined appraisal experience",
+    "yearsActive": "25+ (since 2001) \u00b7 37+ years of combined appraisal experience",
     "headquarters": {
       "city": "Baton Rouge",
       "state": "Louisiana",
@@ -17,7 +20,9 @@
       "mailingAddress": "PO Box 84333, Baton Rouge, LA 70884"
     },
     "contact": {
-      "phone": ["(225) 663-2217"],
+      "phone": [
+        "(225) 663-2217"
+      ],
       "email": "assignments@corbettclaims.net",
       "website": null
     },
@@ -37,22 +42,41 @@
     ],
     "coverageArea": {
       "headquarters": "Baton Rouge, Louisiana",
-      "anchorStates": ["Louisiana", "Texas", "Mississippi", "Alabama", "Florida", "Ohio", "Illinois", "Nevada"],
-      "regionalDescription": "Assignments accepted across the corridor from Texas to Florida and up to Ohio, Illinois, and Nevada"
+      "anchorStates": [
+        "Louisiana",
+        "Texas",
+        "Mississippi",
+        "Alabama",
+        "Florida",
+        "Ohio",
+        "Illinois",
+        "Nevada",
+        "Georgia"
+      ],
+      "regionalDescription": "Assignments accepted across the corridor from Texas to Florida and up to Ohio, Illinois, Nevada, and Georgia"
     },
     "hours": {
-      "monday": "9:00 AM - 6:00 PM",
-      "tuesday": "9:00 AM - 6:00 PM",
-      "wednesday": "9:00 AM - 6:00 PM",
-      "thursday": "9:00 AM - 6:00 PM",
-      "friday": "9:00 AM - 6:00 PM",
+      "monday": "8:00 AM - 5:00 PM",
+      "tuesday": "8:00 AM - 5:00 PM",
+      "wednesday": "8:00 AM - 5:00 PM",
+      "thursday": "8:00 AM - 5:00 PM",
+      "friday": "8:00 AM - 5:00 PM",
       "saturday": "Closed",
       "sunday": "Closed"
     },
-    "paymentMethods": ["Visa", "MasterCard", "Discover", "American Express", "Check", "Debit Card"],
-    "languages": ["English", "Spanish"],
+    "paymentMethods": [
+      "Check",
+      "Venmo",
+      "PayPal",
+      "Cash App",
+      "Apple Cash",
+      "Zelle"
+    ],
+    "languages": [
+      "English"
+    ],
     "differentiators": [
-      "Truly independent — no ties to any insurer or repair shop",
+      "Truly independent \u2014 no ties to any insurer or repair shop",
       "Carrier-side experience: founder spent 12 years as an Allstate adjuster before going independent",
       "Broad equipment scope including heavy farm equipment, which many independent appraisers won't take on"
     ],

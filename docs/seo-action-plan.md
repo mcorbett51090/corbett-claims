@@ -2,7 +2,7 @@
 
 _Produced 2026-07-07 via a research-grounded, two-panel + critic + red-team review (FORGE, standard depth). Goal: be found **immediately for the business name now**, and climb for **service+city searches over the following months.**_
 
-> **Read this first.** Statistics in SEO are mostly vendor estimates, not numbers Google publishes — treat percentages here as *directional*. The load-bearing facts (what follows Google's own documentation) are cited. And the honest headline: **nothing here can work until the site is actually live on `corbettclaims.net`** (today it's a GoDaddy parking page). The cutover is prerequisite #0.
+> **Read this first.** Statistics in SEO are mostly vendor estimates, not numbers Google publishes — treat percentages here as *directional*. The load-bearing facts (what follows Google's own documentation) are cited. **Status update (2026-07-07): the site is now LIVE on [https://corbettclaims.com](https://corbettclaims.com) with HTTPS enforced** — the DNS cutover (the old "prerequisite #0") is done. The remaining foundational step is Search Console. Note the split: the **website** is on `.com`; **email** stays on `@corbettclaims.net`. So the duplicate-domain redirect below runs `.net → .com` (website only — never touch `.net`'s email/MX).
 
 ---
 
@@ -10,10 +10,10 @@ _Produced 2026-07-07 via a research-grounded, two-panel + critic + red-team revi
 
 In priority order. These are ~80% of the result:
 
-1. **Finish the DNS cutover** so `corbettclaims.net` serves the real site (+ enforce HTTPS). *Nothing ranks until this is done.*
+1. ✅ **DNS cutover — done.** The site is live on `corbettclaims.com` with HTTPS enforced. *(This was the old #1; it's complete.)*
 2. **Create/claim & verify a Google Business Profile (GBP).** This is the single biggest lever for a local business being found — bigger than everything on the website combined. (Needs an owner decision — see below.)
-3. **Verify the site in Google Search Console, submit the sitemap, and "Request Indexing"** on the homepage — *after* cutover. This gets you ranking #1 for "Corbett Claims" within days.
-4. **301-redirect `corbettclaims.com` → `corbettclaims.net`** so the two domains don't compete (leave email/MX untouched).
+3. **Verify the site in Google Search Console, submit the sitemap, and "Request Indexing"** on the homepage. This gets you ranking #1 for "Corbett Claims" within days. **(Next up — nothing's blocking it.)**
+4. **301-redirect `corbettclaims.net`'s *website* → `corbettclaims.com`** so the two domains don't compete. Change only `.net`'s A/CNAME (website) records — **never its MX/email**.
 5. **Start asking every satisfied client for a Google review** — reviews are a top-3 local ranking + conversion signal.
 
 Everything else in this document is refinement on top of these five.
@@ -47,27 +47,27 @@ Source for indexing≠ranking + "submission is a hint, not a guarantee": [Google
 
 ## Phase 0 — Prerequisites (this week; blockers)
 
-Do these in order. **Do not request indexing or submit the sitemap while the parking page still answers** — Google would cache the wrong content.
+Most of Phase 0 is **already done** — only Search Console remains. (The old "don't submit the sitemap while the parking page still answers" caution no longer applies; the real site is live.)
 
-| # | Action | Owner | Effort |
+| # | Action | Owner | Status |
 |---|---|---|---|
-| 0.1 | **Pick the canonical host: apex `corbettclaims.net`** (recommended for a one-word brand). The `www` version 301s to it automatically once both DNS records exist. | You | S |
-| 0.2 | **DNS cutover at GoDaddy → GitHub Pages** (the 4 A records + `www` CNAME; re-add the repo `CNAME` file). See `domain-cutover-runbook.md`. | You (GoDaddy) | M |
-| 0.3 | **Enforce HTTPS** in the repo's Pages settings once DNS validates (cert auto-issues, can take up to 24h). | Me/You | S |
-| 0.4 | **Verify a Search Console *Domain* property** (DNS TXT record — covers http/https + www in one). | You + me | S |
+| 0.1 | **Canonical host: apex `corbettclaims.com`** (`www` auto-301s to it). | You | ✅ Done |
+| 0.2 | **DNS cutover at GoDaddy → GitHub Pages** (4 A records + `www` CNAME + `CNAME` file). See `domain-cutover-runbook.md`. | You | ✅ Done |
+| 0.3 | **Enforce HTTPS** in Pages settings. | You | ✅ Done |
+| 0.4 | **Verify a Search Console *Domain* property** (DNS TXT record — covers http/https + www in one). | You + me | ⬜ **Next** |
 | 0.5 | **Owner GBP decision** (the box above) + freeze ONE business name — `Corbett Claims` (brand) — and identify the real backend address. A keyword-stuffed GBP name is the #1 suspension trigger. | Owner | S |
 
 ---
 
-## Phase 1 — Branded fast wins (after cutover; days → ~3 weeks)
+## Phase 1 — Branded fast wins (site is live; days → ~3 weeks)
 
 **Site side (indexing & duplicate defense):**
 
 | # | Action | Effort | Notes |
 |---|---|---|---|
-| 1.1 | **Make `rel=canonical` an absolute `https://corbettclaims.net/`** (currently relative). Removes ambiguity now that `.com` + github.io exist. | S | Code change (small PR). |
-| 1.2 | **301 `corbettclaims.com` → `corbettclaims.net`** (whole domain, at Webador/its DNS). **Only touch A/CNAME/forwarding — never MX** (M365 email stays put). | S–M | Biggest duplicate-content fix. |
-| 1.3 | **Point sitemap.xml + robots.txt `Sitemap:` at the absolute `https://corbettclaims.net/…`, submit the sitemap in GSC, and "Request Indexing" the homepage.** | S | This is what wins branded search fast. |
+| 1.1 | **Canonical** — the `rel=canonical`/OG tags are relative, so they already resolve to `https://corbettclaims.com/`. | — | ✅ Handled by the cutover. |
+| 1.2 | **301 `corbettclaims.net`'s *website* → `corbettclaims.com`** (at GoDaddy, on `.net`'s A/CNAME records only). **Never touch `.net`'s MX/email** (Proofpoint). | S | Biggest duplicate-content fix — still to do. |
+| 1.3 | **Submit the sitemap in GSC + "Request Indexing" the homepage.** (`sitemap.xml` + `robots.txt` already point at `https://corbettclaims.com/` — done in the cutover.) | S | This is what wins branded search fast. |
 | 1.4 | **github.io** needs no work — Pages auto-301s it to the custom domain once attached. Don't add a manual noindex. | — | Confirmed [GitHub docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site). |
 | 1.5 | **Leaflet map:** lazy-load/defer it so it never blocks page load. Then stop — the page is otherwise fast. | S | Core Web Vitals is a minor tie-breaker, not a big lever. |
 
@@ -105,13 +105,14 @@ Branded search is won by Phase 0–1. Ranking for "diminished value appraisal Lo
 ## Critical path (what blocks what)
 
 ```
-0.1 canonical host ─► 0.2 DNS cutover ─► 0.3 HTTPS ─► 0.4 GSC Domain property
-                              │                              │
-   0.5 owner GBP decision ────┤                              ▼
-                              │              1.1 abs. canonical · 1.2 .com→.net 301 · 1.3 sitemap+index
-   (if yes) ─► 1.6 create GBP ─► 1.7 verify ─► 1.8 Tier-1 listings ─► 1.9 reviews
-                              │
-                              └────────────► 2.x content + citations + reviews (weeks→months)
+[✅ done: 0.1 canonical = corbettclaims.com · 0.2 DNS cutover · 0.3 HTTPS]
+        │
+        ▼
+0.4 GSC Domain property ─► 1.2 .net→.com 301 · 1.3 submit sitemap + request indexing   (wins branded search in days)
+
+0.5 owner GBP decision ─► 1.6 create GBP ─► 1.7 verify ─► 1.8 Tier-1 listings ─► 1.9 reviews
+                                    │
+                                    └─► 2.x content + citations + reviews (weeks → months)
 ```
 
 ---
@@ -122,8 +123,7 @@ Branded search is won by Phase 0–1. Ranking for "diminished value appraisal Lo
 |---|---|---|
 | **GBP suspension** (PO-box address, keyword-stuffed name, 9-state service-area sprawl, duplicate listings, rapid simultaneous edits, incentivized/gated/farmed reviews). Catastrophic for a single-location firm with no backup listing. | 🔴 High | Follow every GBP rule in this plan exactly; real hidden address; frozen brand name; 2-hr service area; stage edits over weeks; reviews 100% policy-compliant. |
 | **Owner declines the home address / on-camera verify** → blocks the #1 lever. | 🔴 High | Decide early (box above). Fallback: site indexing + Bing/Apple wins branded search; map pack forfeited. |
-| **SEO actions run before cutover** → Google caches the parking page. | 🟠 Med | Strict sequencing — Phase 1 only after 0.2–0.3 are live. |
-| **`.com` 301 accidentally breaks M365 email** | 🟠 Med | Change only A/CNAME/forwarding; never the MX records. |
+| **The `.net → .com` website redirect accidentally breaks `.net` email** | 🟠 Med | On `.net`, change only the A/CNAME (website) records — **never** the MX/TXT (Proofpoint email). |
 | **Plan overwhelms a 2-person shop → nothing happens** | 🟠 Med | Use the "5 things" list; treat Phase 2 as optional/slow. |
 | **B2B clients (adjusters/attorneys) won't leave public reviews** | 🟡 Low | Lead review asks with private owners; treat pro reviews as bonus. |
 

@@ -503,21 +503,28 @@
 
                     <div class="form-row">
                         <div class="field">
-                            <label for="name">Your Name <span class="required-mark" aria-hidden="true">*</span></label>
-                            <input id="name" type="text" name="name" autocomplete="name" required aria-describedby="name-error" data-validate="required">
-                            <span class="field-error" id="name-error" aria-live="polite"></span>
+                            <label for="first-name">First Name <span class="required-mark" aria-hidden="true">*</span></label>
+                            <input id="first-name" type="text" name="first_name" autocomplete="given-name" required aria-describedby="first-name-error" data-validate="required">
+                            <span class="field-error" id="first-name-error" aria-live="polite"></span>
                         </div>
+                        <div class="field">
+                            <label for="last-name">Last Name <span class="required-mark" aria-hidden="true">*</span></label>
+                            <input id="last-name" type="text" name="last_name" autocomplete="family-name" required aria-describedby="last-name-error" data-validate="required">
+                            <span class="field-error" id="last-name-error" aria-live="polite"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
                         <div class="field">
                             <label for="phone">Phone Number <span class="required-mark" aria-hidden="true">*</span></label>
                             <input id="phone" type="tel" name="phone" autocomplete="tel" required aria-describedby="phone-error" data-validate="phone" placeholder="(225) 555-0100">
                             <span class="field-error" id="phone-error" aria-live="polite"></span>
                         </div>
-                    </div>
-
-                    <div class="field">
-                        <label for="email">Email Address <span class="required-mark" aria-hidden="true">*</span></label>
-                        <input id="email" type="email" name="email" autocomplete="email" required aria-describedby="email-error" data-validate="email">
-                        <span class="field-error" id="email-error" aria-live="polite"></span>
+                        <div class="field">
+                            <label for="email">Email Address <span class="required-mark" aria-hidden="true">*</span></label>
+                            <input id="email" type="email" name="email" autocomplete="email" required aria-describedby="email-error" data-validate="email">
+                            <span class="field-error" id="email-error" aria-live="polite"></span>
+                        </div>
                     </div>
 
                     <div class="form-row">
@@ -928,7 +935,7 @@
                 // the visitor's own email app — pre-filled and addressed to assignments@corbettclaims.net.
                 const g = (n) => ((form.elements[n] && form.elements[n].value) || '').trim();
                 const lines = [
-                    'Name: ' + g('name'),
+                    'Name: ' + (g('first_name') + ' ' + g('last_name')).trim(),
                     'Phone: ' + g('phone'),
                     'Email: ' + g('email'),
                     'Equipment Type: ' + g('equipment_type'),
@@ -944,7 +951,7 @@
                 if (g('message')) lines.push('', 'Notes: ' + g('message'));
 
                 const mailto = 'mailto:assignments@corbettclaims.net'
-                    + '?subject=' + encodeURIComponent('Appraisal request — ' + (g('name') || 'website'))
+                    + '?subject=' + encodeURIComponent('Appraisal request — ' + ((g('first_name') + ' ' + g('last_name')).trim() || 'website'))
                     + '&body=' + encodeURIComponent(lines.join('\n'));
 
                 status.setAttribute('data-state', 'success');

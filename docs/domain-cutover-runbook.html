@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><text y="13" font-size="13">🌐</text></svg>'>
+<title>Domain Cutover Runbook — corbettclaims.net → GitHub Pages</title>
+<style>
+  :root {
+    --ground:#f6f7f9; --surface:#ffffff; --surface-2:#eef1f5;
+    --ink:#16202e; --ink-soft:#4a5769; --ink-faint:#7b8798;
+    --border:#d9dee6; --border-strong:#c3cad5;
+    --navy:#1e3a5f; --link:#2f6099;
+    --del:#a3272b; --del-bg:#fbeaea; --del-border:#eec4c4;
+    --add:#1f7a43; --add-bg:#e7f4ec; --add-border:#bce0c9;
+    --warn:#9a5b00; --warn-bg:#fdf1dd; --warn-border:#f0cf95;
+    --font-sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --font-mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground:#0d1420; --surface:#131c2b; --surface-2:#1b2739;
+      --ink:#e6ebf2; --ink-soft:#a9b4c4; --ink-faint:#74839a;
+      --border:#263449; --border-strong:#33465f;
+      --navy:#7aa7dd; --link:#8fbaf0;
+      --del:#e88b8e; --del-bg:#2a1618; --del-border:#4a2529;
+      --add:#7bd29b; --add-bg:#10241a; --add-border:#244d34;
+      --warn:#e6b26a; --warn-bg:#2a2010; --warn-border:#4a3a1c;
+    }
+  }
+  :root[data-theme="light"] {
+    --ground:#f6f7f9; --surface:#ffffff; --surface-2:#eef1f5;
+    --ink:#16202e; --ink-soft:#4a5769; --ink-faint:#7b8798;
+    --border:#d9dee6; --border-strong:#c3cad5;
+    --navy:#1e3a5f; --link:#2f6099;
+    --del:#a3272b; --del-bg:#fbeaea; --del-border:#eec4c4;
+    --add:#1f7a43; --add-bg:#e7f4ec; --add-border:#bce0c9;
+    --warn:#9a5b00; --warn-bg:#fdf1dd; --warn-border:#f0cf95;
+  }
+  :root[data-theme="dark"] {
+    --ground:#0d1420; --surface:#131c2b; --surface-2:#1b2739;
+    --ink:#e6ebf2; --ink-soft:#a9b4c4; --ink-faint:#74839a;
+    --border:#263449; --border-strong:#33465f;
+    --navy:#7aa7dd; --link:#8fbaf0;
+    --del:#e88b8e; --del-bg:#2a1618; --del-border:#4a2529;
+    --add:#7bd29b; --add-bg:#10241a; --add-border:#244d34;
+    --warn:#e6b26a; --warn-bg:#2a2010; --warn-border:#4a3a1c;
+  }
+
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--font-sans); line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:760px; margin:0 auto; padding:clamp(1.5rem,4vw,3.5rem) clamp(1rem,4vw,1.75rem) 4rem; }
+
+  /* Header */
+  .eyebrow {
+    font-size:.72rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--navy); margin:0 0 .75rem;
+  }
+  h1 {
+    font-size:clamp(1.7rem,4.5vw,2.3rem); line-height:1.12; letter-spacing:-.02em;
+    font-weight:800; margin:0 0 .9rem; text-wrap:balance; color:var(--ink);
+  }
+  .lede { font-size:1.06rem; color:var(--ink-soft); margin:0 0 1.25rem; max-width:60ch; }
+  .metaline {
+    display:flex; flex-wrap:wrap; gap:.5rem .9rem; align-items:center;
+    font-size:.82rem; color:var(--ink-faint); font-family:var(--font-mono);
+    padding-bottom:1.4rem; margin-bottom:.4rem; border-bottom:1px solid var(--border);
+  }
+  .metaline span { display:inline-flex; align-items:center; gap:.4rem; }
+  .metaline .dot { width:5px; height:5px; border-radius:50%; background:var(--border-strong); }
+
+  /* Verified-source note */
+  .note {
+    font-size:.85rem; color:var(--ink-soft); background:var(--surface-2);
+    border:1px solid var(--border); border-radius:8px; padding:.7rem .9rem; margin:1.4rem 0;
+  }
+  .note a { color:var(--link); }
+
+  /* Section headings */
+  h2 {
+    font-size:1.28rem; letter-spacing:-.01em; font-weight:750; margin:2.6rem 0 1rem;
+    display:flex; align-items:center; gap:.7rem; text-wrap:balance;
+  }
+  .step h2 { margin-top:0; }
+  .stepnum {
+    flex:0 0 auto; width:1.9rem; height:1.9rem; border-radius:50%;
+    background:var(--navy); color:#fff; font-size:.95rem; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-variant-numeric:tabular-nums;
+  }
+  @media (prefers-color-scheme: dark) { .stepnum { color:#0d1420; } }
+  :root[data-theme="dark"] .stepnum { color:#0d1420; }
+  :root[data-theme="light"] .stepnum { color:#fff; }
+
+  h3 { font-size:.95rem; font-weight:700; margin:1.5rem 0 .6rem; color:var(--ink); }
+
+  p { margin:.7rem 0; }
+  a { color:var(--link); text-underline-offset:2px; }
+  a:focus-visible, summary:focus-visible { outline:2px solid var(--navy); outline-offset:2px; border-radius:3px; }
+
+  /* Cards */
+  .card {
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:1.4rem clamp(1rem,3vw,1.6rem); margin:1.3rem 0;
+  }
+  .step { position:relative; }
+
+  /* Machine values */
+  code {
+    font-family:var(--font-mono); font-size:.86em;
+    background:var(--surface-2); border:1px solid var(--border);
+    padding:.08em .4em; border-radius:5px; color:var(--ink);
+    white-space:nowrap;
+  }
+
+  /* Tables */
+  .scroll { overflow-x:auto; margin:1rem 0; border:1px solid var(--border); border-radius:10px; }
+  table { border-collapse:collapse; width:100%; font-size:.9rem; min-width:460px; }
+  caption { caption-side:top; text-align:left; font-size:.8rem; color:var(--ink-faint);
+    letter-spacing:.04em; text-transform:uppercase; font-weight:600; padding:.7rem .9rem .3rem; }
+  th {
+    text-align:left; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--ink-faint); font-weight:700; padding:.6rem .9rem; background:var(--surface-2);
+    border-bottom:1px solid var(--border);
+  }
+  td { padding:.62rem .9rem; border-bottom:1px solid var(--border); vertical-align:middle; }
+  tr:last-child td { border-bottom:none; }
+  td.mono, th.mono { font-family:var(--font-mono); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .row-del td { background:var(--del-bg); }
+  .row-add td { background:var(--add-bg); }
+  .row-del td.mono code { text-decoration:line-through; text-decoration-color:var(--del); opacity:.85; }
+
+  /* Action pills */
+  .pill {
+    display:inline-block; font-size:.7rem; font-weight:700; letter-spacing:.03em;
+    padding:.14em .55em; border-radius:999px; text-transform:uppercase; white-space:nowrap;
+    border:1px solid transparent;
+  }
+  .pill-del { color:var(--del); background:var(--del-bg); border-color:var(--del-border); }
+  .pill-add { color:var(--add); background:var(--add-bg); border-color:var(--add-border); }
+  .pill-edit { color:var(--navy); background:var(--surface-2); border-color:var(--border-strong); }
+
+  /* Callout */
+  .callout {
+    background:var(--warn-bg); border:1px solid var(--warn-border); border-left:4px solid var(--warn);
+    border-radius:8px; padding:1rem 1.1rem; margin:1.3rem 0;
+  }
+  .callout .h {
+    font-weight:750; color:var(--warn); font-size:.95rem; margin:0 0 .4rem;
+    display:flex; align-items:center; gap:.5rem;
+  }
+  .callout p { margin:.4rem 0; font-size:.92rem; }
+  .callout ul { margin:.4rem 0; padding-left:1.2rem; }
+  .callout li { margin:.3rem 0; font-size:.92rem; }
+
+  /* Ordered/checklist steps */
+  ol.plain { padding-left:1.3rem; }
+  ol.plain li { margin:.5rem 0; padding-left:.2rem; }
+  ul.verify { list-style:none; padding:0; margin:1rem 0; display:flex; flex-direction:column; gap:.7rem; }
+  ul.verify li {
+    display:flex; gap:.7rem; align-items:flex-start;
+    background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:.8rem .95rem;
+    font-size:.92rem;
+  }
+  ul.verify .check {
+    flex:0 0 auto; width:1.3rem; height:1.3rem; border-radius:50%;
+    background:var(--add-bg); border:1px solid var(--add-border); color:var(--add);
+    display:inline-flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:800; margin-top:.05rem;
+  }
+
+  hr { border:none; border-top:1px solid var(--border); margin:2.6rem 0; }
+
+  .foot { font-size:.8rem; color:var(--ink-faint); margin-top:2.5rem; }
+  .foot code { font-size:.82em; }
+
+  @media print {
+    body { background:#fff; color:#000; }
+    .card, .scroll, ul.verify li { break-inside:avoid; }
+    .wrap { max-width:none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Operations Runbook</p>
+    <h1>Point <code>corbettclaims.net</code> at GitHub Pages</h1>
+    <p class="lede">Move the live site from the current host (AWS/Fastly) to this repo's GitHub Pages deployment, on the custom domain <code>corbettclaims.net</code>.</p>
+    <div class="metaline">
+      <span>Written 2026-07-07 14:45 UTC</span>
+      <span class="dot" aria-hidden="true"></span>
+      <span>mcorbett51090/corbett-claims</span>
+      <span class="dot" aria-hidden="true"></span>
+      <span>DNS provider: GoDaddy</span>
+    </div>
+  </header>
+
+  <div class="note">
+    GitHub Pages IP addresses below were verified against GitHub's official documentation on 2026-07-07 —
+    <a href="https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site">Managing a custom domain for your GitHub Pages site</a>.
+  </div>
+
+  <h2>Current state</h2>
+  <div class="scroll">
+    <table>
+      <caption>As of 2026-07-07</caption>
+      <tbody>
+        <tr><td>Registrar / nameservers</td><td class="mono"><code>ns63/ns64.domaincontrol.com</code> (GoDaddy)</td></tr>
+        <tr><td>Apex <code>A</code> records</td><td class="mono"><code>3.33.130.190</code>, <code>15.197.148.33</code></td></tr>
+        <tr><td><code>www</code></td><td class="mono">CNAME → <code>corbettclaims.net</code></td></tr>
+        <tr><td>CAA record</td><td>none — nothing blocks GitHub's HTTPS cert</td></tr>
+        <tr><td>Apex A record TTL</td><td class="mono">600s (fast cutover)</td></tr>
+        <tr><td>GitHub Pages</td><td>Live at <code>mcorbett51090.github.io/corbett-claims/</code>, built from <code>main</code>/root</td></tr>
+        <tr><td>Custom domain attached?</td><td>Not yet — done by merging the <code>CNAME</code> PR</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <section class="card step">
+    <h2><span class="stepnum" aria-hidden="true">1</span> Change DNS at GoDaddy</h2>
+    <p>GoDaddy → your domain → <strong>Manage DNS</strong>. Make exactly these changes.</p>
+
+    <h3>Apex (<code>@</code>) — replace the two old A records</h3>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Action</th><th>Type</th><th>Name</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr class="row-del"><td><span class="pill pill-del">Delete</span></td><td class="mono">A</td><td class="mono">@</td><td class="mono"><code>3.33.130.190</code></td></tr>
+          <tr class="row-del"><td><span class="pill pill-del">Delete</span></td><td class="mono">A</td><td class="mono">@</td><td class="mono"><code>15.197.148.33</code></td></tr>
+          <tr class="row-add"><td><span class="pill pill-add">Add</span></td><td class="mono">A</td><td class="mono">@</td><td class="mono"><code>185.199.108.153</code></td></tr>
+          <tr class="row-add"><td><span class="pill pill-add">Add</span></td><td class="mono">A</td><td class="mono">@</td><td class="mono"><code>185.199.109.153</code></td></tr>
+          <tr class="row-add"><td><span class="pill pill-add">Add</span></td><td class="mono">A</td><td class="mono">@</td><td class="mono"><code>185.199.110.153</code></td></tr>
+          <tr class="row-add"><td><span class="pill pill-add">Add</span></td><td class="mono">A</td><td class="mono">@</td><td class="mono"><code>185.199.111.153</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3><code>www</code> — edit the existing CNAME</h3>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Action</th><th>Type</th><th>Name</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill pill-edit">Edit</span></td><td class="mono">CNAME</td><td class="mono">www</td><td class="mono"><code>corbettclaims.net</code> → <code>mcorbett51090.github.io</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Optional — IPv6 (AAAA on <code>@</code>)</h3>
+    <p class="mono" style="font-size:.86rem; color:var(--ink-soft);"><code>2606:50c0:8000::153</code>, <code>2606:50c0:8001::153</code>, <code>2606:50c0:8002::153</code>, <code>2606:50c0:8003::153</code></p>
+
+    <div class="callout">
+      <p class="h">⚠ Do not touch these</p>
+      <ul>
+        <li><strong>Leave every <code>MX</code> and <code>TXT</code> record alone</strong> — those run <code>assignments@corbettclaims.net</code> email. Repointing the web A/CNAME records does not affect email; deleting an MX/TXT would break it.</li>
+        <li>If GoDaddy <strong>domain Forwarding</strong> is on for this domain, turn it <strong>off</strong> — it can override the A records.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card step">
+    <h2><span class="stepnum" aria-hidden="true">2</span> Attach the domain</h2>
+    <p>After DNS is in:</p>
+    <ol class="plain">
+      <li>Merge the <strong>domain-cutover PR</strong> (adds the <code>CNAME</code> file = <code>corbettclaims.net</code> and makes the site's URLs host-agnostic) — <a href="https://github.com/mcorbett51090/corbett-claims/pull/3">PR #3</a>.</li>
+      <li>Repo → <strong>Settings → Pages</strong> should show <code>corbettclaims.net</code> verified.</li>
+      <li>Once the certificate finishes provisioning (minutes, occasionally up to an hour), tick <strong>Enforce HTTPS</strong>.</li>
+    </ol>
+    <p style="font-size:.9rem; color:var(--ink-soft);">Merging before DNS is switched is harmless: the <code>github.io</code> URL just starts redirecting to <code>corbettclaims.net</code>, which still serves the old host until Step 1 completes.</p>
+  </section>
+
+  <h2>Verifying the cutover</h2>
+  <ul class="verify">
+    <li><span class="check" aria-hidden="true">✓</span><span><strong>DNS propagation:</strong> <code>dig +short corbettclaims.net A</code> should return the four <code>185.199.10x.153</code> addresses.</span></li>
+    <li><span class="check" aria-hidden="true">✓</span><span><strong>Pages status:</strong> <code>gh api repos/mcorbett51090/corbett-claims/pages</code> → <code>cname</code> reads <code>corbettclaims.net</code>, <code>https_enforced: true</code>.</span></li>
+    <li><span class="check" aria-hidden="true">✓</span><span><strong>End to end:</strong> load <code>https://corbettclaims.net/</code> and submit the contact form — it should open a pre-filled email to <code>assignments@corbettclaims.net</code>.</span></li>
+  </ul>
+
+  <hr>
+
+  <h2>Rollback</h2>
+  <p>If anything goes wrong, restore the two original apex A records at GoDaddy (<code>3.33.130.190</code>, <code>15.197.148.33</code>) and set the <code>www</code> CNAME back to <code>corbettclaims.net</code>. Because the TTL is 600s, the old host is reachable again within about 10 minutes. Keep a note of these originals before you change anything.</p>
+
+  <p class="foot">Source of truth: <code>docs/domain-cutover-runbook.md</code> in the corbett-claims repo. This page mirrors it for reading and printing.</p>
+
+</div>
+
+</body>
+</html>

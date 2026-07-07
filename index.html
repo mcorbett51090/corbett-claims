@@ -148,10 +148,8 @@
     }
     </script>
 
-    <!-- Location field: current-location button + Google Places autocomplete -->
+    <!-- Location field: current-location button + address autocomplete output -->
     <style>
-      #location-autocomplete-mount { display:block; }
-      #location-autocomplete-mount gmp-place-autocomplete { width:100%; }
       .location-actions { display:flex; flex-wrap:wrap; align-items:center; gap:.6rem; margin-top:.5rem; }
       .btn-geo {
         display:inline-flex; align-items:center; gap:.4rem; cursor:pointer; font:inherit;
@@ -160,10 +158,14 @@
       }
       .btn-geo:hover { background:#1e3a5f; color:#fff; }
       .btn-geo:disabled { opacity:.55; cursor:default; }
-      .geo-status { font-size:.85rem; color:var(--muted,#5a6675); }
+      .geo-status { display:block; margin-top:.5rem; font-size:.85rem; line-height:1.45; color:var(--muted,#5a6675); }
+      .geo-status:empty { display:none; }
+      .geo-status a { color:#1e3a5f; font-weight:600; }
       .geo-status[data-state="ok"]   { color:#1f7a43; }
       .geo-status[data-state="err"]  { color:#a3272b; }
       .geo-status[data-state="load"] { color:#1e3a5f; }
+      /* Keep Google's autocomplete dropdown above the map/other content */
+      .pac-container { z-index: 10000; }
     </style>
 </head>
 <body>
@@ -547,24 +549,20 @@
                     </div>
 
                     <div class="field">
-                        <label for="location-input">Vehicle / Equipment Location <span class="required-mark" aria-hidden="true">*</span></label>
+                        <label for="location">Vehicle / Equipment Location <span class="required-mark" aria-hidden="true">*</span></label>
 
-                        <!-- Google Places autocomplete mounts here once the Maps script loads (progressive enhancement) -->
-                        <div id="location-autocomplete-mount" hidden></div>
-
-                        <!-- Always-present base field: free text (e.g. "mile marker 42, I-10 W"), browser autofill,
-                             and the current-location button all work even if Google never loads -->
-                        <input id="location-input" type="text" autocomplete="street-address" aria-describedby="location-hint location-error" placeholder="Start typing an address…">
+                        <!-- The site's own styled input (matches the other fields). Google Places
+                             autocomplete attaches to THIS input; the GPS button writes into it too. -->
+                        <input id="location" name="location" type="text" autocomplete="street-address" required aria-describedby="location-hint location-error geo-status" data-validate="required" placeholder="Start typing an address…">
 
                         <div class="location-actions">
                             <button type="button" id="use-location-btn" class="btn-geo">
                                 <span aria-hidden="true">📍</span> Use my current location
                             </button>
-                            <span id="geo-status" class="geo-status" role="status" aria-live="polite"></span>
                         </div>
 
-                        <!-- Canonical value the form validates and emails (set by autocomplete, GPS, or typed text) -->
-                        <input type="hidden" id="location" name="location" data-validate="required">
+                        <!-- Captured GPS coordinates + a map link appear here so the user can confirm the location (e.g. spot VPN skew). -->
+                        <span id="geo-status" class="geo-status" role="status" aria-live="polite"></span>
                         <input type="hidden" id="location_maps_url" name="location_maps_url">
 
                         <span class="field-hint" id="location-hint">Type an address and pick a suggestion, or tap <strong>Use my current location</strong> — best when a vehicle is stranded on the road.</span>
@@ -967,37 +965,29 @@
         })();
     </script>
 
-    <!-- Location field: current-location (GPS) + progressive Google Places autocomplete -->
+    <!-- Location field: current-location (GPS) + Google Places autocomplete bound to our own input -->
     <script>
         (function () {
-            var hidden = document.getElementById('location');
+            var input = document.getElementById('location');
             var mapsHidden = document.getElementById('location_maps_url');
-            var plain = document.getElementById('location-input');
-            var mount = document.getElementById('location-autocomplete-mount');
             var geoBtn = document.getElementById('use-location-btn');
             var geoStatus = document.getElementById('geo-status');
             var locErr = document.getElementById('location-error');
-            if (!hidden || !plain || !geoBtn) return;
+            if (!input || !geoBtn) return;
 
-            function setStatus(msg, state) {
+            function setStatus(html, state) {
                 if (!geoStatus) return;
-                geoStatus.textContent = msg;
+                geoStatus.innerHTML = html || '';
                 if (state) geoStatus.setAttribute('data-state', state);
                 else geoStatus.removeAttribute('data-state');
             }
-            // Write the canonical value + optional maps link, then let the main form
-            // script re-run its validation + progress meter (it listens on [data-validate]).
-            function setLoc(val, mapsUrl) {
-                hidden.value = val || '';
-                if (mapsHidden) mapsHidden.value = mapsUrl || '';
-                if (val && locErr) { locErr.textContent = ''; hidden.removeAttribute('aria-invalid'); }
-                hidden.dispatchEvent(new Event('input', { bubbles: true }));
+            // Clear the required-error and refresh the main form's validation + progress meter.
+            function refresh() {
+                if (input.value && locErr) { locErr.textContent = ''; input.removeAttribute('aria-invalid'); }
+                input.dispatchEvent(new Event('input', { bubbles: true }));
             }
 
-            // Typed free text — works with or without Google.
-            plain.addEventListener('input', function () { setLoc(plain.value, ''); });
-
-            // "Use my current location" — browser Geolocation, no third party, no key.
+            // "Use my current location" — browser Geolocation (no third party, no key).
             geoBtn.addEventListener('click', function () {
                 if (!('geolocation' in navigator)) {
                     setStatus('Location isn’t available on this device — please type the address.', 'err');
@@ -1010,9 +1000,17 @@
                     var lo = pos.coords.longitude.toFixed(6);
                     var acc = Math.round(pos.coords.accuracy || 0);
                     var coord = la + ', ' + lo;
-                    plain.value = coord;
-                    setLoc(coord, 'https://www.google.com/maps?q=' + la + ',' + lo);
-                    setStatus('Location captured — accurate to about ' + acc + ' m ✓', 'ok');
+                    var mapsUrl = 'https://www.google.com/maps?q=' + la + ',' + lo;
+                    input.value = coord;                       // visible in the box
+                    if (mapsHidden) mapsHidden.value = mapsUrl;
+                    refresh();
+                    // Show the captured output so the user can confirm it (VPN / network can skew it).
+                    setStatus(
+                        'Captured <strong>' + coord + '</strong> (±' + acc + ' m). ' +
+                        '<a href="' + mapsUrl + '" target="_blank" rel="noopener">View on map ↗</a> — ' +
+                        'confirm this is your location; if it looks off, a VPN or network may be skewing it.',
+                        'ok'
+                    );
                     geoBtn.disabled = false;
                 }, function (err) {
                     var m = err.code === 1 ? 'Location permission was blocked. Allow location for this site, or type the address.'
@@ -1023,47 +1021,36 @@
                 }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
             });
 
-            // Progressive enhancement: Google Places autocomplete (Maps script calls this when ready).
+            // Address type-ahead: Google Places Autocomplete bound to OUR input (keeps the site's styling).
+            // Called by the Maps script's callback when it finishes loading.
             window.initLocationFeature = function () {
-                if (!(window.google && google.maps && google.maps.importLibrary)) return;
-                google.maps.importLibrary('places').then(function () {
-                    var el;
-                    try { el = new google.maps.places.PlaceAutocompleteElement({ includedRegionCodes: ['us'] }); }
-                    catch (e) { try { el = new google.maps.places.PlaceAutocompleteElement(); } catch (e2) { return; } }
-                    mount.appendChild(el);
-                    mount.hidden = false;
-                    plain.hidden = true; // Google element becomes the typing surface
-                    el.addEventListener('gmp-select', function (ev) {
-                        var pred = ev.placePrediction || (ev.detail && ev.detail.placePrediction);
-                        if (!pred || !pred.toPlace) return;
-                        var place = pred.toPlace();
-                        place.fetchFields({ fields: ['formattedAddress', 'location'] }).then(function () {
-                            var addr = place.formattedAddress || '';
-                            var url = '';
-                            var loc = place.location;
-                            if (loc) {
-                                var la = (typeof loc.lat === 'function') ? loc.lat() : loc.lat;
-                                var lo = (typeof loc.lng === 'function') ? loc.lng() : loc.lng;
-                                if (la != null && lo != null) url = 'https://www.google.com/maps?q=' + la + ',' + lo;
-                            }
-                            setLoc(addr, url);
-                            setStatus('Address selected ✓', 'ok');
-                        });
+                if (!(window.google && google.maps && google.maps.places && google.maps.places.Autocomplete)) return;
+                try {
+                    var ac = new google.maps.places.Autocomplete(input, {
+                        fields: ['formatted_address', 'geometry'],
+                        componentRestrictions: { country: 'us' }
                     });
-                    // Best-effort: capture free text typed into the Google box (so an un-picked entry still submits).
-                    el.addEventListener('input', function (ev) {
-                        var v = (ev.target && ev.target.value) || el.value || '';
-                        if (v) setLoc(v, '');
+                    ac.addListener('place_changed', function () {
+                        var place = ac.getPlace();
+                        var url = '';
+                        if (place && place.geometry && place.geometry.location) {
+                            var la = place.geometry.location.lat();
+                            var lo = place.geometry.location.lng();
+                            url = 'https://www.google.com/maps?q=' + la + ',' + lo;
+                        }
+                        if (mapsHidden) mapsHidden.value = url;   // Autocomplete already filled input.value
+                        refresh();
+                        setStatus('', null);                      // clear any earlier GPS output
                     });
-                });
+                } catch (e) { /* autocomplete unavailable — the plain input still works */ }
             };
         })();
     </script>
     <!--
       Google Maps JavaScript API (Places). ACTION REQUIRED: replace PASTE_YOUR_GOOGLE_MAPS_API_KEY
       with your key. Setup + key restrictions: docs/google-places-setup.md
-      Until a valid key is in place, the form still works — address type-ahead is simply skipped
-      and the plain input + "Use my current location" button remain fully functional.
+      Until a valid key is in place, the form still works — the input, typing, and the
+      "Use my current location" button all remain fully functional; only address type-ahead is skipped.
     -->
     <!-- Hero background video: load lazily; skip on reduced-motion / data-saver so the poster stays. -->
     <script>

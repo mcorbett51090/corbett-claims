@@ -77,8 +77,9 @@ Under **Assignment Type:**
 - Added a **print stylesheet**.
 - Propagated all changes into the JSON-LD structured data + `data.json` (hours, payment, languages, 9 states).
 
-## Open questions for the owner (please confirm)
+## Open questions — resolved 2026-07-07
 
-1. **Allstate credential** — your list removed the hero *badge* ("Ex-Allstate Adjuster") and the *headline* only. The Allstate history is still in the "Meet the Owners" bio and the founder's background copy. We **kept** it there (that's what your list implied). Say the word if you want it scrubbed everywhere.
-2. **Remaining "Court" bits in the request form** — you removed the **"Court / expert witness"** *Assignment Type*. The form still has a **"Court / deadline date"** *Urgency* option and a court-date field that appears when it's picked. Your list didn't mention those — want them removed too for consistency?
-3. **Custom domain** — social/canonical URLs and the sitemap are hardcoded to the GitHub Pages address (`mcorbett51090.github.io/corbett-claims`). If you point a custom domain (e.g. `corbettclaims.net`) at the site, those need updating.
+1. **Allstate credential** — ✅ **Scrubbed everywhere** (hero lede, "Meet the Owners" bio, og/twitter descriptions, JSON-LD, `data.json` description/founderBackground/differentiators). No Allstate reference remains.
+   - ⚠️ **One thing to eyeball:** the trust-bar stat still reads **"37+ Years of Appraisal Experience."** That 37 = 12 Allstate adjuster years + 25 independent. With Allstate removed, you may want to reword this to **"25+"** or reframe it. Left as-is because it's an owner-set marketing number that wasn't in the change list — your call.
+2. **Court in the request form** — ✅ **Removed.** Dropped the "Court / deadline date" *Urgency* option, the conditional court-date field, and its JavaScript. The form no longer references court/litigation anywhere.
+3. **Custom domain** — ⚠️ **Not switched — would have broken the live site.** `corbettclaims.net` currently resolves to AWS/Fastly IPs (`15.197.148.33 / 3.33.130.190`) and serves a live site there — it is **not** on GitHub Pages. Pointing this repo's Pages deployment at that domain (via a `CNAME` file) would conflict with the existing host. **To move this site to `corbettclaims.net` later:** (a) repoint the domain's DNS to GitHub Pages (`185.199.108–111.153`), (b) add a `CNAME` file containing `corbettclaims.net`, (c) update the ~6 absolute URLs + `sitemap.xml`/`robots.txt` from the github.io address to `https://corbettclaims.net/`. That's a DNS-side decision, not a repo edit — flagging for when you're ready.

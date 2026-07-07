@@ -12,14 +12,14 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://mcorbett51090.github.io/corbett-claims/">
     <meta property="og:title" content="A complete auto appraisal service | Corbett Claims">
-    <meta property="og:description" content="12 years inside Allstate. 25+ years independent. Independent appraisals on autos, motorcycles, RVs, motorhomes, and heavy farm equipment.">
+    <meta property="og:description" content="25+ years of independent appraisals on autos, motorcycles, RVs, motorhomes, and heavy farm equipment.">
     <meta property="og:image" content="https://mcorbett51090.github.io/corbett-claims/images/og-logo.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Corbett Claims — Independent Auto and Heavy Equipment Appraisal, Baton Rouge LA">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="A complete auto appraisal service | Corbett Claims">
-    <meta name="twitter:description" content="12 years inside Allstate. 25+ years independent. Damage estimates, total-loss valuations, and diminished value on autos, motorcycles, RVs, and heavy equipment.">
+    <meta name="twitter:description" content="25+ years independent. Damage estimates, total-loss valuations, and diminished value on autos, motorcycles, RVs, and heavy equipment.">
     <meta name="twitter:image" content="https://mcorbett51090.github.io/corbett-claims/images/og-logo.png">
     <script>
         // Make social-preview meta tags fully qualified against the current host.
@@ -58,7 +58,7 @@
       "@type": "ProfessionalService",
       "name": "Corbett Claims",
       "alternateName": "Corbett Claim Service, Inc.",
-      "description": "Independent auto and heavy equipment appraisal service. Founded in 2001 by Ronnie Corbett following 12 years as a staff adjuster at Allstate Insurance. Provides estimates on cars, motorcycles, RVs, motorhomes, and heavy farm equipment for insurance companies, attorneys, and private individuals.",
+      "description": "Independent auto and heavy equipment appraisal service. Founded in 2001 by Ronnie Corbett. Provides estimates on cars, motorcycles, RVs, motorhomes, and heavy farm equipment for insurance companies, attorneys, and private individuals.",
       "foundingDate": "2001",
       "founder": { "@type": "Person", "name": "Ronnie Corbett" },
       "telephone": "+1-225-663-2217",
@@ -199,7 +199,7 @@
             <h1>A complete auto appraisal service</h1>
 
             <p class="lede">
-                12 years inside Allstate. 25+ years independent. Damage estimates, total-loss valuations, and diminished-value appraisals on autos, motorcycles, RVs, motorhomes, and heavy farm equipment — for insurance companies, attorneys, and individual owners.
+                25+ years independent. Damage estimates, total-loss valuations, and diminished-value appraisals on autos, motorcycles, RVs, motorhomes, and heavy farm equipment — for insurance companies, attorneys, and individual owners.
             </p>
 
             <div class="hero-ctas">
@@ -328,7 +328,7 @@
             </div>
 
             <p class="team-bio">
-                Ronnie Corbett founded Corbett Claims in 2001 after 12 years as a staff adjuster at Allstate Insurance — bringing the carrier-side perspective with him when he went independent. Today he and Annie run the business together, providing impartial appraisals on cars, motorcycles, RVs, motorhomes, and heavy farm equipment for insurance companies, attorneys, and private owners across the country.
+                Ronnie Corbett founded Corbett Claims in 2001. Today he and Annie run the business together, providing impartial appraisals on cars, motorcycles, RVs, motorhomes, and heavy farm equipment for insurance companies, attorneys, and private owners across the country.
             </p>
         </div>
     </section>
@@ -531,15 +531,8 @@
                             <select id="urgency" name="urgency">
                                 <option>Standard</option>
                                 <option>Rush (within a few days)</option>
-                                <option>Court / deadline date</option>
                             </select>
                         </div>
-                    </div>
-
-                    <!-- Conditional reveal: court date -->
-                    <div class="field" id="field-court-date" hidden>
-                        <label for="court-date">Court / Deadline Date</label>
-                        <input id="court-date" type="date" name="court_date">
                     </div>
 
                     <div class="field">
@@ -706,7 +699,6 @@
             const fieldEquipmentDetail = document.getElementById('field-equipment-detail');
             const fieldRvDetail = document.getElementById('field-rv-detail');
             const fieldPreloss = document.getElementById('field-preloss');
-            const fieldCourtDate = document.getElementById('field-court-date');
             const fileInput = document.getElementById('attachments');
             const fileList = document.getElementById('file-list');
             const status = document.getElementById('form-status');
@@ -719,11 +711,9 @@
             function syncConditionalFields() {
                 const eq = equipmentSel.value;
                 const as = assignmentSel.value;
-                const ur = urgencySel.value;
                 fieldEquipmentDetail.hidden = eq !== 'Heavy farm equipment';
                 fieldRvDetail.hidden = eq !== 'RV / Motorhome / Trailer';
                 fieldPreloss.hidden = as !== 'Diminished-value appraisal';
-                fieldCourtDate.hidden = !/Court/.test(ur);
             }
             [equipmentSel, assignmentSel, urgencySel].forEach((el) => {
                 el.addEventListener('change', () => { syncConditionalFields(); updateProgress(); });

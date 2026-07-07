@@ -167,8 +167,12 @@ nav {
 
 .desktop-nav {
     display: none;
-    gap: 2rem;
+    gap: 1rem;
     font-size: 0.95rem;
+}
+
+@media (min-width: 960px) {
+    .desktop-nav { gap: 2rem; }
 }
 
 nav a {
@@ -181,7 +185,9 @@ nav a:hover {
     color: var(--primary);
 }
 
-.nav-cta {
+/* scoped to `nav` so its specificity (0,1,1) beats `.btn` (0,1,0) — otherwise
+   .btn's display leaks the header CTA onto mobile and overflows at 320px */
+nav .nav-cta {
     display: none;
 }
 
@@ -211,7 +217,7 @@ nav a:hover {
 
 @media (min-width: 768px) {
     .desktop-nav { display: flex; }
-    .nav-cta { display: inline-flex; }
+    nav .nav-cta { display: inline-flex; }
     #menu-btn { display: none; }
     #mobile-menu { display: none !important; }
 }
@@ -577,25 +583,34 @@ header.hero::before {
 /* ---------- Contact / form ---------- */
 .contact-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2.5rem;
 }
 
 @media (min-width: 768px) {
-    .contact-grid { grid-template-columns: 1fr 1fr; }
+    .contact-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 }
 
 .contact-form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    /* grid item: allow it to shrink to its cell instead of its content min-width */
+    min-width: 0;
 }
 
 .form-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
 }
+
+@media (min-width: 480px) {
+    .form-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
+
+/* let grid/flex children shrink below their intrinsic min-width (no 320px overflow) */
+.field { min-width: 0; }
 
 .field label {
     display: block;
@@ -607,6 +622,8 @@ header.hero::before {
 
 input, textarea, select {
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
     box-sizing: border-box;
     border: 1px solid #6b7280;
     border-radius: 10px;

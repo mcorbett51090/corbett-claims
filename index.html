@@ -47,9 +47,10 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;900&family=Playfair+Display:ital,wght@1,700&display=swap">
 
     <link rel="stylesheet" href="styles.css">
-    <!-- Leaflet CSS loaded async; map is below the fold -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""></noscript>
+    <!-- Leaflet CSS — the service map renders broken without it, so load it normally.
+         (The previous media="print"+onload async trick could silently stay print-only
+         on cached loads, leaving the map's tiles scrambled.) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 
     <!-- LocalBusiness structured data -->
     <script type="application/ld+json">

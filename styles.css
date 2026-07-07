@@ -259,6 +259,9 @@ header.hero::before {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /* Soft-focus look (owner's brief) + slight scale so the blur has no transparent edge */
+    filter: blur(3px);
+    transform: scale(1.06);
 }
 /* Navy scrim so the white hero text stays legible over the footage */
 .hero-media::after {

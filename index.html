@@ -1321,19 +1321,44 @@
                 });
                 var mOther = document.createElement('option'); mOther.value = 'Other'; mOther.textContent = 'Other / not listed'; makeSel.appendChild(mOther);
 
-                makeSel.addEventListener('change', function () {
-                    var models = data[makeSel.value] || [];
+                // The model list depends on Make + (optionally) Year. With a year chosen we ask NHTSA for
+                // that make+year's models (CORS-enabled); the baked list is an INSTANT fallback, so if the
+                // NHTSA lookup ever fails or is slow the dropdown still works (shows the full baked list).
+                var modelReq = 0;
+                function setModel(models) {
                     modelSel.innerHTML = '';
-                    if (!makeSel.value || makeSel.value === 'Other' || !models.length) {
-                        var ph0 = document.createElement('option'); ph0.value = '';
-                        ph0.textContent = makeSel.value === 'Other' ? 'Describe in “Anything else?”' : 'Select make first…';
-                        modelSel.appendChild(ph0); modelSel.disabled = true; return;
-                    }
                     var ph = document.createElement('option'); ph.value = ''; ph.textContent = 'Select model…'; modelSel.appendChild(ph);
                     models.forEach(function (m) { var o = document.createElement('option'); o.value = m; o.textContent = m; modelSel.appendChild(o); });
                     var oOther = document.createElement('option'); oOther.value = 'Other'; oOther.textContent = 'Other / not listed'; modelSel.appendChild(oOther);
                     modelSel.disabled = false;
-                });
+                }
+                function disableModel(msg) {
+                    modelSel.innerHTML = '<option value="">' + (msg || 'Select make first…') + '</option>';
+                    modelSel.disabled = true;
+                }
+                function populateModels() {
+                    var make = makeSel.value, year = yearSel.value;
+                    var baked = data[make] || [];
+                    if (!make || make === 'Other' || !baked.length) {
+                        disableModel(make === 'Other' ? 'Describe in “Anything else?”' : 'Select make first…'); return;
+                    }
+                    if (!/^\d{4}$/.test(year)) { setModel(baked); return; }   // no specific year → full baked list
+                    var my = ++modelReq, settled = false;
+                    disableModel('Loading models…');
+                    var finish = function (models) { if (settled || my !== modelReq) return; settled = true; setModel(models); };
+                    var to = setTimeout(function () { finish(baked); }, 5000);   // NHTSA slow/down → baked fallback
+                    fetch('https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/' + encodeURIComponent(make) + '/modelyear/' + year + '?format=json')
+                        .then(function (r) { return r.ok ? r.json() : null; })
+                        .then(function (d) {
+                            clearTimeout(to);
+                            var names = (d && d.Results) ? d.Results.map(function (x) { return (x.Model_Name || '').trim(); }).filter(Boolean) : [];
+                            var ms = Array.from(new Set(names)).sort();
+                            finish(ms.length ? ms : baked);   // empty (e.g. make-name mismatch) → baked
+                        })
+                        .catch(function () { clearTimeout(to); finish(baked); });
+                }
+                makeSel.addEventListener('change', populateModels);
+                yearSel.addEventListener('change', populateModels);   // changing the year re-filters the model list
             }
             if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fill);
             else fill();

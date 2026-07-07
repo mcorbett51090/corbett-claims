@@ -173,6 +173,16 @@
       .location-map { height:180px; margin-top:.6rem; border:1px solid var(--border,#e5e7eb); border-radius:10px; overflow:hidden; }
       .location-map[hidden] { display:none; }
       .location-map .leaflet-control-attribution { font-size:10px; }
+      /* Keyless (Photon) address autocomplete dropdown */
+      .ac-wrap { position:relative; }
+      .ac-suggestions {
+        position:absolute; left:0; right:0; top:calc(100% + 4px); margin:0; padding:4px;
+        list-style:none; background:#fff; border:1px solid var(--border,#d9dee6); border-radius:10px;
+        box-shadow:0 8px 24px rgba(0,0,0,0.12); z-index:1000; max-height:260px; overflow-y:auto;
+      }
+      .ac-suggestions[hidden] { display:none; }
+      .ac-item { padding:.55rem .7rem; border-radius:7px; font-size:.95rem; cursor:pointer; color:var(--text,#111827); }
+      .ac-item:hover, .ac-item.ac-active { background:#eef2f7; }
     </style>
 </head>
 <body>
@@ -752,7 +762,6 @@
 
             const equipmentSel = document.getElementById('equipment-type');
             const assignmentSel = document.getElementById('assignment-type');
-            const urgencySel = document.getElementById('urgency');
             const fieldEquipmentDetail = document.getElementById('field-equipment-detail');
             const fieldRvDetail = document.getElementById('field-rv-detail');
             const fieldPreloss = document.getElementById('field-preloss');
@@ -770,7 +779,7 @@
                 fieldRvDetail.hidden = eq !== 'RV / Motorhome / Trailer';
                 fieldPreloss.hidden = as !== 'Diminished-value appraisal';
             }
-            [equipmentSel, assignmentSel, urgencySel].forEach((el) => {
+            [equipmentSel, assignmentSel].forEach((el) => {
                 el.addEventListener('change', () => { syncConditionalFields(); updateProgress(); });
             });
 
@@ -1074,38 +1083,85 @@
                 }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
             });
 
-            // Address type-ahead: Google Places Autocomplete bound to OUR input (keeps the site's styling).
-            // Called by the Maps script's callback when it finishes loading.
-            window.initLocationFeature = function () {
-                if (!(window.google && google.maps && google.maps.places && google.maps.places.Autocomplete)) return;
-                try {
-                    var ac = new google.maps.places.Autocomplete(input, {
-                        fields: ['formatted_address', 'geometry'],
-                        componentRestrictions: { country: 'us' }
+            // Address type-ahead — KEYLESS, via Photon (OpenStreetMap). No API key needed.
+            (function () {
+                var wrap = document.createElement('div');
+                wrap.className = 'ac-wrap';
+                input.parentNode.insertBefore(wrap, input);
+                wrap.appendChild(input);
+                var box = document.createElement('ul');
+                box.className = 'ac-suggestions';
+                box.setAttribute('role', 'listbox');
+                box.hidden = true;
+                wrap.appendChild(box);
+
+                var results = [], active = -1, timer = null, ctrl = null, lastQ = '';
+
+                function close() { box.hidden = true; box.innerHTML = ''; results = []; active = -1; }
+                function label(p) {
+                    var l1 = [p.housenumber, p.street].filter(Boolean).join(' ') || p.name || '';
+                    var city = p.city || p.town || p.village || p.county || '';
+                    return [l1, city, p.state, p.postcode].filter(Boolean).join(', ');
+                }
+                function draw() {
+                    box.innerHTML = '';
+                    results.forEach(function (r, i) {
+                        var li = document.createElement('li');
+                        li.className = 'ac-item' + (i === active ? ' ac-active' : '');
+                        li.setAttribute('role', 'option');
+                        li.textContent = r.label;
+                        li.addEventListener('mousedown', function (e) { e.preventDefault(); choose(r); });
+                        box.appendChild(li);
                     });
-                    ac.addListener('place_changed', function () {
-                        var place = ac.getPlace();
-                        var url = '';
-                        if (place && place.geometry && place.geometry.location) {
-                            var la = place.geometry.location.lat();
-                            var lo = place.geometry.location.lng();
-                            url = 'https://www.google.com/maps?q=' + la + ',' + lo;
-                            showMap(la, lo);
-                        }
-                        if (mapsHidden) mapsHidden.value = url;   // Autocomplete already filled input.value
-                        refresh();
-                        setStatus('', null);                      // clear any earlier GPS output
-                    });
-                } catch (e) { /* autocomplete unavailable — the plain input still works */ }
-            };
+                    box.hidden = results.length === 0;
+                }
+                function choose(r) {
+                    input.value = r.label;
+                    if (mapsHidden) mapsHidden.value = (r.lat != null) ? 'https://www.google.com/maps?q=' + r.lat + ',' + r.lng : '';
+                    close();
+                    refresh();
+                    setStatus('', null);
+                    if (r.lat != null) showMap(r.lat, r.lng); else hideMap();
+                    syncClear();
+                }
+                function query(q) {
+                    if (ctrl) { try { ctrl.abort(); } catch (e) {} }
+                    ctrl = ('AbortController' in window) ? new AbortController() : null;
+                    fetch('https://photon.komoot.io/api/?q=' + encodeURIComponent(q) + '&lat=30.45&lon=-91.19&limit=6&lang=en', ctrl ? { signal: ctrl.signal } : undefined)
+                        .then(function (r) { return r.ok ? r.json() : null; })
+                        .then(function (data) {
+                            if (!data || !data.features) { close(); return; }
+                            results = data.features
+                                .filter(function (f) { return f.properties && f.properties.countrycode === 'US'; })
+                                .map(function (f) {
+                                    var c = (f.geometry && f.geometry.coordinates) || [];
+                                    return { label: label(f.properties), lat: c[1], lng: c[0] };
+                                })
+                                .filter(function (r) { return r.label; });
+                            active = -1;
+                            draw();
+                        })
+                        .catch(function () { /* aborted / offline — leave the plain input working */ });
+                }
+                input.addEventListener('input', function (e) {
+                    if (!e.isTrusted) return;              // GPS / programmatic fills shouldn't trigger a search
+                    var q = input.value.trim();
+                    if (q.length < 3) { close(); return; }
+                    if (q === lastQ) return; lastQ = q;
+                    clearTimeout(timer);
+                    timer = setTimeout(function () { query(q); }, 280);
+                });
+                input.addEventListener('keydown', function (e) {
+                    if (box.hidden) return;
+                    if (e.key === 'ArrowDown') { active = Math.min(active + 1, results.length - 1); draw(); e.preventDefault(); }
+                    else if (e.key === 'ArrowUp') { active = Math.max(active - 1, 0); draw(); e.preventDefault(); }
+                    else if (e.key === 'Enter' && active >= 0) { choose(results[active]); e.preventDefault(); }
+                    else if (e.key === 'Escape') { close(); }
+                });
+                document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) close(); });
+            })();
         })();
     </script>
-    <!--
-      Google Maps JavaScript API (Places). ACTION REQUIRED: replace PASTE_YOUR_GOOGLE_MAPS_API_KEY
-      with your key. Setup + key restrictions: docs/google-places-setup.md
-      Until a valid key is in place, the form still works — the input, typing, and the
-      "Use my current location" button all remain fully functional; only address type-ahead is skipped.
-    -->
     <!-- Hero background video: load lazily; skip on reduced-motion / data-saver so the poster stays. -->
     <script>
         (function () {

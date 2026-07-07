@@ -546,7 +546,9 @@
                         </div>
                     </div>
 
-                    <!-- Optional vehicle details — dropdowns populated from vehicles.js (baked from NHTSA vPIC). -->
+                    <!-- Optional vehicle details — shown only for "Auto / Light truck" (see syncConditionalFields).
+                         Dropdowns populated from vehicles.js (baked from NHTSA vPIC). -->
+                    <div id="field-vehicle-details" hidden>
                     <div class="form-row">
                         <div class="field">
                             <label for="veh-year">Year <span style="color:var(--muted); font-weight:400; font-size:.85em;">(optional)</span></label>
@@ -590,6 +592,7 @@
                             </select>
                         </div>
                     </div>
+                    </div><!-- /#field-vehicle-details -->
 
                     <!-- Conditional reveal: heavy equipment -->
                     <div class="field" id="field-equipment-detail" hidden>
@@ -810,6 +813,7 @@
             const fieldEquipmentDetail = document.getElementById('field-equipment-detail');
             const fieldRvDetail = document.getElementById('field-rv-detail');
             const fieldPreloss = document.getElementById('field-preloss');
+            const fieldVehicle = document.getElementById('field-vehicle-details');
             const status = document.getElementById('form-status');
             const submitBtn = document.getElementById('form-submit');
             const progressBar = document.getElementById('form-progress-bar');
@@ -823,6 +827,19 @@
                 fieldEquipmentDetail.hidden = eq !== 'Heavy farm equipment';
                 fieldRvDetail.hidden = eq !== 'RV / Motorhome / Trailer';
                 fieldPreloss.hidden = as !== 'Diminished-value appraisal';
+                // Year/Make/Model/Color only apply to autos & light trucks.
+                if (fieldVehicle) {
+                    var showVehicle = eq === 'Auto / Light truck';
+                    fieldVehicle.hidden = !showVehicle;
+                    if (!showVehicle) {
+                        // Reset so a hidden section never submits stale vehicle data.
+                        ['veh-year', 'veh-make', 'veh-color'].forEach(function (id) {
+                            var s = document.getElementById(id); if (s) s.value = '';
+                        });
+                        var vm = document.getElementById('veh-model');
+                        if (vm) { vm.innerHTML = '<option value="">Select make first…</option>'; vm.disabled = true; }
+                    }
+                }
             }
             [equipmentSel, assignmentSel].forEach((el) => {
                 el.addEventListener('change', () => { syncConditionalFields(); updateProgress(); });

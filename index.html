@@ -47,9 +47,10 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;900&family=Playfair+Display:ital,wght@1,700&display=swap">
 
     <link rel="stylesheet" href="styles.css">
-    <!-- Leaflet CSS loaded async; map is below the fold -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""></noscript>
+    <!-- Leaflet CSS — the service map renders broken without it, so load it normally.
+         (The previous media="print"+onload async trick could silently stay print-only
+         on cached loads, leaving the map's tiles scrambled.) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 
     <!-- LocalBusiness structured data -->
     <script type="application/ld+json">
@@ -148,10 +149,8 @@
     }
     </script>
 
-    <!-- Location field: current-location button + Google Places autocomplete -->
+    <!-- Location field: current-location button + address autocomplete output -->
     <style>
-      #location-autocomplete-mount { display:block; }
-      #location-autocomplete-mount gmp-place-autocomplete { width:100%; }
       .location-actions { display:flex; flex-wrap:wrap; align-items:center; gap:.6rem; margin-top:.5rem; }
       .btn-geo {
         display:inline-flex; align-items:center; gap:.4rem; cursor:pointer; font:inherit;
@@ -160,10 +159,30 @@
       }
       .btn-geo:hover { background:#1e3a5f; color:#fff; }
       .btn-geo:disabled { opacity:.55; cursor:default; }
-      .geo-status { font-size:.85rem; color:var(--muted,#5a6675); }
+      .geo-status { display:block; margin-top:.5rem; font-size:.85rem; line-height:1.45; color:var(--muted,#5a6675); }
+      .geo-status:empty { display:none; }
+      .geo-status a { color:#1e3a5f; font-weight:600; }
       .geo-status[data-state="ok"]   { color:#1f7a43; }
       .geo-status[data-state="err"]  { color:#a3272b; }
       .geo-status[data-state="load"] { color:#1e3a5f; }
+      /* Keep Google's autocomplete dropdown above the map/other content */
+      .pac-container { z-index: 10000; }
+      .btn-clear { color:#4b5563; border-color:#c3c9d2; }
+      .btn-clear:hover { background:#4b5563; color:#fff; border-color:#4b5563; }
+      /* Inline location map (Leaflet / OpenStreetMap) */
+      .location-map { height:180px; margin-top:.6rem; border:1px solid var(--border,#e5e7eb); border-radius:10px; overflow:hidden; }
+      .location-map[hidden] { display:none; }
+      .location-map .leaflet-control-attribution { font-size:10px; }
+      /* Keyless (Photon) address autocomplete dropdown */
+      .ac-wrap { position:relative; }
+      .ac-suggestions {
+        position:absolute; left:0; right:0; top:calc(100% + 4px); margin:0; padding:4px;
+        list-style:none; background:#fff; border:1px solid var(--border,#d9dee6); border-radius:10px;
+        box-shadow:0 8px 24px rgba(0,0,0,0.12); z-index:1000; max-height:260px; overflow-y:auto;
+      }
+      .ac-suggestions[hidden] { display:none; }
+      .ac-item { padding:.55rem .7rem; border-radius:7px; font-size:.95rem; cursor:pointer; color:var(--text,#111827); }
+      .ac-item:hover, .ac-item.ac-active { background:#eef2f7; }
     </style>
 </head>
 <body>
@@ -211,6 +230,11 @@
 
     <!-- Hero -->
     <header class="hero" id="top">
+        <!-- Decorative looping background. Poster/solid-navy shows instantly (fast LCP);
+             the video is loaded lazily by JS and skipped on reduced-motion / data-saver. -->
+        <div class="hero-media" aria-hidden="true">
+            <video id="hero-video" class="hero-video" muted loop playsinline preload="none" poster="images/hero-poster.jpg"></video>
+        </div>
         <div class="hero-inner">
             <div class="hero-badge">Independent Appraiser · Since 2001</div>
 
@@ -542,25 +566,27 @@
                     </div>
 
                     <div class="field">
-                        <label for="location-input">Vehicle / Equipment Location <span class="required-mark" aria-hidden="true">*</span></label>
+                        <label for="location">Vehicle / Equipment Location <span class="required-mark" aria-hidden="true">*</span></label>
 
-                        <!-- Google Places autocomplete mounts here once the Maps script loads (progressive enhancement) -->
-                        <div id="location-autocomplete-mount" hidden></div>
-
-                        <!-- Always-present base field: free text (e.g. "mile marker 42, I-10 W"), browser autofill,
-                             and the current-location button all work even if Google never loads -->
-                        <input id="location-input" type="text" autocomplete="street-address" aria-describedby="location-hint location-error" placeholder="Start typing an address…">
+                        <!-- The site's own styled input (matches the other fields). Google Places
+                             autocomplete attaches to THIS input; the GPS button writes into it too. -->
+                        <input id="location" name="location" type="text" autocomplete="street-address" required aria-describedby="location-hint location-error geo-status" data-validate="required" placeholder="Start typing an address…">
 
                         <div class="location-actions">
                             <button type="button" id="use-location-btn" class="btn-geo">
                                 <span aria-hidden="true">📍</span> Use my current location
                             </button>
-                            <span id="geo-status" class="geo-status" role="status" aria-live="polite"></span>
+                            <button type="button" id="clear-location-btn" class="btn-geo btn-clear" hidden>
+                                <span aria-hidden="true">✕</span> Clear
+                            </button>
                         </div>
 
-                        <!-- Canonical value the form validates and emails (set by autocomplete, GPS, or typed text) -->
-                        <input type="hidden" id="location" name="location" data-validate="required">
+                        <!-- Captured GPS coordinates + a map link appear here so the user can confirm the location (e.g. spot VPN skew). -->
+                        <span id="geo-status" class="geo-status" role="status" aria-live="polite"></span>
                         <input type="hidden" id="location_maps_url" name="location_maps_url">
+
+                        <!-- Live map preview of the captured/selected location (Leaflet + OpenStreetMap, no API key). -->
+                        <div id="location-map" class="location-map" hidden></div>
 
                         <span class="field-hint" id="location-hint">Type an address and pick a suggestion, or tap <strong>Use my current location</strong> — best when a vehicle is stranded on the road.</span>
                         <span class="field-error" id="location-error" aria-live="polite"></span>
@@ -736,7 +762,6 @@
 
             const equipmentSel = document.getElementById('equipment-type');
             const assignmentSel = document.getElementById('assignment-type');
-            const urgencySel = document.getElementById('urgency');
             const fieldEquipmentDetail = document.getElementById('field-equipment-detail');
             const fieldRvDetail = document.getElementById('field-rv-detail');
             const fieldPreloss = document.getElementById('field-preloss');
@@ -754,7 +779,7 @@
                 fieldRvDetail.hidden = eq !== 'RV / Motorhome / Trailer';
                 fieldPreloss.hidden = as !== 'Diminished-value appraisal';
             }
-            [equipmentSel, assignmentSel, urgencySel].forEach((el) => {
+            [equipmentSel, assignmentSel].forEach((el) => {
                 el.addEventListener('change', () => { syncConditionalFields(); updateProgress(); });
             });
 
@@ -962,37 +987,68 @@
         })();
     </script>
 
-    <!-- Location field: current-location (GPS) + progressive Google Places autocomplete -->
+    <!-- Location field: current-location (GPS) + Google Places autocomplete bound to our own input -->
     <script>
         (function () {
-            var hidden = document.getElementById('location');
+            var input = document.getElementById('location');
             var mapsHidden = document.getElementById('location_maps_url');
-            var plain = document.getElementById('location-input');
-            var mount = document.getElementById('location-autocomplete-mount');
             var geoBtn = document.getElementById('use-location-btn');
             var geoStatus = document.getElementById('geo-status');
             var locErr = document.getElementById('location-error');
-            if (!hidden || !plain || !geoBtn) return;
+            var clearBtn = document.getElementById('clear-location-btn');
+            var mapEl = document.getElementById('location-map');
+            if (!input || !geoBtn) return;
 
-            function setStatus(msg, state) {
+            var lmap = null, lmarker = null;
+            // Show the captured/selected point on a small OpenStreetMap (Leaflet — no API key).
+            function showMap(lat, lng) {
+                lat = +lat; lng = +lng;
+                if (!mapEl || !window.L || isNaN(lat) || isNaN(lng)) return;
+                mapEl.hidden = false;
+                if (!lmap) {
+                    lmap = L.map(mapEl, { scrollWheelZoom: false });
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19, attribution: '© OpenStreetMap'
+                    }).addTo(lmap);
+                    lmarker = L.marker([lat, lng]).addTo(lmap);
+                }
+                lmarker.setLatLng([lat, lng]);
+                lmap.setView([lat, lng], 15);
+                // The container was display:none until now — Leaflet must recompute its size.
+                setTimeout(function () { lmap.invalidateSize(); }, 0);
+            }
+            function hideMap() { if (mapEl) mapEl.hidden = true; }
+
+            function setStatus(html, state) {
                 if (!geoStatus) return;
-                geoStatus.textContent = msg;
+                geoStatus.innerHTML = html || '';
                 if (state) geoStatus.setAttribute('data-state', state);
                 else geoStatus.removeAttribute('data-state');
             }
-            // Write the canonical value + optional maps link, then let the main form
-            // script re-run its validation + progress meter (it listens on [data-validate]).
-            function setLoc(val, mapsUrl) {
-                hidden.value = val || '';
-                if (mapsHidden) mapsHidden.value = mapsUrl || '';
-                if (val && locErr) { locErr.textContent = ''; hidden.removeAttribute('aria-invalid'); }
-                hidden.dispatchEvent(new Event('input', { bubbles: true }));
+            // Clear the required-error and refresh the main form's validation + progress meter.
+            function refresh() {
+                if (input.value && locErr) { locErr.textContent = ''; input.removeAttribute('aria-invalid'); }
+                input.dispatchEvent(new Event('input', { bubbles: true }));
             }
 
-            // Typed free text — works with or without Google.
-            plain.addEventListener('input', function () { setLoc(plain.value, ''); });
+            // "Clear" appears whenever the field has a value; it resets the field, map, and status.
+            function syncClear() { if (clearBtn) clearBtn.hidden = !input.value; }
+            input.addEventListener('input', function (e) {
+                if (e.isTrusted) { setStatus('', null); hideMap(); } // real typing → stale output/map no longer applies
+                syncClear();
+            });
+            if (clearBtn) clearBtn.addEventListener('click', function () {
+                input.value = '';
+                if (mapsHidden) mapsHidden.value = '';
+                setStatus('', null);
+                hideMap();
+                refresh();
+                syncClear();
+                input.focus();
+            });
+            syncClear();
 
-            // "Use my current location" — browser Geolocation, no third party, no key.
+            // "Use my current location" — browser Geolocation (no third party, no key).
             geoBtn.addEventListener('click', function () {
                 if (!('geolocation' in navigator)) {
                     setStatus('Location isn’t available on this device — please type the address.', 'err');
@@ -1005,9 +1061,18 @@
                     var lo = pos.coords.longitude.toFixed(6);
                     var acc = Math.round(pos.coords.accuracy || 0);
                     var coord = la + ', ' + lo;
-                    plain.value = coord;
-                    setLoc(coord, 'https://www.google.com/maps?q=' + la + ',' + lo);
-                    setStatus('Location captured — accurate to about ' + acc + ' m ✓', 'ok');
+                    var mapsUrl = 'https://www.google.com/maps?q=' + la + ',' + lo;
+                    input.value = coord;                       // visible in the box
+                    if (mapsHidden) mapsHidden.value = mapsUrl;
+                    refresh();
+                    // Show the captured output so the user can confirm it (VPN / network can skew it).
+                    setStatus(
+                        'Captured <strong>' + coord + '</strong> (±' + acc + ' m). ' +
+                        '<a href="' + mapsUrl + '" target="_blank" rel="noopener">View on map ↗</a> — ' +
+                        'confirm this is your location; if it looks off, a VPN or network may be skewing it.',
+                        'ok'
+                    );
+                    showMap(la, lo);
                     geoBtn.disabled = false;
                 }, function (err) {
                     var m = err.code === 1 ? 'Location permission was blocked. Allow location for this site, or type the address.'
@@ -1018,49 +1083,138 @@
                 }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
             });
 
-            // Progressive enhancement: Google Places autocomplete (Maps script calls this when ready).
-            window.initLocationFeature = function () {
-                if (!(window.google && google.maps && google.maps.importLibrary)) return;
-                google.maps.importLibrary('places').then(function () {
-                    var el;
-                    try { el = new google.maps.places.PlaceAutocompleteElement({ includedRegionCodes: ['us'] }); }
-                    catch (e) { try { el = new google.maps.places.PlaceAutocompleteElement(); } catch (e2) { return; } }
-                    mount.appendChild(el);
-                    mount.hidden = false;
-                    plain.hidden = true; // Google element becomes the typing surface
-                    el.addEventListener('gmp-select', function (ev) {
-                        var pred = ev.placePrediction || (ev.detail && ev.detail.placePrediction);
-                        if (!pred || !pred.toPlace) return;
-                        var place = pred.toPlace();
-                        place.fetchFields({ fields: ['formattedAddress', 'location'] }).then(function () {
-                            var addr = place.formattedAddress || '';
-                            var url = '';
-                            var loc = place.location;
-                            if (loc) {
-                                var la = (typeof loc.lat === 'function') ? loc.lat() : loc.lat;
-                                var lo = (typeof loc.lng === 'function') ? loc.lng() : loc.lng;
-                                if (la != null && lo != null) url = 'https://www.google.com/maps?q=' + la + ',' + lo;
-                            }
-                            setLoc(addr, url);
-                            setStatus('Address selected ✓', 'ok');
-                        });
+            // Address type-ahead — KEYLESS, via Photon (OpenStreetMap). No API key needed.
+            (function () {
+                var wrap = document.createElement('div');
+                wrap.className = 'ac-wrap';
+                input.parentNode.insertBefore(wrap, input);
+                wrap.appendChild(input);
+                var box = document.createElement('ul');
+                box.className = 'ac-suggestions';
+                box.setAttribute('role', 'listbox');
+                box.hidden = true;
+                wrap.appendChild(box);
+
+                var results = [], active = -1, timer = null, ctrl = null, lastQ = '', reqId = 0, jsonpId = 0;
+
+                function close() { box.hidden = true; box.innerHTML = ''; results = []; active = -1; }
+                function label(p) {
+                    var l1 = [p.housenumber, p.street].filter(Boolean).join(' ') || p.name || '';
+                    var city = p.city || p.town || p.village || p.county || '';
+                    return [l1, city, p.state, p.postcode].filter(Boolean).join(', ');
+                }
+                function draw() {
+                    box.innerHTML = '';
+                    results.forEach(function (r, i) {
+                        var li = document.createElement('li');
+                        li.className = 'ac-item' + (i === active ? ' ac-active' : '');
+                        li.setAttribute('role', 'option');
+                        li.textContent = r.label;
+                        li.addEventListener('mousedown', function (e) { e.preventDefault(); choose(r); });
+                        box.appendChild(li);
                     });
-                    // Best-effort: capture free text typed into the Google box (so an un-picked entry still submits).
-                    el.addEventListener('input', function (ev) {
-                        var v = (ev.target && ev.target.value) || el.value || '';
-                        if (v) setLoc(v, '');
+                    box.hidden = results.length === 0;
+                }
+                function choose(r) {
+                    input.value = r.label;
+                    if (mapsHidden) mapsHidden.value = (r.lat != null) ? 'https://www.google.com/maps?q=' + r.lat + ',' + r.lng : '';
+                    close();
+                    refresh();
+                    setStatus('', null);
+                    if (r.lat != null) showMap(r.lat, r.lng); else hideMap();
+                    syncClear();
+                }
+                // Photon (OSM) — fast street/place suggestions via a normal CORS fetch.
+                function parsePhoton(data) {
+                    if (!data || !data.features) return [];
+                    return data.features
+                        .filter(function (f) { return f.properties && String(f.properties.countrycode).toUpperCase() === 'US'; })
+                        .map(function (f) {
+                            var c = (f.geometry && f.geometry.coordinates) || [];
+                            return { label: label(f.properties), lat: c[1], lng: c[0] };
+                        })
+                        .filter(function (r) { return r.label; });
+                }
+                // US Census geocoder — authoritative house-number addresses. It has no CORS header,
+                // so we call it via JSONP (dynamic <script>) instead of fetch.
+                function parseCensus(data) {
+                    var m = (data && data.result && data.result.addressMatches) || [];
+                    return m.map(function (a) {
+                        var c = a.coordinates || {};
+                        return { label: a.matchedAddress || '', lat: c.y, lng: c.x };
+                    }).filter(function (r) { return r.label; });
+                }
+                function censusJSONP(q) {
+                    return new Promise(function (resolve) {
+                        var name = '__cen_' + (++jsonpId);
+                        var s = document.createElement('script');
+                        function cleanup() { try { delete window[name]; } catch (e) { window[name] = undefined; } if (s.parentNode) s.parentNode.removeChild(s); }
+                        var t = setTimeout(function () { cleanup(); resolve([]); }, 6000);
+                        window[name] = function (data) { clearTimeout(t); cleanup(); resolve(parseCensus(data)); };
+                        s.onerror = function () { clearTimeout(t); cleanup(); resolve([]); };
+                        s.src = 'https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=' + encodeURIComponent(q) + '&benchmark=Public_AR_Current&format=jsonp&callback=' + name;
+                        document.head.appendChild(s);
                     });
+                }
+                function dedup(list) {
+                    var seen = {}, out = [];
+                    list.forEach(function (r) {
+                        var k = String(r.label).toLowerCase().replace(/[^a-z0-9]/g, '');
+                        if (k && !seen[k]) { seen[k] = 1; out.push(r); }
+                    });
+                    return out;
+                }
+                function query(q) {
+                    var my = ++reqId;
+                    if (ctrl) { try { ctrl.abort(); } catch (e) {} }
+                    ctrl = ('AbortController' in window) ? new AbortController() : null;
+                    var photonP = fetch('https://photon.komoot.io/api/?q=' + encodeURIComponent(q) + '&lat=30.45&lon=-91.19&limit=6&lang=en', ctrl ? { signal: ctrl.signal } : undefined)
+                        .then(function (r) { return r.ok ? r.json() : null; }).then(parsePhoton).catch(function () { return []; });
+                    // Only ask Census when the text contains a house number — that's what it's authoritative for.
+                    var censusP = /\d/.test(q) ? censusJSONP(q) : Promise.resolve([]);
+                    Promise.all([censusP, photonP]).then(function (arr) {
+                        if (my !== reqId) return;                             // a newer keystroke superseded this
+                        results = dedup(arr[0].concat(arr[1])).slice(0, 8);    // exact Census matches ranked first
+                        active = -1;
+                        draw();
+                    });
+                }
+                input.addEventListener('input', function (e) {
+                    if (!e.isTrusted) return;              // GPS / programmatic fills shouldn't trigger a search
+                    var q = input.value.trim();
+                    if (q.length < 3) { close(); return; }
+                    if (q === lastQ) return; lastQ = q;
+                    clearTimeout(timer);
+                    timer = setTimeout(function () { query(q); }, 280);
                 });
-            };
+                input.addEventListener('keydown', function (e) {
+                    if (box.hidden) return;
+                    if (e.key === 'ArrowDown') { active = Math.min(active + 1, results.length - 1); draw(); e.preventDefault(); }
+                    else if (e.key === 'ArrowUp') { active = Math.max(active - 1, 0); draw(); e.preventDefault(); }
+                    else if (e.key === 'Enter' && active >= 0) { choose(results[active]); e.preventDefault(); }
+                    else if (e.key === 'Escape') { close(); }
+                });
+                document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) close(); });
+            })();
         })();
     </script>
-    <!--
-      Google Maps JavaScript API (Places). ACTION REQUIRED: replace PASTE_YOUR_GOOGLE_MAPS_API_KEY
-      with your key. Setup + key restrictions: docs/google-places-setup.md
-      Until a valid key is in place, the form still works — address type-ahead is simply skipped
-      and the plain input + "Use my current location" button remain fully functional.
-    -->
-    <script async
-      src="https://maps.googleapis.com/maps/api/js?key=PASTE_YOUR_GOOGLE_MAPS_API_KEY&loading=async&libraries=places&callback=initLocationFeature"></script>
+    <!-- Hero background video: load lazily; skip on reduced-motion / data-saver so the poster stays. -->
+    <script>
+        (function () {
+            var v = document.getElementById('hero-video');
+            if (!v) return;
+            var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+            var conn = navigator.connection || {};
+            if (reduce || conn.saveData) return; // keep the poster / navy; don't fetch the clip
+            var s = document.createElement('source');
+            s.src = 'images/hero-loop.mp4';
+            s.type = 'video/mp4';
+            v.appendChild(s);
+            v.load();
+            var play = function () { var p = v.play(); if (p && p.catch) p.catch(function () {}); };
+            if (document.readyState === 'complete') play();
+            else window.addEventListener('load', play);
+        })();
+    </script>
 </body>
 </html>

@@ -16,7 +16,7 @@ one-time, ~15-minute setup.
    account for Maps, but low volume stays within the recurring free monthly credit —
    see cost note below.
 3. **Enable two APIs** (APIs & Services → Library, search + Enable each):
-   - **Places API (New)**
+   - **Places API**  *(the address type-ahead widget uses this; if you also see "Places API (New)", enabling both is fine)*
    - **Maps JavaScript API**
 4. **Create the key:** APIs & Services → Credentials → **Create credentials → API key**.
 5. **Restrict the key** (click the key to edit) — important so it can't be abused if someone
@@ -25,7 +25,7 @@ one-time, ~15-minute setup.
      - `https://corbettclaims.net/*`
      - `https://www.corbettclaims.net/*`
      - `https://mcorbett51090.github.io/*`  *(for testing on the Pages URL before the domain cutover)*
-   - **API restrictions → Restrict key** → select **Places API (New)** and **Maps JavaScript API** only.
+   - **API restrictions → Restrict key** → select **Places API** and **Maps JavaScript API** only (plus **Places API (New)** if you enabled it).
    - Save.
 6. **Paste the key into the site:** in `index.html`, find `PASTE_YOUR_GOOGLE_MAPS_API_KEY`
    (in the Google Maps `<script async …>` tag near the bottom) and replace it with your key.

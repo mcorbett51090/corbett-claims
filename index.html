@@ -444,7 +444,12 @@
             </div>
 
             <div class="contact-grid">
-                <form class="contact-form" id="appraisal-form" action="https://formspree.io/f/xwkgvjqg" method="POST" enctype="multipart/form-data" novalidate>
+                <!--
+                  No third-party service and no backend: on submit, JavaScript opens the
+                  visitor's own email app pre-filled and addressed to assignments@corbettclaims.net.
+                  The action/enctype below are the no-JavaScript fallback (a plain mailto submit).
+                -->
+                <form class="contact-form" id="appraisal-form" action="mailto:assignments@corbettclaims.net" method="post" enctype="text/plain" novalidate>
 
                     <div class="form-progress" aria-hidden="true">
                         <div class="form-progress-bar" id="form-progress-bar"></div>
@@ -536,23 +541,13 @@
                     </div>
 
                     <div class="field">
-                        <label for="attachments">Photos or Documents <span style="color:var(--muted); font-weight:400;">(optional)</span></label>
-                        <div class="file-upload">
-                            <input id="attachments" type="file" name="attachments" multiple accept="image/*,.pdf,.doc,.docx" aria-describedby="attachments-hint">
-                            <span class="file-upload-label" id="attachments-hint">Photos of damage, police report, or any document up to 10 MB each.</span>
-                            <ul class="file-list" id="file-list" aria-live="polite"></ul>
-                        </div>
+                        <label>Photos or Documents <span style="color:var(--muted); font-weight:400;">(optional)</span></label>
+                        <p class="field-hint" style="margin-top:4px;">Have photos of the damage, a police report, or other documents? When your email app opens, just attach them before you press Send — they're welcome but never required up front.</p>
                     </div>
 
                     <div class="field">
                         <label for="message">Anything Else?</label>
                         <textarea id="message" name="message" rows="3" placeholder="Optional — add anything we should know."></textarea>
-                    </div>
-
-                    <!-- Honeypot: hidden from humans, bots fill it -->
-                    <div class="honeypot" aria-hidden="true">
-                        <label for="company">Company (leave blank)</label>
-                        <input type="text" id="company" name="_gotcha" tabindex="-1" autocomplete="off">
                     </div>
 
                     <button type="submit" class="btn" id="form-submit" style="padding:15px;">Send Request</button>
@@ -719,8 +714,6 @@
             const fieldEquipmentDetail = document.getElementById('field-equipment-detail');
             const fieldRvDetail = document.getElementById('field-rv-detail');
             const fieldPreloss = document.getElementById('field-preloss');
-            const fileInput = document.getElementById('attachments');
-            const fileList = document.getElementById('file-list');
             const status = document.getElementById('form-status');
             const submitBtn = document.getElementById('form-submit');
             const progressBar = document.getElementById('form-progress-bar');
@@ -752,17 +745,6 @@
                     formatted = '(' + digits;
                 }
                 e.target.value = formatted;
-            });
-
-            // ----- File list -----
-            fileInput.addEventListener('change', () => {
-                fileList.innerHTML = '';
-                Array.from(fileInput.files).forEach((file) => {
-                    const li = document.createElement('li');
-                    const sizeKb = Math.round(file.size / 1024);
-                    li.textContent = file.name + ' (' + (sizeKb > 1024 ? (sizeKb / 1024).toFixed(1) + ' MB' : sizeKb + ' KB') + ')';
-                    fileList.appendChild(li);
-                });
             });
 
             // ----- Validation -----
@@ -826,33 +808,35 @@
                     return;
                 }
 
-                status.setAttribute('data-state', 'loading');
-                status.textContent = 'Sending your request…';
-                submitBtn.disabled = true;
+                // No third-party service, no backend: hand the completed, validated request to
+                // the visitor's own email app — pre-filled and addressed to assignments@corbettclaims.net.
+                const g = (n) => ((form.elements[n] && form.elements[n].value) || '').trim();
+                const lines = [
+                    'Name: ' + g('name'),
+                    'Phone: ' + g('phone'),
+                    'Email: ' + g('email'),
+                    'Equipment Type: ' + g('equipment_type'),
+                    'Assignment Type: ' + g('assignment_type'),
+                ];
+                if (g('equipment_detail')) lines.push('Make/Model/Hours: ' + g('equipment_detail'));
+                if (g('rv_detail')) lines.push('RV Class & Length: ' + g('rv_detail'));
+                if (g('preloss_condition')) lines.push('Pre-loss Condition: ' + g('preloss_condition'));
+                lines.push('Location: ' + g('location'));
+                lines.push('Urgency: ' + g('urgency'));
+                if (g('message')) lines.push('', 'Notes: ' + g('message'));
 
-                try {
-                    const fd = new FormData(form);
-                    const res = await fetch(form.action, {
-                        method: 'POST',
-                        body: fd,
-                        headers: { 'Accept': 'application/json' }
-                    });
-                    if (res.ok) {
-                        status.setAttribute('data-state', 'success');
-                        status.innerHTML = '<strong>Request received.</strong> We respond within one business day. For urgent work, call <a href="tel:2256632217">(225) 663-2217</a>.';
-                        form.reset();
-                        fileList.innerHTML = '';
-                        syncConditionalFields();
-                        updateProgress();
-                    } else {
-                        throw new Error('Form server returned ' + res.status);
-                    }
-                } catch (err) {
-                    status.setAttribute('data-state', 'error');
-                    status.innerHTML = "Sorry — something went wrong sending the form. Please call <a href=\"tel:2256632217\">(225) 663-2217</a> or email <a href=\"mailto:assignments@corbettclaims.net\">assignments@corbettclaims.net</a>.";
-                } finally {
-                    submitBtn.disabled = false;
-                }
+                const mailto = 'mailto:assignments@corbettclaims.net'
+                    + '?subject=' + encodeURIComponent('Appraisal request — ' + (g('name') || 'website'))
+                    + '&body=' + encodeURIComponent(lines.join('\n'));
+
+                status.setAttribute('data-state', 'success');
+                status.innerHTML = '<strong>Almost done — your email app is opening.</strong> '
+                    + 'Just press <em>Send</em> to submit your request (attach any photos there if you have them). '
+                    + "If nothing opens, email <a href=\"mailto:assignments@corbettclaims.net\">assignments@corbettclaims.net</a> "
+                    + 'or call <a href="tel:2256632217">(225) 663-2217</a>.';
+
+                // Open the visitor's email client with everything pre-filled.
+                window.location.href = mailto;
             });
 
             // Init

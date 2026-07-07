@@ -80,5 +80,57 @@ choice is informed.
 
 ---
 
+## 🛡️ Uptime & maintenance — keeping the site from going down
+
+GitHub Pages is **static hosting on a global CDN (Fastly)** — there's no server that can crash, and its
+real-world uptime is very high (~99.9%+). Downtime for a small site almost never comes from GitHub; it
+comes from the two things below. The current setup is healthy (verified 2026-07-07): repo **public**,
+HTTPS **enforced**, cert **approved**, custom domain wired.
+
+The site is also built to avoid third-party runtime dependencies on purpose — the vehicle dropdowns use
+**baked static data** (no live API), and the map/autocomplete run client-side — so an outside service
+having a bad day can't take the form down.
+
+### Do these — split by who owns what
+
+**Domain — the site owner's responsibility (GoDaddy):**
+
+- **⭐ Domain auto-renew ON + a valid card on file.** This is the **#1 real risk** — if
+  `corbettclaims.com` lapses, the site is unreachable no matter how healthy GitHub is. Keep a current
+  email on the GoDaddy account so renewal notices arrive. _(The owner manages GoDaddy, not the developer.)_
+- **Don't delete the GoDaddy DNS records** that point at GitHub.
+
+**GitHub account — the developer's responsibility:**
+
+- **Keep the repo public.** It's public now, which is why free Pages works. Flipping it **private** stops
+  Pages unless the account is on a paid GitHub plan.
+- **Enable 2FA + save the recovery codes**, and keep the account email/phone recoverable. GitHub can lock
+  you out if you lose your 2FA device with no recovery codes. (The site stays *up* if you're locked out —
+  you just couldn't update it until you regain access.)
+- **Don't delete, rename, or archive** the repo, the account, or the repo's **`CNAME`** file — any of
+  those breaks the live URL.
+- **Resilience (optional, recommended for a business site):** so the site never hinges on one personal
+  account, either **add a second trusted admin** to the repo, or **transfer the repo to a free GitHub
+  Organization** with 2+ owners. Then losing any one person's access can't strand the site.
+
+> Note: free **public** GitHub Pages has **no billing**, so there's nothing on the GitHub side that can
+> "lapse" and take the site down — the GitHub-account risks are all about *account access*, not payment.
+
+### Optional — early warning
+
+- **○ Free uptime monitor** (e.g. **UptimeRobot**, free tier): pings `corbettclaims.com` every ~5 minutes
+  and emails/texts you if it's ever unreachable. It doesn't *prevent* downtime, but you'd hear about it
+  in minutes instead of from a customer. Setup: create a free account → **Add New Monitor** → type
+  **HTTPS**, URL `https://corbettclaims.com`, interval 5 min → add your email/phone as the alert contact.
+
+### Honest bottom line
+
+True 100% uptime doesn't exist anywhere (even the big clouds have outages). But static files + CDN +
+auto-renewed HTTPS at **$0 hosting** is about as reliable and low-maintenance as it gets. Nail
+**domain auto-renew** and **account security**, and the realistic risks are covered. GitHub's own rare
+blips are brief and are something no host lets you avoid.
+
+---
+
 _Priority order: do the **⭐ Recommended** items (they drive being found); the **○ Optional** items can
 wait indefinitely._

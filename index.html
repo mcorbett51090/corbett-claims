@@ -1095,7 +1095,7 @@
                 box.hidden = true;
                 wrap.appendChild(box);
 
-                var results = [], active = -1, timer = null, ctrl = null, lastQ = '';
+                var results = [], active = -1, timer = null, ctrl = null, lastQ = '', reqId = 0, jsonpId = 0;
 
                 function close() { box.hidden = true; box.innerHTML = ''; results = []; active = -1; }
                 function label(p) {
@@ -1124,24 +1124,60 @@
                     if (r.lat != null) showMap(r.lat, r.lng); else hideMap();
                     syncClear();
                 }
+                // Photon (OSM) — fast street/place suggestions via a normal CORS fetch.
+                function parsePhoton(data) {
+                    if (!data || !data.features) return [];
+                    return data.features
+                        .filter(function (f) { return f.properties && String(f.properties.countrycode).toUpperCase() === 'US'; })
+                        .map(function (f) {
+                            var c = (f.geometry && f.geometry.coordinates) || [];
+                            return { label: label(f.properties), lat: c[1], lng: c[0] };
+                        })
+                        .filter(function (r) { return r.label; });
+                }
+                // US Census geocoder — authoritative house-number addresses. It has no CORS header,
+                // so we call it via JSONP (dynamic <script>) instead of fetch.
+                function parseCensus(data) {
+                    var m = (data && data.result && data.result.addressMatches) || [];
+                    return m.map(function (a) {
+                        var c = a.coordinates || {};
+                        return { label: a.matchedAddress || '', lat: c.y, lng: c.x };
+                    }).filter(function (r) { return r.label; });
+                }
+                function censusJSONP(q) {
+                    return new Promise(function (resolve) {
+                        var name = '__cen_' + (++jsonpId);
+                        var s = document.createElement('script');
+                        function cleanup() { try { delete window[name]; } catch (e) { window[name] = undefined; } if (s.parentNode) s.parentNode.removeChild(s); }
+                        var t = setTimeout(function () { cleanup(); resolve([]); }, 6000);
+                        window[name] = function (data) { clearTimeout(t); cleanup(); resolve(parseCensus(data)); };
+                        s.onerror = function () { clearTimeout(t); cleanup(); resolve([]); };
+                        s.src = 'https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=' + encodeURIComponent(q) + '&benchmark=Public_AR_Current&format=jsonp&callback=' + name;
+                        document.head.appendChild(s);
+                    });
+                }
+                function dedup(list) {
+                    var seen = {}, out = [];
+                    list.forEach(function (r) {
+                        var k = String(r.label).toLowerCase().replace(/[^a-z0-9]/g, '');
+                        if (k && !seen[k]) { seen[k] = 1; out.push(r); }
+                    });
+                    return out;
+                }
                 function query(q) {
+                    var my = ++reqId;
                     if (ctrl) { try { ctrl.abort(); } catch (e) {} }
                     ctrl = ('AbortController' in window) ? new AbortController() : null;
-                    fetch('https://photon.komoot.io/api/?q=' + encodeURIComponent(q) + '&lat=30.45&lon=-91.19&limit=6&lang=en', ctrl ? { signal: ctrl.signal } : undefined)
-                        .then(function (r) { return r.ok ? r.json() : null; })
-                        .then(function (data) {
-                            if (!data || !data.features) { close(); return; }
-                            results = data.features
-                                .filter(function (f) { return f.properties && f.properties.countrycode === 'US'; })
-                                .map(function (f) {
-                                    var c = (f.geometry && f.geometry.coordinates) || [];
-                                    return { label: label(f.properties), lat: c[1], lng: c[0] };
-                                })
-                                .filter(function (r) { return r.label; });
-                            active = -1;
-                            draw();
-                        })
-                        .catch(function () { /* aborted / offline — leave the plain input working */ });
+                    var photonP = fetch('https://photon.komoot.io/api/?q=' + encodeURIComponent(q) + '&lat=30.45&lon=-91.19&limit=6&lang=en', ctrl ? { signal: ctrl.signal } : undefined)
+                        .then(function (r) { return r.ok ? r.json() : null; }).then(parsePhoton).catch(function () { return []; });
+                    // Only ask Census when the text contains a house number — that's what it's authoritative for.
+                    var censusP = /\d/.test(q) ? censusJSONP(q) : Promise.resolve([]);
+                    Promise.all([censusP, photonP]).then(function (arr) {
+                        if (my !== reqId) return;                             // a newer keystroke superseded this
+                        results = dedup(arr[0].concat(arr[1])).slice(0, 8);    // exact Census matches ranked first
+                        active = -1;
+                        draw();
+                    });
                 }
                 input.addEventListener('input', function (e) {
                     if (!e.isTrusted) return;              // GPS / programmatic fills shouldn't trigger a search

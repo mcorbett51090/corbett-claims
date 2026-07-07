@@ -935,6 +935,28 @@ footer .footer-inner {
     font-size: 0.85rem;
 }
 
+/* Raven Power logo credit (matches the chateaudelesigny footer) */
+.ft__built {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 1.25rem;
+}
+.ft__rc {
+    display: inline-flex;
+    padding: 0.4rem;
+    border-radius: 6px;
+    opacity: 0.75;
+    transition: opacity 0.2s ease;
+}
+.ft__rc:hover {
+    opacity: 1;
+}
+.ft__rc-mark {
+    display: block;
+    width: 40px;
+    height: auto;
+}
+
 /* ---------- Mobile tweaks ---------- */
 @media (max-width: 600px) {
     .hero h1 { font-size: 2.15rem; }

@@ -84,11 +84,11 @@
         {"@type": "State", "name": "Texas"},
         {"@type": "State", "name": "Mississippi"},
         {"@type": "State", "name": "Alabama"},
+        {"@type": "State", "name": "Georgia"},
         {"@type": "State", "name": "Florida"},
         {"@type": "State", "name": "Ohio"},
         {"@type": "State", "name": "Illinois"},
-        {"@type": "State", "name": "Nevada"},
-        {"@type": "State", "name": "Georgia"}
+        {"@type": "State", "name": "Nevada"}
       ],
       "knowsLanguage": ["en"],
       "paymentAccepted": "Check, Venmo, PayPal, Cash App, Apple Cash, Zelle",
@@ -132,7 +132,7 @@
         {
           "@type": "Question",
           "name": "What areas do you serve?",
-          "acceptedAnswer": { "@type": "Answer", "text": "We're headquartered in Baton Rouge, Louisiana, and regularly accept assignments across Louisiana, Texas, Mississippi, Alabama, Florida, Ohio, Illinois, Nevada, and Georgia — essentially from Texas to Florida and up to Ohio, Illinois, Nevada, and Georgia. Reach out and we'll confirm coverage for your location." }
+          "acceptedAnswer": { "@type": "Answer", "text": "We're headquartered in Baton Rouge, Louisiana, and regularly accept assignments across Louisiana, Texas, Mississippi, Alabama, Georgia, Florida, Ohio, Illinois, and Nevada — essentially from Texas to Florida and up to Ohio, Illinois and Nevada. Reach out and we'll confirm coverage for your location." }
         },
         {
           "@type": "Question",
@@ -207,7 +207,7 @@
                 <a href="#how" class="btn btn-secondary btn-lg">How It Works</a>
             </div>
 
-            <div class="hero-meta">Based in Baton Rouge · Assignments accepted across TX, LA, MS, AL, FL, OH, IL, NV, GA · We respond within 1 business day</div>
+            <div class="hero-meta">Based in Baton Rouge · Assignments accepted across TX, LA, MS, AL, GA, FL, OH, IL, NV · We respond within 1 business day</div>
         </div>
     </header>
 
@@ -354,11 +354,11 @@
                                 <option value="anchor" data-name="Texas">Texas</option>
                                 <option value="anchor" data-name="Mississippi">Mississippi</option>
                                 <option value="anchor" data-name="Alabama">Alabama</option>
+                                <option value="anchor" data-name="Georgia">Georgia</option>
                                 <option value="anchor" data-name="Florida">Florida</option>
                                 <option value="anchor" data-name="Ohio">Ohio</option>
                                 <option value="anchor" data-name="Illinois">Illinois</option>
                                 <option value="anchor" data-name="Nevada">Nevada</option>
-                                <option value="anchor" data-name="Georgia">Georgia</option>
                                 <option disabled>──────────</option>
                                 <option value="other" data-name="Other">Somewhere else</option>
                             </select>
@@ -372,7 +372,7 @@
 
                 <noscript>
                     <img src="images/southeast_us_gis_map.png"
-                         alt="Service area map covering Texas, Louisiana, Mississippi, Alabama, Florida, Ohio, Illinois, Nevada, and Georgia"
+                         alt="Service area map covering Texas, Louisiana, Mississippi, Alabama, Georgia, Florida, Ohio, Illinois, and Nevada"
                          class="map-fallback">
                 </noscript>
 
@@ -381,15 +381,15 @@
                     <span class="chip">Texas</span>
                     <span class="chip">Mississippi</span>
                     <span class="chip">Alabama</span>
+                    <span class="chip">Georgia</span>
                     <span class="chip">Florida</span>
                     <span class="chip">Ohio</span>
                     <span class="chip">Illinois</span>
                     <span class="chip">Nevada</span>
-                    <span class="chip">Georgia</span>
                 </div>
 
                 <p style="margin-top:1rem; color:var(--muted); font-size:0.95rem; text-align:center;">
-                    Headquartered in Baton Rouge. Assignments accepted from Texas to Florida and up to Ohio, Illinois, Nevada, and Georgia — call or email to confirm coverage for your location.
+                    Headquartered in Baton Rouge. Assignments accepted from Texas to Florida and up to Ohio, Illinois and Nevada.
                 </p>
             </div>
         </div>
@@ -421,7 +421,7 @@
                 </details>
                 <details class="faq-item">
                     <summary>What areas do you serve?</summary>
-                    <p>We're headquartered in Baton Rouge, Louisiana, and regularly accept assignments across Louisiana, Texas, Mississippi, Alabama, Florida, Ohio, Illinois, Nevada, and Georgia — essentially from Texas to Florida and up to Ohio, Illinois, Nevada, and Georgia. Reach out and we'll confirm coverage for your location.</p>
+                    <p>We're headquartered in Baton Rouge, Louisiana, and regularly accept assignments across Louisiana, Texas, Mississippi, Alabama, Georgia, Florida, Ohio, Illinois, and Nevada — essentially from Texas to Florida and up to Ohio, Illinois and Nevada. Reach out and we'll confirm coverage for your location.</p>
                 </details>
                 <details class="faq-item">
                     <summary>What forms of payment do you accept?</summary>
@@ -467,8 +467,7 @@
                         </div>
                         <div class="field">
                             <label for="phone">Phone Number <span class="required-mark" aria-hidden="true">*</span></label>
-                            <input id="phone" type="tel" name="phone" autocomplete="tel" required aria-describedby="phone-hint phone-error" data-validate="phone" placeholder="(225) 555-0100">
-                            <span class="field-hint" id="phone-hint">We'll only call about your assignment.</span>
+                            <input id="phone" type="tel" name="phone" autocomplete="tel" required aria-describedby="phone-error" data-validate="phone" placeholder="(225) 555-0100">
                             <span class="field-error" id="phone-error" aria-live="polite"></span>
                         </div>
                     </div>
@@ -524,20 +523,11 @@
                         <textarea id="preloss-condition" name="preloss_condition" rows="2" placeholder="Brief description of vehicle condition before the loss — mileage, service records, modifications, etc."></textarea>
                     </div>
 
-                    <div class="form-row">
-                        <div class="field">
-                            <label for="location">Vehicle / Equipment Location <span class="required-mark" aria-hidden="true">*</span></label>
-                            <input id="location" type="text" name="location" required aria-describedby="location-hint location-error" data-validate="required" placeholder="City, State or ZIP">
-                            <span class="field-hint" id="location-hint">Where the inspection would take place.</span>
-                            <span class="field-error" id="location-error" aria-live="polite"></span>
-                        </div>
-                        <div class="field">
-                            <label for="urgency">Urgency</label>
-                            <select id="urgency" name="urgency">
-                                <option>Standard</option>
-                                <option>Rush (within a few days)</option>
-                            </select>
-                        </div>
+                    <div class="field">
+                        <label for="location">Vehicle / Equipment Location <span class="required-mark" aria-hidden="true">*</span></label>
+                        <input id="location" type="text" name="location" required aria-describedby="location-hint location-error" data-validate="required" placeholder="City, State or ZIP">
+                        <span class="field-hint" id="location-hint">Where the inspection would take place.</span>
+                        <span class="field-error" id="location-error" aria-live="polite"></span>
                     </div>
 
                     <div class="field">
@@ -822,7 +812,6 @@
                 if (g('rv_detail')) lines.push('RV Class & Length: ' + g('rv_detail'));
                 if (g('preloss_condition')) lines.push('Pre-loss Condition: ' + g('preloss_condition'));
                 lines.push('Location: ' + g('location'));
-                lines.push('Urgency: ' + g('urgency'));
                 if (g('message')) lines.push('', 'Notes: ' + g('message'));
 
                 const mailto = 'mailto:assignments@corbettclaims.net'

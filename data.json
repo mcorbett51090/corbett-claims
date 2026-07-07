@@ -47,13 +47,13 @@
         "Texas",
         "Mississippi",
         "Alabama",
+        "Georgia",
         "Florida",
         "Ohio",
         "Illinois",
-        "Nevada",
-        "Georgia"
+        "Nevada"
       ],
-      "regionalDescription": "Assignments accepted across the corridor from Texas to Florida and up to Ohio, Illinois, Nevada, and Georgia"
+      "regionalDescription": "Assignments accepted across the corridor from Texas to Florida and up to Ohio, Illinois and Nevada"
     },
     "hours": {
       "monday": "8:00 AM - 5:00 PM",

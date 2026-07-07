@@ -491,7 +491,7 @@
                   visitor's own email app pre-filled and addressed to assignments@corbettclaims.net.
                   The action/enctype below are the no-JavaScript fallback (a plain mailto submit).
                 -->
-                <form class="contact-form" id="appraisal-form" action="mailto:assignments@corbettclaims.net" method="post" enctype="text/plain" novalidate>
+                <form class="contact-form" id="appraisal-form" autocomplete="on" novalidate>
 
                     <div class="form-progress" aria-hidden="true">
                         <div class="form-progress-bar" id="form-progress-bar"></div>
@@ -651,6 +651,9 @@
                     </div>
 
                     <button type="submit" class="btn" id="form-submit" style="padding:15px;">Send Request</button>
+                    <noscript>
+                        <p class="form-note">JavaScript is turned off, so this button won't open your email app. Please email your request to <a href="mailto:assignments@corbettclaims.net">assignments@corbettclaims.net</a> or call <a href="tel:2256632217">(225) 663-2217</a>.</p>
+                    </noscript>
                     <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
                     <p class="form-note">We respond within one business day. By submitting, you agree to be contacted about your inquiry. We don't share your info.</p>
                 </form>

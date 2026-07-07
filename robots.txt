@@ -1,21 +1,31 @@
 # Corbett Claims — robots policy
-# Static marketing site. All content is public and crawlable.
+# Static marketing site. Public content is crawlable; the internal /docs/
+# folder (operational notes) is excluded from all crawlers.
+# NOTE: robots.txt is advisory and does not restrict direct access — it only
+# asks compliant crawlers not to index. /docs/ files remain reachable by URL.
 
 User-agent: *
 Allow: /
+Disallow: /docs/
 
 # AI answer-engine crawlers — explicitly allowed (we want AI-search visibility
 # for a local service business). Remove a line to opt an engine out.
+# Each named agent matches its OWN group and ignores "User-agent: *", so the
+# /docs/ disallow is repeated per group.
 User-agent: GPTBot
 Allow: /
+Disallow: /docs/
 
 User-agent: ClaudeBot
 Allow: /
+Disallow: /docs/
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /docs/
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /docs/
 
-Sitemap: https://mcorbett51090.github.io/corbett-claims/sitemap.xml
+Sitemap: https://corbettclaims.net/sitemap.xml

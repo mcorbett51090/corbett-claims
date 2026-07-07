@@ -167,6 +167,12 @@
       .geo-status[data-state="load"] { color:#1e3a5f; }
       /* Keep Google's autocomplete dropdown above the map/other content */
       .pac-container { z-index: 10000; }
+      .btn-clear { color:#4b5563; border-color:#c3c9d2; }
+      .btn-clear:hover { background:#4b5563; color:#fff; border-color:#4b5563; }
+      /* Inline location map (Leaflet / OpenStreetMap) */
+      .location-map { height:180px; margin-top:.6rem; border:1px solid var(--border,#e5e7eb); border-radius:10px; overflow:hidden; }
+      .location-map[hidden] { display:none; }
+      .location-map .leaflet-control-attribution { font-size:10px; }
     </style>
 </head>
 <body>
@@ -555,11 +561,17 @@
                             <button type="button" id="use-location-btn" class="btn-geo">
                                 <span aria-hidden="true">📍</span> Use my current location
                             </button>
+                            <button type="button" id="clear-location-btn" class="btn-geo btn-clear" hidden>
+                                <span aria-hidden="true">✕</span> Clear
+                            </button>
                         </div>
 
                         <!-- Captured GPS coordinates + a map link appear here so the user can confirm the location (e.g. spot VPN skew). -->
                         <span id="geo-status" class="geo-status" role="status" aria-live="polite"></span>
                         <input type="hidden" id="location_maps_url" name="location_maps_url">
+
+                        <!-- Live map preview of the captured/selected location (Leaflet + OpenStreetMap, no API key). -->
+                        <div id="location-map" class="location-map" hidden></div>
 
                         <span class="field-hint" id="location-hint">Type an address and pick a suggestion, or tap <strong>Use my current location</strong> — best when a vehicle is stranded on the road.</span>
                         <span class="field-error" id="location-error" aria-live="polite"></span>
@@ -969,7 +981,29 @@
             var geoBtn = document.getElementById('use-location-btn');
             var geoStatus = document.getElementById('geo-status');
             var locErr = document.getElementById('location-error');
+            var clearBtn = document.getElementById('clear-location-btn');
+            var mapEl = document.getElementById('location-map');
             if (!input || !geoBtn) return;
+
+            var lmap = null, lmarker = null;
+            // Show the captured/selected point on a small OpenStreetMap (Leaflet — no API key).
+            function showMap(lat, lng) {
+                lat = +lat; lng = +lng;
+                if (!mapEl || !window.L || isNaN(lat) || isNaN(lng)) return;
+                mapEl.hidden = false;
+                if (!lmap) {
+                    lmap = L.map(mapEl, { scrollWheelZoom: false });
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19, attribution: '© OpenStreetMap'
+                    }).addTo(lmap);
+                    lmarker = L.marker([lat, lng]).addTo(lmap);
+                }
+                lmarker.setLatLng([lat, lng]);
+                lmap.setView([lat, lng], 15);
+                // The container was display:none until now — Leaflet must recompute its size.
+                setTimeout(function () { lmap.invalidateSize(); }, 0);
+            }
+            function hideMap() { if (mapEl) mapEl.hidden = true; }
 
             function setStatus(html, state) {
                 if (!geoStatus) return;
@@ -982,6 +1016,23 @@
                 if (input.value && locErr) { locErr.textContent = ''; input.removeAttribute('aria-invalid'); }
                 input.dispatchEvent(new Event('input', { bubbles: true }));
             }
+
+            // "Clear" appears whenever the field has a value; it resets the field, map, and status.
+            function syncClear() { if (clearBtn) clearBtn.hidden = !input.value; }
+            input.addEventListener('input', function (e) {
+                if (e.isTrusted) { setStatus('', null); hideMap(); } // real typing → stale output/map no longer applies
+                syncClear();
+            });
+            if (clearBtn) clearBtn.addEventListener('click', function () {
+                input.value = '';
+                if (mapsHidden) mapsHidden.value = '';
+                setStatus('', null);
+                hideMap();
+                refresh();
+                syncClear();
+                input.focus();
+            });
+            syncClear();
 
             // "Use my current location" — browser Geolocation (no third party, no key).
             geoBtn.addEventListener('click', function () {
@@ -1007,6 +1058,7 @@
                         'confirm this is your location; if it looks off, a VPN or network may be skewing it.',
                         'ok'
                     );
+                    showMap(la, lo);
                     geoBtn.disabled = false;
                 }, function (err) {
                     var m = err.code === 1 ? 'Location permission was blocked. Allow location for this site, or type the address.'
@@ -1033,6 +1085,7 @@
                             var la = place.geometry.location.lat();
                             var lo = place.geometry.location.lng();
                             url = 'https://www.google.com/maps?q=' + la + ',' + lo;
+                            showMap(la, lo);
                         }
                         if (mapsHidden) mapsHidden.value = url;   // Autocomplete already filled input.value
                         refresh();

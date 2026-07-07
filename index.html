@@ -546,6 +546,51 @@
                         </div>
                     </div>
 
+                    <!-- Optional vehicle details — dropdowns populated from vehicles.js (baked from NHTSA vPIC). -->
+                    <div class="form-row">
+                        <div class="field">
+                            <label for="veh-year">Year <span style="color:var(--muted); font-weight:400; font-size:.85em;">(optional)</span></label>
+                            <select id="veh-year" name="vehicle_year">
+                                <option value="">Select year…</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="veh-make">Make <span style="color:var(--muted); font-weight:400; font-size:.85em;">(optional)</span></label>
+                            <select id="veh-make" name="vehicle_make">
+                                <option value="">Select make…</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="field">
+                            <label for="veh-model">Model <span style="color:var(--muted); font-weight:400; font-size:.85em;">(optional)</span></label>
+                            <select id="veh-model" name="vehicle_model" disabled>
+                                <option value="">Select make first…</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="veh-color">Color <span style="color:var(--muted); font-weight:400; font-size:.85em;">(optional)</span></label>
+                            <select id="veh-color" name="vehicle_color">
+                                <option value="">Select color…</option>
+                                <option>White</option>
+                                <option>Black</option>
+                                <option>Gray</option>
+                                <option>Silver</option>
+                                <option>Blue</option>
+                                <option>Red</option>
+                                <option>Green</option>
+                                <option>Brown</option>
+                                <option>Beige / Tan</option>
+                                <option>Gold</option>
+                                <option>Orange</option>
+                                <option>Yellow</option>
+                                <option>Purple</option>
+                                <option>Maroon</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- Conditional reveal: heavy equipment -->
                     <div class="field" id="field-equipment-detail" hidden>
                         <label for="equipment-detail">Make, Model, &amp; Hours / Mileage</label>
@@ -869,6 +914,8 @@
                     'Equipment Type: ' + g('equipment_type'),
                     'Assignment Type: ' + g('assignment_type'),
                 ];
+                var _veh = [g('vehicle_year'), g('vehicle_make'), g('vehicle_model'), g('vehicle_color')].filter(Boolean).join(' ');
+                if (_veh) lines.push('Vehicle: ' + _veh);
                 if (g('equipment_detail')) lines.push('Make/Model/Hours: ' + g('equipment_detail'));
                 if (g('rv_detail')) lines.push('RV Class & Length: ' + g('rv_detail'));
                 if (g('preloss_condition')) lines.push('Pre-loss Condition: ' + g('preloss_condition'));
@@ -1225,6 +1272,54 @@
             var play = function () { var p = v.play(); if (p && p.catch) p.catch(function () {}); };
             if (document.readyState === 'complete') play();
             else window.addEventListener('load', play);
+        })();
+    </script>
+
+    <!-- Optional Year/Make/Model/Color dropdowns. Data is baked into vehicles.js (from NHTSA vPIC),
+         so there is NO runtime API call — the fields can't break if an external service is down. -->
+    <script defer src="vehicles.js"></script>
+    <script>
+        (function () {
+            function fill() {
+                var data = window.VEHICLE_DATA;
+                var yearSel = document.getElementById('veh-year');
+                var makeSel = document.getElementById('veh-make');
+                var modelSel = document.getElementById('veh-model');
+                if (!yearSel || !makeSel || !modelSel) return;
+
+                // Years: next model year down to 1981, then a catch-all.
+                var maxYear = new Date().getFullYear() + 1;
+                for (var y = maxYear; y >= 1981; y--) {
+                    var o = document.createElement('option'); o.value = String(y); o.textContent = y; yearSel.appendChild(o);
+                }
+                var older = document.createElement('option'); older.value = 'Older (pre-1981)'; older.textContent = 'Older (pre-1981)'; yearSel.appendChild(older);
+
+                if (!data) {   // data file didn't load — keep the fields optional and out of the way
+                    makeSel.innerHTML = '<option value="">(unavailable — describe in “Anything else?”)</option>';
+                    return;
+                }
+
+                Object.keys(data).filter(function (m) { return data[m] && data[m].length; }).sort().forEach(function (m) {
+                    var o = document.createElement('option'); o.value = m; o.textContent = m; makeSel.appendChild(o);
+                });
+                var mOther = document.createElement('option'); mOther.value = 'Other'; mOther.textContent = 'Other / not listed'; makeSel.appendChild(mOther);
+
+                makeSel.addEventListener('change', function () {
+                    var models = data[makeSel.value] || [];
+                    modelSel.innerHTML = '';
+                    if (!makeSel.value || makeSel.value === 'Other' || !models.length) {
+                        var ph0 = document.createElement('option'); ph0.value = '';
+                        ph0.textContent = makeSel.value === 'Other' ? 'Describe in “Anything else?”' : 'Select make first…';
+                        modelSel.appendChild(ph0); modelSel.disabled = true; return;
+                    }
+                    var ph = document.createElement('option'); ph.value = ''; ph.textContent = 'Select model…'; modelSel.appendChild(ph);
+                    models.forEach(function (m) { var o = document.createElement('option'); o.value = m; o.textContent = m; modelSel.appendChild(o); });
+                    var oOther = document.createElement('option'); oOther.value = 'Other'; oOther.textContent = 'Other / not listed'; modelSel.appendChild(oOther);
+                    modelSel.disabled = false;
+                });
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fill);
+            else fill();
         })();
     </script>
 </body>

@@ -220,6 +220,11 @@
 
     <!-- Hero -->
     <header class="hero" id="top">
+        <!-- Decorative looping background. Poster/solid-navy shows instantly (fast LCP);
+             the video is loaded lazily by JS and skipped on reduced-motion / data-saver. -->
+        <div class="hero-media" aria-hidden="true">
+            <video id="hero-video" class="hero-video" muted loop playsinline preload="none" poster="images/hero-poster.jpg"></video>
+        </div>
         <div class="hero-inner">
             <div class="hero-badge">Independent Appraiser · Since 2001</div>
 
@@ -1101,7 +1106,23 @@
       Until a valid key is in place, the form still works — the input, typing, and the
       "Use my current location" button all remain fully functional; only address type-ahead is skipped.
     -->
-    <script async
-      src="https://maps.googleapis.com/maps/api/js?key=PASTE_YOUR_GOOGLE_MAPS_API_KEY&loading=async&libraries=places&callback=initLocationFeature"></script>
+    <!-- Hero background video: load lazily; skip on reduced-motion / data-saver so the poster stays. -->
+    <script>
+        (function () {
+            var v = document.getElementById('hero-video');
+            if (!v) return;
+            var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+            var conn = navigator.connection || {};
+            if (reduce || conn.saveData) return; // keep the poster / navy; don't fetch the clip
+            var s = document.createElement('source');
+            s.src = 'images/hero-loop.mp4';
+            s.type = 'video/mp4';
+            v.appendChild(s);
+            v.load();
+            var play = function () { var p = v.play(); if (p && p.catch) p.catch(function () {}); };
+            if (document.readyState === 'complete') play();
+            else window.addEventListener('load', play);
+        })();
+    </script>
 </body>
 </html>

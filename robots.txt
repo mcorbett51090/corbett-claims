@@ -18,4 +18,4 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
-Sitemap: https://mcorbett51090.github.io/corbett-claims/sitemap.xml
+Sitemap: https://corbettclaims.net/sitemap.xml

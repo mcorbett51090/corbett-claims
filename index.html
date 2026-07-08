@@ -7,20 +7,21 @@
 
     <meta name="description" content="A complete auto appraisal service. 25+ years independent. Damage estimates, total-loss valuations, and diminished-value appraisals on autos, motorcycles, RVs, and heavy farm equipment for insurance companies, attorneys, and individual owners.">
 
-    <!-- Social preview (host-agnostic: relative URLs are absolutized at runtime by the script below) -->
-    <link rel="canonical" href="./">
+    <!-- Social preview — canonical/og pinned to the production www domain; the
+         script below still absolutizes any remaining relative asset URLs at runtime. -->
+    <link rel="canonical" href="https://www.corbettclaims.com/">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="./">
+    <meta property="og:url" content="https://www.corbettclaims.com/">
     <meta property="og:title" content="A complete auto appraisal service | Corbett Claims">
     <meta property="og:description" content="25+ years of independent appraisals on autos, motorcycles, RVs, motorhomes, and heavy farm equipment.">
-    <meta property="og:image" content="images/og-logo.png">
+    <meta property="og:image" content="https://www.corbettclaims.com/images/og-logo.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Corbett Claims — Independent Auto and Heavy Equipment Appraisal, Baton Rouge LA">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="A complete auto appraisal service | Corbett Claims">
     <meta name="twitter:description" content="25+ years independent. Damage estimates, total-loss valuations, and diminished value on autos, motorcycles, RVs, and heavy equipment.">
-    <meta name="twitter:image" content="images/og-logo.png">
+    <meta name="twitter:image" content="https://www.corbettclaims.com/images/og-logo.png">
     <script>
         // Make social-preview meta tags fully qualified against the current host.
         (function () {
@@ -57,6 +58,8 @@
     {
       "@context": "https://schema.org",
       "@type": "ProfessionalService",
+      "@id": "https://www.corbettclaims.com/#business",
+      "url": "https://www.corbettclaims.com/",
       "name": "Corbett Claims",
       "alternateName": "Corbett Claim Service, Inc.",
       "description": "Independent auto and heavy equipment appraisal service. Founded in 2001 by Ronnie Corbett. Provides estimates on cars, motorcycles, RVs, motorhomes, and heavy farm equipment for insurance companies, attorneys, and private individuals.",
@@ -64,7 +67,8 @@
       "founder": { "@type": "Person", "name": "Ronnie Corbett" },
       "telephone": "+1-225-663-2217",
       "email": "assignments@corbettclaims.net",
-      "image": "images/og-logo.png",
+      "image": "https://www.corbettclaims.com/images/og-logo.png",
+      "logo": "https://www.corbettclaims.com/images/og-logo.png",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "PO Box 84333",
@@ -645,11 +649,6 @@
 
                         <span class="field-hint" id="location-hint">Type an address and pick a suggestion, or tap <strong>Use my current location</strong> — best when a vehicle is stranded on the road.</span>
                         <span class="field-error" id="location-error" aria-live="polite"></span>
-                    </div>
-
-                    <div class="field">
-                        <label>Photos or Documents <span style="color:var(--muted); font-weight:400;">(optional)</span></label>
-                        <p class="field-hint" style="margin-top:4px;">Have photos of the damage, a police report, or other documents? When your email app opens, just attach them before you press Send — they're welcome but never required up front.</p>
                     </div>
 
                     <div class="field">

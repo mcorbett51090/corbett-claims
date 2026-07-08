@@ -28,4 +28,4 @@ User-agent: PerplexityBot
 Allow: /
 Disallow: /docs/
 
-Sitemap: https://corbettclaims.com/sitemap.xml
+Sitemap: https://www.corbettclaims.com/sitemap.xml

@@ -940,8 +940,10 @@
                     'Equipment Type: ' + g('equipment_type'),
                     'Assignment Type: ' + g('assignment_type'),
                 ];
-                var _veh = [g('vehicle_year'), g('vehicle_make'), g('vehicle_model'), g('vehicle_color')].filter(Boolean).join(' ');
-                if (_veh) lines.push('Vehicle: ' + _veh);
+                if (g('vehicle_year')) lines.push('Year: ' + g('vehicle_year'));
+                if (g('vehicle_make')) lines.push('Make: ' + g('vehicle_make'));
+                if (g('vehicle_model')) lines.push('Model: ' + g('vehicle_model'));
+                if (g('vehicle_color')) lines.push('Color: ' + g('vehicle_color'));
                 if (g('equipment_detail')) lines.push('Make/Model/Hours: ' + g('equipment_detail'));
                 if (g('rv_detail')) lines.push('RV Class & Length: ' + g('rv_detail'));
                 if (g('preloss_condition')) lines.push('Pre-loss Condition: ' + g('preloss_condition'));

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-density="compact">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,16 +23,6 @@
     <meta name="twitter:description" content="25+ years independent. Damage estimates, total-loss valuations, and diminished value on autos, motorcycles, RVs, and heavy equipment.">
     <meta name="twitter:image" content="https://www.corbettclaims.com/images/og-logo.png">
     <script>
-        // Restore the saved vertical-density choice before first paint (no flash of the default).
-        (function () {
-            try {
-                var d = localStorage.getItem('cc-density');
-                if (['spacious', 'comfortable', 'compact', 'tight'].indexOf(d) >= 0) {
-                    document.documentElement.setAttribute('data-density', d);
-                }
-            } catch (e) {}
-        })();
-
         // Make social-preview meta tags fully qualified against the current host.
         (function () {
             var here = new URL('.', window.location.href).href;
@@ -444,8 +434,10 @@
         </div>
     </section>
 
-    <!-- FAQ -->
-    <section id="faq">
+    <!-- FAQ — hidden until a FAQ link (header nav, mobile menu, or footer) is clicked.
+         Kept in the DOM (not removed) so the content stays crawlable and the FAQPage
+         structured data above still matches. Revealed by the FAQ-reveal script below. -->
+    <section id="faq" hidden>
         <div class="container" style="max-width:800px;">
             <div class="section-head">
                 <h2 class="section-title">Frequently Asked Questions</h2>
@@ -656,15 +648,9 @@
 
     <a href="tel:2256632217" class="floating-btn" id="floating-btn" aria-label="Call Corbett Claims at (225) 663-2217"><span aria-hidden="true">📞</span> Call Now</a>
 
-    <!-- Cycles the page's vertical spacing (Spacious → Comfortable → Compact → Tight); choice is remembered. -->
-    <button type="button" class="density-btn" id="density-btn" title="Adjust the page spacing" aria-live="polite">
-        <span class="density-arrow" aria-hidden="true">⇕</span>
-        <span class="density-caption">Spacing:</span>
-        <span id="density-label">Comfortable</span>
-    </button>
-
     <footer>
         <div class="footer-inner">
+            <p class="footer-nav"><a href="#faq">FAQ</a></p>
             <!-- The © glyph is a discreet "secret door" to the owner-only view. Looks like
                  ordinary footer text; leads to /owner.html (noindex) which links out to the
                  Google analytics dashboard behind Google sign-in — no data lives on this page. -->
@@ -725,6 +711,34 @@
             menu.querySelectorAll('a').forEach((link) => {
                 link.addEventListener('click', () => closeMenu(false));
             });
+        })();
+
+        // ---------- FAQ reveal (section is hidden until a FAQ link is clicked) ----------
+        (function () {
+            const faq = document.getElementById('faq');
+            if (!faq) return;
+
+            function revealFaq(scroll) {
+                faq.hidden = false;
+                if (scroll) {
+                    // Let the layout settle (menu closing, section appearing) before scrolling.
+                    requestAnimationFrame(function () {
+                        faq.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                }
+            }
+
+            // Any link pointing at #faq — header nav, mobile menu, footer — reveals it.
+            document.querySelectorAll('a[href="#faq"]').forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    revealFaq(true);
+                    history.replaceState(null, '', '#faq');
+                });
+            });
+
+            // A direct visit to /#faq should show it too.
+            if (location.hash === '#faq') revealFaq(true);
         })();
 
         // ---------- Interactive timeline (How It Works) ----------
@@ -1248,35 +1262,5 @@
         })();
     </script>
 
-    <!-- ---------- Density toggle: cycle vertical spacing, remember the choice ---------- -->
-    <script>
-        (function () {
-            var LEVELS = ['spacious', 'comfortable', 'compact', 'tight'];
-            var PRETTY = { spacious: 'Spacious', comfortable: 'Comfortable', compact: 'Compact', tight: 'Tight' };
-            var KEY = 'cc-density';
-            var btn = document.getElementById('density-btn');
-            var label = document.getElementById('density-label');
-            if (!btn || !label) return;
-
-            function currentLevel() {
-                var d = document.documentElement.getAttribute('data-density');
-                return LEVELS.indexOf(d) >= 0 ? d : 'comfortable';
-            }
-            function apply(level) {
-                document.documentElement.setAttribute('data-density', level);
-                label.textContent = PRETTY[level];
-                btn.setAttribute('aria-label', 'Page spacing: ' + PRETTY[level] + '. Tap to change.');
-            }
-
-            // Reflect whatever the head script restored (or the comfortable default).
-            apply(currentLevel());
-
-            btn.addEventListener('click', function () {
-                var next = LEVELS[(LEVELS.indexOf(currentLevel()) + 1) % LEVELS.length];
-                apply(next);
-                try { localStorage.setItem(KEY, next); } catch (e) {}
-            });
-        })();
-    </script>
 </body>
 </html>

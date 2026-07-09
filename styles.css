@@ -14,9 +14,9 @@
 }
 
 /* ---------- Vertical density presets ----------
-   Cycled by the bottom-left density toggle (#density-btn). Default (no
-   data-density attribute) is "comfortable" so the page reads condensed even
-   before JS runs — no flash of the old spacious layout. */
+   The page ships at "compact" spacing (set via data-density="compact" on <html>).
+   The other presets are retained but no longer user-switchable — the toggle was
+   removed once the owner settled on compact. */
 :root,
 :root[data-density="comfortable"] {
     --pad-section: 2.75rem;
@@ -981,46 +981,6 @@ select[aria-invalid="true"] {
     display: none;
 }
 
-/* ---------- Density toggle (bottom-left) ---------- */
-.density-btn {
-    position: fixed;
-    bottom: 24px;
-    left: 24px;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: #fff;
-    color: var(--primary);
-    border: 1px solid var(--border);
-    padding: 10px 16px;
-    border-radius: 9999px;
-    font: inherit;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 8px 15px -6px rgb(0 0 0 / 0.25);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    z-index: 50;
-}
-.density-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 16px 22px -8px rgb(0 0 0 / 0.22);
-}
-.density-btn:focus-visible {
-    outline: 3px solid var(--focus-ring);
-    outline-offset: 2px;
-}
-.density-btn .density-arrow { font-size: 1rem; line-height: 1; }
-.density-btn .density-caption { color: var(--muted); font-weight: 500; }
-@media (prefers-reduced-motion: reduce) {
-    .density-btn { transition: none; }
-    .density-btn:hover { transform: none; }
-}
-@media (max-width: 600px) {
-    /* Shrink so it doesn't crowd the Call button on small screens. */
-    .density-btn { bottom: 18px; left: 14px; padding: 8px 12px; font-size: 0.78rem; }
-    .density-btn .density-caption { display: none; }
-}
 
 /* ---------- Footer ---------- */
 footer {
@@ -1034,6 +994,19 @@ footer .footer-inner {
     padding: 1.5rem;
     text-align: center;
     font-size: 0.85rem;
+}
+
+footer .footer-nav {
+    margin: 0 0 0.75rem;
+}
+footer .footer-nav a {
+    color: #d1d5db;
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+footer .footer-nav a:hover {
+    text-decoration: underline;
 }
 
 /* Secret door — the © glyph links to the owner view but reads as ordinary text
@@ -1091,7 +1064,6 @@ footer .footer-inner {
     #mobile-menu,
     .nav-cta,
     .floating-btn,
-    .density-btn,
     #service-map,
     .hero-ctas,
     .contact-form,

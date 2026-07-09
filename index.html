@@ -437,18 +437,6 @@
                          class="map-fallback">
                 </noscript>
 
-                <div class="area-chip-row">
-                    <span class="chip">Louisiana <small>(HQ)</small></span>
-                    <span class="chip">Texas</span>
-                    <span class="chip">Mississippi</span>
-                    <span class="chip">Alabama</span>
-                    <span class="chip">Georgia</span>
-                    <span class="chip">Florida</span>
-                    <span class="chip">Ohio</span>
-                    <span class="chip">Illinois</span>
-                    <span class="chip">Nevada</span>
-                </div>
-
                 <p style="margin-top:1rem; color:var(--muted); font-size:0.95rem; text-align:center;">
                     Headquartered in Baton Rouge. Assignments accepted from Texas to Florida and up to Ohio, Illinois and Nevada.
                 </p>
@@ -677,7 +665,10 @@
 
     <footer>
         <div class="footer-inner">
-            © 2026 Corbett Claims. Independent auto &amp; heavy equipment appraisals since 2001.
+            <!-- The © glyph is a discreet "secret door" to the owner-only view. Looks like
+                 ordinary footer text; leads to /owner.html (noindex) which links out to the
+                 Google analytics dashboard behind Google sign-in — no data lives on this page. -->
+            <a class="ft__door" href="/owner.html" rel="nofollow" aria-label="Owner area">©</a> 2026 Corbett Claims. Independent auto &amp; heavy equipment appraisals since 2001.
         </div>
 
         <div class="ft__built">

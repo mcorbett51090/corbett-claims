@@ -7,6 +7,7 @@
 User-agent: *
 Allow: /
 Disallow: /docs/
+Disallow: /owner.html
 
 # AI answer-engine crawlers — explicitly allowed (we want AI-search visibility
 # for a local service business). Remove a line to opt an engine out.
@@ -15,17 +16,21 @@ Disallow: /docs/
 User-agent: GPTBot
 Allow: /
 Disallow: /docs/
+Disallow: /owner.html
 
 User-agent: ClaudeBot
 Allow: /
 Disallow: /docs/
+Disallow: /owner.html
 
 User-agent: Google-Extended
 Allow: /
 Disallow: /docs/
+Disallow: /owner.html
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /docs/
+Disallow: /owner.html
 
 Sitemap: https://www.corbettclaims.com/sitemap.xml

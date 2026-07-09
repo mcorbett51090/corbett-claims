@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Area | Corbett Claims</title>
+
+    <!-- Owner-only hub. Not for the public: kept out of search engines and the sitemap.
+         The page itself holds NO analytics data — it only links out to Google's dashboard,
+         which sits behind Google sign-in. So even though the URL is technically reachable,
+         nothing sensitive is exposed here. -->
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://www.corbettclaims.com/owner.html">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .owner-wrap {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem 5rem;
+        }
+        .owner-eyebrow {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--primary-soft);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .owner-wrap h1 {
+            font-size: 2rem;
+            color: var(--text);
+            margin: 0 0 0.5rem;
+        }
+        .owner-lede {
+            color: var(--muted);
+            max-width: 52ch;
+            margin: 0 0 2rem;
+        }
+        .owner-grid {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+            gap: 1rem;
+        }
+        .owner-grid a {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 0.25rem 1rem;
+            padding: 1.4rem;
+            text-decoration: none;
+            border: 1px solid var(--border);
+            border-top: 3px solid var(--primary);
+            border-radius: 10px;
+            background: #fff;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .owner-grid a:hover {
+            border-top-color: var(--primary-soft);
+            box-shadow: 0 4px 16px rgba(30, 58, 95, 0.1);
+        }
+        .owner-grid a:focus-visible {
+            outline: 2px solid var(--focus-ring);
+            outline-offset: 2px;
+        }
+        .owner-t {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .owner-d {
+            grid-column: 1 / -1;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+        .owner-go {
+            color: var(--primary);
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .owner-back {
+            display: inline-block;
+            margin-top: 2.5rem;
+            color: var(--muted);
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+        .owner-back:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <main class="owner-wrap">
+        <p class="owner-eyebrow">Owner Area</p>
+        <h1>Your tools</h1>
+        <p class="owner-lede">
+            Private links for the owners of Corbett Claims. The analytics dashboard opens in
+            Google and asks you to sign in with your Google account &mdash; only approved
+            accounts can see the numbers.
+        </p>
+
+        <ul class="owner-grid" role="list">
+            <li>
+                <!-- Analytics dashboard.
+                     Default target is Google Analytics' own reporting UI (free, behind Google
+                     sign-in). For a prettier custom report, build a Looker Studio dashboard from
+                     your GA4 data (also free) and paste its share URL below in place of this one.
+                     Setup steps: docs/OWNER-VIEW-SETUP.md -->
+                <a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer">
+                    <span class="owner-t">Analytics Dashboard</span>
+                    <span class="owner-go" aria-hidden="true">&rarr;</span>
+                    <span class="owner-d">
+                        Site visits, traffic sources, and trends. Opens Google Analytics
+                        (Google sign-in required).
+                    </span>
+                </a>
+            </li>
+            <!-- Add future owner-only tools here. -->
+        </ul>
+
+        <a class="owner-back" href="/">&larr; Back to the site</a>
+    </main>
+</body>
+</html>

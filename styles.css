@@ -13,6 +13,36 @@
     --success: #047857;
 }
 
+/* ---------- Vertical density presets ----------
+   Cycled by the bottom-left density toggle (#density-btn). Default (no
+   data-density attribute) is "comfortable" so the page reads condensed even
+   before JS runs — no flash of the old spacious layout. */
+:root,
+:root[data-density="comfortable"] {
+    --pad-section: 2.75rem;
+    --pad-hero: 3.25rem;
+    --gap-head: 1.5rem;
+    --gap-grid: 1.5rem;
+}
+:root[data-density="spacious"] {
+    --pad-section: 4rem;
+    --pad-hero: 4.5rem;
+    --gap-head: 2.25rem;
+    --gap-grid: 2rem;
+}
+:root[data-density="compact"] {
+    --pad-section: 2.25rem;
+    --pad-hero: 2.75rem;
+    --gap-head: 1.25rem;
+    --gap-grid: 1.35rem;
+}
+:root[data-density="tight"] {
+    --pad-section: 1.75rem;
+    --pad-hero: 2.25rem;
+    --gap-head: 1rem;
+    --gap-grid: 1.2rem;
+}
+
 html {
     scroll-behavior: smooth;
     /* Keep focused elements / anchor targets clear of the sticky nav (WCAG 2.4.11). */
@@ -77,7 +107,7 @@ body {
 .container {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 4rem 1.5rem;
+    padding: var(--pad-section) 1.5rem;
 }
 
 .container-wide {
@@ -99,7 +129,7 @@ body {
 
 .section-head {
     text-align: center;
-    margin-bottom: 2.25rem;
+    margin-bottom: var(--gap-head);
 }
 
 .section-head p {
@@ -230,7 +260,7 @@ header.hero {
     background-blend-mode: overlay;
     color: white;
     text-align: center;
-    padding: 4.5rem 1.5rem;
+    padding: var(--pad-hero) 1.5rem;
     position: relative;
     overflow: hidden;
 }
@@ -349,13 +379,13 @@ header.hero::before {
 /* ---------- Cards ---------- */
 .card-grid {
     display: grid;
-    gap: 1.5rem;
+    gap: var(--gap-grid);
 }
 
 .steps-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.75rem;
+    gap: var(--gap-grid);
 }
 
 .card {
@@ -951,6 +981,47 @@ select[aria-invalid="true"] {
     display: none;
 }
 
+/* ---------- Density toggle (bottom-left) ---------- */
+.density-btn {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #fff;
+    color: var(--primary);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    border-radius: 9999px;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 15px -6px rgb(0 0 0 / 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    z-index: 50;
+}
+.density-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 22px -8px rgb(0 0 0 / 0.22);
+}
+.density-btn:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+.density-btn .density-arrow { font-size: 1rem; line-height: 1; }
+.density-btn .density-caption { color: var(--muted); font-weight: 500; }
+@media (prefers-reduced-motion: reduce) {
+    .density-btn { transition: none; }
+    .density-btn:hover { transform: none; }
+}
+@media (max-width: 600px) {
+    /* Shrink so it doesn't crowd the Call button on small screens. */
+    .density-btn { bottom: 18px; left: 14px; padding: 8px 12px; font-size: 0.78rem; }
+    .density-btn .density-caption { display: none; }
+}
+
 /* ---------- Footer ---------- */
 footer {
     background: #111827;
@@ -993,7 +1064,8 @@ footer .footer-inner {
     .hero p.lede { font-size: 1.05rem; }
     .form-row { grid-template-columns: 1fr; }
     .section-title { font-size: 1.85rem; }
-    .container { padding: 3rem 1.25rem; }
+    /* Proportional to the active density so mobile can never end up taller than desktop. */
+    .container { padding: calc(var(--pad-section) * 0.8) 1.25rem; }
 }
 
 /* ---------- Print ---------- */
@@ -1003,6 +1075,7 @@ footer .footer-inner {
     #mobile-menu,
     .nav-cta,
     .floating-btn,
+    .density-btn,
     #service-map,
     .hero-ctas,
     .contact-form,

@@ -72,11 +72,14 @@ choice is informed.
 - **Verdict: OPTIONAL.** Genuine LSU footage isn't on free-stock libraries (and would be a trademark
   risk); the current clip is the closest trademark-safe fit.
 
-### ○ Privacy-friendly analytics _(OPTIONAL)_
+### ✅ Website analytics _(wired — activate when you want it)_
 
-- **What:** add lightweight analytics (Plausible, Cloudflare Web Analytics, or GA4) to see traffic and
-  which pages convert.
-- **Verdict: OPTIONAL.** Useful once traffic grows; skip until then.
+- **What:** **Google Analytics 4** is wired into the site but ships **off**. No script, no cookies, and
+  no data are collected until a Measurement ID is pasted in — see [`ANALYTICS.md`](ANALYTICS.md).
+- **To turn it on (≈2 min):** create a free GA4 property, copy its `G-XXXXXXXXXX` ID, paste it into the
+  single activation line in `analytics.js`, and push. Full steps in [`ANALYTICS.md`](ANALYTICS.md).
+- **Note:** GA4 uses a cookie; no consent banner is included (fine for a US-only audience — the
+  reasoning and the EU/CA alternatives are documented in `ANALYTICS.md`).
 
 ---
 

@@ -1,3 +1,29 @@
+<!--
+TEMPLATE / REUSE NOTE — not shown when this file is rendered.
+
+This document is reused as the "getting found on Google" deliverable for each
+client site. When you adapt it for a new business, do ALL of the following:
+
+  1. Replace the business name, owner names, phone, website, hours, and service
+     area throughout.
+
+  2. PROCESS — add the current business's description. Replace the
+     "Your ready-to-paste business description" section below with THIS business's
+     description. Source it from that site's data.json -> business.description,
+     then shape it into the two boxes owners actually fill:
+       - Google Business Profile version: <= 750 characters, NO phone number and
+         NO URL (Google strips those out), plain sentences, lead with what the
+         business does + city/state, and work in the natural keywords a customer
+         would search.
+       - Short version: 1-2 sentences for directory listings with a smaller box.
+
+  3. Keep the wording consistent with the site's on-page meta description where
+     possible — the same description across the site, GBP, and directories is
+     exactly the consistency Google rewards.
+
+  Mirror every change into the plain-text twin (getting-found-on-google.txt).
+-->
+
 # Getting Corbett Claims found on Google — owner instructions
 
 **For:** Ronnie & Annie Corbett
@@ -70,14 +96,47 @@ much as Step 1 for searches like "auto appraiser Baton Rouge."
    - **Website:** https://www.corbettclaims.com/
    - **Hours:** Mon–Fri 8:00 AM – 5:00 PM, closed Sat & Sun
    - **Service area:** set it as a *service-area business* covering Baton Rouge
-     and the states you work (LA, TX, MS, AL, GA, FL, OH, IL, NV). You do **not**
+     and the states you work (LA, TX, MS, AL, GA, FL, TN, OH, IL, NV). You do **not**
      have to publish the PO Box as a street address if you'd rather not show one.
    - **Category:** "Appraiser" (add "Auto appraiser" if offered).
+   - **Description:** paste the text from **"Your ready-to-paste business
+     description"** just below.
 4. Google verifies by **postcard, phone, or email** — follow whichever it
    offers. Verification can take a few days (postcard is slowest).
 
 Once live, ask a few clients you've worked with to leave a Google review — even
 3–4 reviews meaningfully help you rank and win trust.
+
+---
+
+## Your ready-to-paste business description
+
+Both your **Google Business Profile** (Step 2) and your **directory listings**
+(Step 3) have a "Description" or "About" box. Paste the same text into each one —
+using identical wording everywhere is exactly the consistency Google rewards.
+
+**For Google Business Profile** — paste this into the profile's "Description"
+field. (Google allows up to 750 characters and strips out phone numbers and web
+links, so those are deliberately left out here.)
+
+> Corbett Claims (Corbett Claim Service, Inc.) is an independent auto and
+> heavy-equipment appraisal service based in Baton Rouge, Louisiana. Founded in
+> 2001 by Ronnie Corbett, the business brings more than 25 years of experience
+> providing objective damage estimates and value appraisals on cars, motorcycles,
+> RVs, motorhomes, and heavy farm equipment. Corbett Claims works with insurance
+> companies, attorneys, and private vehicle owners who need a fair, independent
+> estimate of repair cost or value. As a service-area business, it accepts
+> assignments across Louisiana, Texas, Mississippi, Alabama, Georgia, Florida,
+> Tennessee, Ohio, Illinois, and Nevada.
+
+**Short version** — for directory listings with a smaller box:
+
+> Independent auto and heavy-equipment appraisal service in Baton Rouge, LA. Since
+> 2001, Corbett Claims has provided objective damage estimates and value
+> appraisals on cars, motorcycles, RVs, motorhomes, and heavy farm equipment for
+> insurance companies, attorneys, and private vehicle owners across Louisiana,
+> Texas, Mississippi, Alabama, Georgia, Florida, Tennessee, Ohio, Illinois, and
+> Nevada.
 
 ---
 
@@ -97,6 +156,8 @@ For each listing that is actually yours:
    **match the website exactly**.
 3. Add your website link `https://www.corbettclaims.com/`. Each listing that
    links to your site is a small vote that helps the website rank.
+4. Where the listing has an "About" or "Description" box, paste the same business
+   description from the section above.
 
 Consistency is the point: Google trusts a business more when the name, phone, and
 details are identical everywhere it appears.

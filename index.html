@@ -608,6 +608,13 @@
                     </div>
 
                     <div class="field">
+                        <label for="attachments">Attach Photos or PDFs</label>
+                        <input id="attachments" type="file" name="attachments" class="file-input" multiple accept="image/*,application/pdf,.pdf" aria-describedby="attachments-hint">
+                        <ul class="file-list" id="attachments-list" aria-live="polite"></ul>
+                        <span class="field-hint" id="attachments-hint">Optional — pick photos of the damage or any PDFs. Your request opens in your own email app, so you'll attach the files you choose here to that email before pressing <strong>Send</strong>. You can also email them any time to <a href="mailto:assignments@corbettclaims.net">assignments@corbettclaims.net</a>.</span>
+                    </div>
+
+                    <div class="field">
                         <label for="message">Comments</label>
                         <textarea id="message" name="message" rows="3" placeholder="Optional — add anything we should know."></textarea>
                     </div>
@@ -876,6 +883,33 @@
                 else progressLabel.textContent = 'Ready to send';
             }
 
+            // ----- Attachments (photos / PDFs) -----
+            // The mailto handoff can't carry files, so we list the chosen files here and
+            // remind the visitor to attach them to the email that opens on submit.
+            const fileInput = document.getElementById('attachments');
+            const fileList = document.getElementById('attachments-list');
+            function selectedFileNames() {
+                return (fileInput && fileInput.files)
+                    ? Array.prototype.map.call(fileInput.files, function (f) { return f.name; })
+                    : [];
+            }
+            // Filenames are attacker-controllable text — escape before any innerHTML use.
+            function escHtml(s) {
+                const d = document.createElement('div');
+                d.textContent = String(s);
+                return d.innerHTML;
+            }
+            if (fileInput && fileList) {
+                fileInput.addEventListener('change', function () {
+                    fileList.innerHTML = '';
+                    selectedFileNames().forEach(function (n) {
+                        const li = document.createElement('li');
+                        li.textContent = n;
+                        fileList.appendChild(li);
+                    });
+                });
+            }
+
             // ----- Submit -----
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -913,13 +947,23 @@
                     'Comments: ' + g('message'),
                 ];
 
+                // Files can't ride along on a mailto: link — note them in the body so the
+                // owner knows to expect them, and prompt the sender to attach them below.
+                var _fileNames = selectedFileNames();
+                if (_fileNames.length) {
+                    lines.push('');
+                    lines.push('Attachments (' + _fileNames.length + ' — sender is attaching these to this email): ' + _fileNames.join(', '));
+                }
+
                 const mailto = 'mailto:assignments@corbettclaims.net'
                     + '?subject=' + encodeURIComponent('Appraisal request — ' + (g('claim_number') ? 'Claim ' + g('claim_number') : (g('owner_name') || 'website')))
                     + '&body=' + encodeURIComponent(lines.join('\n'));
 
                 status.setAttribute('data-state', 'success');
                 status.innerHTML = '<strong>Almost done — your email app is opening.</strong> '
-                    + 'Just press <em>Send</em> to submit your request (attach any photos there if you have them). '
+                    + (_fileNames.length
+                        ? 'Press <em>Send</em> to submit your request — <strong>and attach the ' + _fileNames.length + ' file' + (_fileNames.length > 1 ? 's' : '') + ' you selected</strong> (' + escHtml(_fileNames.join(', ')) + ') to that email before sending. '
+                        : 'Just press <em>Send</em> to submit your request (attach any photos there if you have them). ')
                     + "If nothing opens, email <a href=\"mailto:assignments@corbettclaims.net\">assignments@corbettclaims.net</a> "
                     + 'or call <a href="tel:2256632217">(225) 663-2217</a>.';
 
@@ -932,6 +976,7 @@
                     if (!status) return;
                     status.setAttribute('data-state', 'success');
                     status.innerHTML = '<strong>&#10003; Thanks &mdash; your request is on its way.</strong> '
+                        + (_fileNames.length ? '<strong>Don&rsquo;t forget to attach your ' + _fileNames.length + ' file' + (_fileNames.length > 1 ? 's' : '') + '</strong> to that email. ' : '')
                         + 'Once you press <em>Send</em> in your email app, you&rsquo;re all set: '
                         + 'we&rsquo;ll get back to you <strong>within one business day</strong>. '
                         + 'For anything urgent, call <a href="tel:2256632217">(225)&nbsp;663-2217</a>.';

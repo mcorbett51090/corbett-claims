@@ -379,6 +379,7 @@ header.hero::before {
 /* ---------- Cards ---------- */
 .card-grid {
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--gap-grid);
 }
 
@@ -392,7 +393,7 @@ header.hero::before {
     background: white;
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 2rem;
+    padding: 1.5rem;
     transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1),
                 box-shadow 0.3s cubic-bezier(0.4, 0.0, 0.2, 1),
                 border-color 0.3s ease;
@@ -406,9 +407,9 @@ header.hero::before {
 }
 
 .card-icon {
-    width: 44px;
-    height: 44px;
-    margin-bottom: 0.9rem;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 0.75rem;
     color: var(--primary);
     display: inline-flex;
     align-items: center;
@@ -417,8 +418,8 @@ header.hero::before {
     border-radius: 12px;
 }
 .card-icon svg {
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
     stroke: currentColor;
     fill: none;
     stroke-width: 2;
@@ -428,7 +429,7 @@ header.hero::before {
 
 .card h3 {
     margin: 0 0 0.4rem 0;
-    font-size: 1.25rem;
+    font-size: 1.15rem;
 }
 
 .card p {
@@ -726,6 +727,47 @@ select[aria-invalid="true"] {
     margin-top: 0.35rem;
     color: var(--muted);
     font-size: 0.85rem;
+}
+
+/* File-attachment field (Photos / PDFs) */
+.file-input {
+    padding: 10px 14px;
+    cursor: pointer;
+    line-height: 1.4;
+}
+.file-input::file-selector-button {
+    margin-right: 12px;
+    padding: 8px 14px;
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    background: rgba(30, 58, 95, 0.06);
+    color: var(--primary);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+.file-input::file-selector-button:hover {
+    background: rgba(30, 58, 95, 0.12);
+}
+.file-list {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+.file-list:empty { display: none; }
+.file-list li {
+    font-size: 0.85rem;
+    color: var(--text);
+    background: rgba(30, 58, 95, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    word-break: break-word;
 }
 
 .field-error {

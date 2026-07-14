@@ -1,6 +1,6 @@
 # Corbett Claims — Website Roadmap
 
-_Last updated 2026-07-07. Internal planning doc (excluded from search engines via `robots.txt`).
+_Last updated 2026-07-14. Internal planning doc (excluded from search engines via `robots.txt`).
 It tracks what's shipped, what's recommended next, and optional nice-to-haves._
 
 ---
@@ -64,6 +64,26 @@ choice is informed.
   a free-tier signup.
 - **Verdict: OPTIONAL.** The mailto flow works and keeps everything in-house. Revisit only if you want a
   guaranteed delivery receipt.
+
+### ○ Astro (or another SSG) migration _(OPTIONAL — deferred; trigger = SEO Phase 2)_
+
+- **What:** rebuild the hand-coded static site on the **Astro** framework (astro.build) — a shared
+  layout + components (nav, footer, contact form, `<head>`/schema), pages authored as `.astro`/`.md`.
+  Still outputs static HTML to GitHub Pages (via a GitHub Actions build); the Leaflet map and the
+  mailto form become client "islands."
+- **Gain:** removes duplicated markup once the site is **more than one page** — one place to edit the
+  nav/footer/form/schema, per-page title/description/canonical, and (with content collections)
+  owner-editable service copy in markdown instead of HTML.
+- **Cost:** adds a **Node build + CI step** (the site can then fail to build; today it can't) and cuts
+  against the current **zero-build, no-billing, edit-and-push** workflow. Porting the existing page
+  carries regression risk across the mailto form, keyless geocoding, JSON-LD, and the
+  Pages/HTTPS/`.nojekyll` setup — each needs re-verification.
+- **Verdict: DEFER — decided 2026-07-14 (Matt, exploring, no commitment yet).** No payoff while the
+  site is effectively **one page**; it produces the same final HTML with no user-facing gain. **The
+  trigger to revisit is committing to SEO Phase 2** — the per-service + bounded geo pages in
+  [`seo-action-plan.md`](seo-action-plan.md). If/when that's greenlit, do the Astro move **as** Phase 2:
+  port the current page into a layout + components first, then add the new pages as siblings — not as a
+  separate rewrite beforehand.
 
 ### ○ Actual LSU hero footage _(OPTIONAL / opportunistic)_
 

@@ -609,7 +609,7 @@
 
                     <div class="field">
                         <label for="attachments">Attach Photos or PDFs</label>
-                        <input id="attachments" type="file" name="attachments" class="file-input" multiple accept="image/*,application/pdf,.pdf" aria-describedby="attachments-hint">
+                        <input id="attachments" type="file" name="attachments" class="file-input" multiple accept="image/*,application/pdf,.pdf" aria-describedby="attachments-hint" data-secure-upload-file>
                         <ul class="file-list" id="attachments-list" aria-live="polite"></ul>
                         <span class="field-hint" id="attachments-hint">Optional — pick photos of the damage or any PDFs. Your request opens in your own email app, so you'll attach the files you choose here to that email before pressing <strong>Send</strong>. You can also email them any time to <a href="mailto:assignments@corbettclaims.net">assignments@corbettclaims.net</a>.</span>
                     </div>
@@ -619,11 +619,24 @@
                         <textarea id="message" name="message" rows="3" placeholder="Optional — add anything we should know."></textarea>
                     </div>
 
+                    <!--
+                      Secure-upload widgets (Turnstile human-check + spam honeypot) — present
+                      in the DOM but fully inert while SECURE_UPLOAD.enabled is false below:
+                      `hidden` removes this from layout entirely (no flex gap, no reflow), no
+                      script loads, and no submit-handler branch reads it. Only flipping
+                      `enabled: true` (once the Worker + Turnstile keys are provisioned) makes
+                      this participate in the page at all. See raven-site-kit/secure-upload/.
+                    -->
+                    <div id="secure-upload-widgets" hidden>
+                        <div id="cf-turnstile-mount"></div>
+                        <input type="checkbox" id="botcheck" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">
+                    </div>
+
                     <button type="submit" class="btn" id="form-submit" style="padding:15px;">Send Request</button>
                     <noscript>
                         <p class="form-note">JavaScript is turned off, so this button won't open your email app. Please email your request to <a href="mailto:assignments@corbettclaims.net">assignments@corbettclaims.net</a> or call <a href="tel:2256632217">(225) 663-2217</a>.</p>
                     </noscript>
-                    <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
+                    <div class="form-status" id="form-status" data-form-status role="status" aria-live="polite"></div>
                     <p class="form-note">We respond within one business day. By submitting, you agree to be contacted about your inquiry. We don't share your info.</p>
                 </form>
 
@@ -807,6 +820,55 @@
             io.observe(contact);
         })();
 
+        // ---------- Secure upload (optional file attachments via Worker) ----------
+        // Additive and OFF by default. With `enabled: false` (the committed state) none
+        // of this runs: no script loads, no widget activates, `secureActive` stays false,
+        // and the Smart-form submit handler below takes its existing mailto-only branch
+        // unchanged. Flip `enabled: true` only after the Worker + Turnstile keys are
+        // provisioned per raven-site-kit/secure-upload/README.md's checklist.
+        const SECURE_UPLOAD = {
+            enabled: false,
+            workerUrl: 'https://YOUR-WORKER.example.workers.dev', // TODO(owner): real deployed Worker URL
+            siteId: 'corbett-claims',
+            turnstileSiteKey: 'YOUR-TURNSTILE-SITE-KEY', // TODO(owner): real Turnstile site key
+        };
+        let secureActive = false;
+        let secureUploadModulePromise = null; // resolves to the module, or null on load failure
+
+        if (SECURE_UPLOAD.enabled) {
+            (function initSecureUploadWidgets() {
+                const widgets = document.getElementById('secure-upload-widgets');
+                const mount = document.getElementById('cf-turnstile-mount');
+                const hint = document.getElementById('attachments-hint');
+                if (!widgets || !mount) return;
+
+                widgets.hidden = false;
+                mount.classList.add('cf-turnstile');
+                mount.setAttribute('data-sitekey', SECURE_UPLOAD.turnstileSiteKey);
+
+                const s = document.createElement('script');
+                s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+                s.async = true;
+                s.defer = true;
+                document.head.appendChild(s);
+
+                // Files now upload automatically — drop the "attach to that email" wording.
+                if (hint) {
+                    hint.innerHTML = 'Optional — pick photos of the damage or any PDFs. They upload automatically and securely when you submit, so there&rsquo;s nothing to attach to an email. You can also email them any time to <a href="mailto:assignments@corbettclaims.net">assignments@corbettclaims.net</a>.';
+                }
+
+                secureActive = true;
+            })();
+
+            // Load the client module only when the feature is enabled — a disabled site
+            // fetches nothing extra. Kicked off at init (not on submit) so it's almost
+            // certainly resolved by the time the visitor submits.
+            secureUploadModulePromise = import('/secure-upload.js').catch((err) => {
+                console.error('secure-upload: failed to load client module', err);
+                return null;
+            });
+        }
+
         // ---------- Smart form ----------
         (function () {
             const form = document.getElementById('appraisal-form');
@@ -925,9 +987,95 @@
                     return;
                 }
 
+                const g = (n) => ((form.elements[n] && form.elements[n].value) || '').trim();
+
+                // ----- Secure upload path (only when enabled AND a file was chosen) -----
+                // Everything above (validation) and everything below (mailto) is the
+                // existing, unmodified flow. This block only ever runs when SECURE_UPLOAD
+                // was flipped on at the top of this script; with `enabled: false`,
+                // `secureActive` is always false and this whole branch is skipped, so
+                // submission falls straight through to the original mailto code untouched.
+                if (secureActive && selectedFileNames().length > 0) {
+                    const botField = document.getElementById('botcheck');
+                    if (botField && botField.checked) {
+                        // Honeypot tripped — a real visitor can never see or check this
+                        // field. Feign success, send nothing, don't fall back to mailto.
+                        status.setAttribute('data-state', 'success');
+                        status.innerHTML = '<strong>&#10003; Thanks &mdash; your request is on its way.</strong>';
+                        form.reset();
+                        if (fileList) fileList.innerHTML = '';
+                        updateProgress();
+                        return;
+                    }
+
+                    if (submitBtn) submitBtn.disabled = true;
+                    status.setAttribute('data-state', 'loading');
+                    status.textContent = 'Sending your request and uploading your files securely…';
+
+                    const _fileCount = selectedFileNames().length;
+                    let secureDelivered = false;
+                    try {
+                        const tsInput = form.querySelector('input[name="cf-turnstile-response"]');
+                        const turnstileToken = tsInput ? tsInput.value : '';
+
+                        // Same values the mailto builder below uses, INCLUDING claim_number,
+                        // so the owner can correlate a delivered-files email with any
+                        // separate mailto submission for the same claim.
+                        const secureFields = {
+                            claim_number: g('claim_number'),
+                            insured: g('insured'),
+                            claimant: g('claimant'),
+                            owner_name: g('owner_name'),
+                            owner_address: [g('owner_address'), g('owner_zip')].filter(Boolean).join(', '),
+                            date_of_loss: g('date_of_loss'),
+                            email: g('email'),
+                            phone: g('phone'),
+                            alt_phone: g('alt_phone'),
+                            location: g('location'),
+                            location_maps_url: g('location_maps_url'),
+                            loss_type: g('loss_type'),
+                            message: g('message'),
+                        };
+
+                        const mod = secureUploadModulePromise ? await secureUploadModulePromise : null;
+                        if (!mod) throw new Error('Upload service unavailable.');
+
+                        await mod.uploadFiles(
+                            {
+                                workerUrl: SECURE_UPLOAD.workerUrl,
+                                siteId: SECURE_UPLOAD.siteId,
+                                turnstileSiteKey: SECURE_UPLOAD.turnstileSiteKey,
+                            },
+                            fileInput.files,
+                            secureFields,
+                            { turnstileToken: turnstileToken }
+                        );
+                        secureDelivered = true;
+                    } catch (err) {
+                        secureDelivered = false;
+                    } finally {
+                        if (submitBtn) submitBtn.disabled = false;
+                    }
+
+                    if (secureDelivered) {
+                        status.setAttribute('data-state', 'success');
+                        status.innerHTML = '<strong>&#10003; Thanks &mdash; your request and ' + _fileCount + ' file' + (_fileCount > 1 ? 's were' : ' was') + ' delivered securely.</strong> '
+                            + 'We&rsquo;ll get back to you <strong>within one business day</strong>. '
+                            + 'For anything urgent, call <a href="tel:2256632217">(225)&nbsp;663-2217</a>.';
+                        form.reset();
+                        if (fileList) fileList.innerHTML = '';
+                        updateProgress();
+                        return;
+                    }
+
+                    // Secure delivery failed — be honest, and never lose the request:
+                    // fall through into the proven mailto path below so nothing is dropped.
+                    status.setAttribute('data-state', 'error');
+                    status.textContent = "We couldn't upload your files automatically, so we're opening your email app instead — please attach your files there too.";
+                }
+
                 // No third-party service, no backend: hand the completed, validated request to
                 // the visitor's own email app — pre-filled and addressed to assignments@corbettclaims.net.
-                const g = (n) => ((form.elements[n] && form.elements[n].value) || '').trim();
                 var _mapUrl = g('location_maps_url');
                 var _ownerAddr = [g('owner_address'), g('owner_zip')].filter(Boolean).join(', ');
                 // Emitted in the owner's requested field order so it's ready to key into his software.

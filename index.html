@@ -820,12 +820,15 @@
             io.observe(contact);
         })();
 
-        // ---------- Secure upload (optional file attachments via Worker) ----------
-        // Additive and OFF by default. With `enabled: false` (the committed state) none
-        // of this runs: no script loads, no widget activates, `secureActive` stays false,
-        // and the Smart-form submit handler below takes its existing mailto-only branch
-        // unchanged. Flip `enabled: true` only after the Worker + Turnstile keys are
-        // provisioned per raven-site-kit/secure-upload/README.md's checklist.
+        // ---------- Secure Worker submission (plan-v2: primary channel, whole form) ----------
+        // OFF by default. With `enabled: false` (the committed state) none of this runs:
+        // no script loads, no widget activates, `secureActive` stays false, and the
+        // Smart-form submit handler below takes its existing mailto-only branch
+        // unchanged — byte-identical to today. Once flipped on (only after the Worker +
+        // Turnstile keys are provisioned per raven-site-kit/secure-upload/README.md's
+        // checklist), EVERY submission — text-only and with files — routes through the
+        // Worker via `submitForm()` as the PRIMARY channel; mailto becomes a fallback,
+        // used only if that Worker call fails, plus the always-present <noscript> path.
         const SECURE_UPLOAD = {
             enabled: false,
             workerUrl: 'https://YOUR-WORKER.example.workers.dev', // TODO(owner): real deployed Worker URL
@@ -989,13 +992,16 @@
 
                 const g = (n) => ((form.elements[n] && form.elements[n].value) || '').trim();
 
-                // ----- Secure upload path (only when enabled AND a file was chosen) -----
+                // ----- Secure Worker path (plan-v2: the WHOLE submission — text-only AND
+                // with files — routes through the Worker when enabled, replacing mailto
+                // as the primary channel) -----
                 // Everything above (validation) and everything below (mailto) is the
                 // existing, unmodified flow. This block only ever runs when SECURE_UPLOAD
                 // was flipped on at the top of this script; with `enabled: false`,
                 // `secureActive` is always false and this whole branch is skipped, so
-                // submission falls straight through to the original mailto code untouched.
-                if (secureActive && selectedFileNames().length > 0) {
+                // submission falls straight through to the original mailto code untouched
+                // — byte-identical to today.
+                if (secureActive) {
                     const botField = document.getElementById('botcheck');
                     if (botField && botField.checked) {
                         // Honeypot tripped — a real visitor can never see or check this
@@ -1008,19 +1014,22 @@
                         return;
                     }
 
+                    const _fileCount = selectedFileNames().length;
+
                     if (submitBtn) submitBtn.disabled = true;
                     status.setAttribute('data-state', 'loading');
-                    status.textContent = 'Sending your request and uploading your files securely…';
+                    status.textContent = _fileCount > 0
+                        ? 'Sending your request and uploading your files securely…'
+                        : 'Sending your request securely…';
 
-                    const _fileCount = selectedFileNames().length;
                     let secureDelivered = false;
                     try {
                         const tsInput = form.querySelector('input[name="cf-turnstile-response"]');
                         const turnstileToken = tsInput ? tsInput.value : '';
 
                         // Same values the mailto builder below uses, INCLUDING claim_number,
-                        // so the owner can correlate a delivered-files email with any
-                        // separate mailto submission for the same claim.
+                        // so the owner can correlate a Worker-delivered submission with any
+                        // fallback mailto submission for the same claim.
                         const secureFields = {
                             claim_number: g('claim_number'),
                             insured: g('insured'),
@@ -1040,15 +1049,21 @@
                         const mod = secureUploadModulePromise ? await secureUploadModulePromise : null;
                         if (!mod) throw new Error('Upload service unavailable.');
 
-                        await mod.uploadFiles(
+                        // submitForm() is the unified whole-form entry point (plan-v2): it
+                        // picks presign+PUT+/complete when files are attached, or posts
+                        // fields-only to the Worker's /submit when the file input is empty —
+                        // either way this ONE call is the entire submission, no mailto.
+                        await mod.submitForm(
                             {
                                 workerUrl: SECURE_UPLOAD.workerUrl,
                                 siteId: SECURE_UPLOAD.siteId,
                                 turnstileSiteKey: SECURE_UPLOAD.turnstileSiteKey,
                             },
-                            fileInput.files,
-                            secureFields,
-                            { turnstileToken: turnstileToken }
+                            {
+                                fields: secureFields,
+                                files: (fileInput && fileInput.files) || [],
+                                turnstileToken: turnstileToken,
+                            }
                         );
                         secureDelivered = true;
                     } catch (err) {
@@ -1059,7 +1074,9 @@
 
                     if (secureDelivered) {
                         status.setAttribute('data-state', 'success');
-                        status.innerHTML = '<strong>&#10003; Thanks &mdash; your request and ' + _fileCount + ' file' + (_fileCount > 1 ? 's were' : ' was') + ' delivered securely.</strong> '
+                        status.innerHTML = (_fileCount > 0
+                                ? '<strong>&#10003; Thanks &mdash; your request and ' + _fileCount + ' file' + (_fileCount > 1 ? 's were' : ' was') + ' delivered securely.</strong> '
+                                : '<strong>&#10003; Thanks &mdash; your request was delivered securely.</strong> ')
                             + 'We&rsquo;ll get back to you <strong>within one business day</strong>. '
                             + 'For anything urgent, call <a href="tel:2256632217">(225)&nbsp;663-2217</a>.';
                         form.reset();
@@ -1069,9 +1086,12 @@
                     }
 
                     // Secure delivery failed — be honest, and never lose the request:
-                    // fall through into the proven mailto path below so nothing is dropped.
+                    // fall through into the proven mailto path below (the ONLY remaining
+                    // use of mailto now) so nothing is dropped.
                     status.setAttribute('data-state', 'error');
-                    status.textContent = "We couldn't upload your files automatically, so we're opening your email app instead — please attach your files there too.";
+                    status.textContent = _fileCount > 0
+                        ? "We couldn't send your request automatically, so we're opening your email app instead — please attach your files there too."
+                        : "We couldn't send your request automatically, so we're opening your email app instead.";
                 }
 
                 // No third-party service, no backend: hand the completed, validated request to

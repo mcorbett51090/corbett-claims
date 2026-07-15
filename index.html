@@ -614,6 +614,24 @@
                         <span class="field-hint" id="attachments-hint">Optional — pick photos of the damage or any PDFs. Your request opens in your own email app, so you'll attach the files you choose here to that email before pressing <strong>Send</strong>. You can also email them any time to <a href="mailto:assignments@corbettclaims.net">assignments@corbettclaims.net</a>.</span>
                     </div>
 
+                    <!--
+                      Photo quality — resizes photos IN THE BROWSER before upload so a
+                      photo-heavy claim fits under the 20 MB whole-submission cap. Hidden
+                      (and irrelevant) unless SECURE_UPLOAD.enabled: the mailto fallback
+                      attaches nothing, so there'd be nothing to resize. Revealed by
+                      initSecureUploadWidgets below, same as the Turnstile mount.
+                    -->
+                    <div class="field" id="photo-quality-field" hidden>
+                        <label for="photo-quality">Photo Quality</label>
+                        <select id="photo-quality" name="photo_quality" data-secure-upload-quality aria-describedby="photo-quality-hint">
+                            <option value="actual" selected>Actual size — best quality</option>
+                            <option value="large">Large — slightly smaller</option>
+                            <option value="medium">Medium — good for most photos</option>
+                            <option value="small">Small — fastest to upload</option>
+                        </select>
+                        <span class="field-hint" id="photo-quality-hint">Photos are resized on your device before uploading — the originals on your phone aren't changed. If your photos total more than 20 MB, choose a smaller size.</span>
+                    </div>
+
                     <div class="field">
                         <label for="message">Comments</label>
                         <textarea id="message" name="message" rows="3" placeholder="Optional — add anything we should know."></textarea>
@@ -830,10 +848,15 @@
         // Worker via `submitForm()` as the PRIMARY channel; mailto becomes a fallback,
         // used only if that Worker call fails, plus the always-present <noscript> path.
         const SECURE_UPLOAD = {
-            enabled: false,
-            workerUrl: 'https://YOUR-WORKER.example.workers.dev', // TODO(owner): real deployed Worker URL
+            enabled: true,
+            workerUrl: 'https://raven-secure-upload.matt-769.workers.dev',
             siteId: 'corbett-claims',
-            turnstileSiteKey: 'YOUR-TURNSTILE-SITE-KEY', // TODO(owner): real Turnstile site key
+            turnstileSiteKey: '0x4AAAAAAD2pG4nnEomDn82u', // public by design — safe to ship
+            // Whole-submission ceiling, and it MUST match the Worker's per-site
+            // maxTotalBytes (email-attach mode batches every file into one email).
+            // Checked in-browser after compression so an over-cap claim is caught
+            // before a single byte is uploaded; the Worker enforces it regardless.
+            maxTotalBytes: 20971520, // 20 MB
         };
         let secureActive = false;
         let secureUploadModulePromise = null; // resolves to the module, or null on load failure
@@ -843,9 +866,12 @@
                 const widgets = document.getElementById('secure-upload-widgets');
                 const mount = document.getElementById('cf-turnstile-mount');
                 const hint = document.getElementById('attachments-hint');
+                const qualityField = document.getElementById('photo-quality-field');
                 if (!widgets || !mount) return;
 
                 widgets.hidden = false;
+                // Only meaningful on the Worker path — see the markup comment above.
+                if (qualityField) qualityField.hidden = false;
                 mount.classList.add('cf-turnstile');
                 mount.setAttribute('data-sitekey', SECURE_UPLOAD.turnstileSiteKey);
 
@@ -1023,6 +1049,8 @@
                         : 'Sending your request securely…';
 
                     let secureDelivered = false;
+                    let overCapMessage = '';
+                    const qualityEl = document.getElementById('photo-quality');
                     try {
                         const tsInput = form.querySelector('input[name="cf-turnstile-response"]');
                         const turnstileToken = tsInput ? tsInput.value : '';
@@ -1063,11 +1091,24 @@
                                 fields: secureFields,
                                 files: (fileInput && fileInput.files) || [],
                                 turnstileToken: turnstileToken,
+                                // Resize photos in-browser before upload, then refuse to
+                                // start if the batch still exceeds the Worker's cap.
+                                quality: (qualityEl && qualityEl.value) || 'actual',
+                                maxTotalBytes: SECURE_UPLOAD.maxTotalBytes,
                             }
                         );
                         secureDelivered = true;
                     } catch (err) {
                         secureDelivered = false;
+                        // "Too big" is a FIXABLE input problem, not a delivery failure —
+                        // the visitor can pick a smaller photo quality and succeed. Falling
+                        // back to mailto here would be actively wrong: email can't carry
+                        // these files either, so it would hand them a half-empty draft and
+                        // read as though the claim went through. Every OTHER failure still
+                        // falls through to mailto below, so a real request is never lost.
+                        if (err && /over the .*limit/i.test(err.message || '')) {
+                            overCapMessage = err.message;
+                        }
                     } finally {
                         if (submitBtn) submitBtn.disabled = false;
                     }
@@ -1082,6 +1123,16 @@
                         form.reset();
                         if (fileList) fileList.innerHTML = '';
                         updateProgress();
+                        return;
+                    }
+
+                    // Over the total-size cap — surface it and STOP (no mailto, see above).
+                    // The form is left exactly as the visitor filled it so changing the
+                    // photo quality and pressing Send again is all it takes.
+                    if (overCapMessage) {
+                        status.setAttribute('data-state', 'error');
+                        status.textContent = overCapMessage;
+                        if (qualityEl) qualityEl.focus();
                         return;
                     }
 

@@ -609,8 +609,8 @@
 
                     <div class="field">
                         <label for="attachments">Attach Photos or PDFs</label>
-                        <input id="attachments" type="file" name="attachments" class="file-input" multiple accept="image/*,application/pdf,.pdf" aria-describedby="attachments-hint" data-secure-upload-file>
-                        <ul class="file-list" id="attachments-list" aria-live="polite"></ul>
+                        <input id="attachments" type="file" name="attachments" class="file-input" multiple accept="image/*,application/pdf,.pdf" aria-describedby="attachments-hint" data-secure-upload-file data-secure-upload-preview data-secure-upload-preview-for="attachments-list">
+                        <div class="su-preview" id="attachments-list" data-secure-upload-preview-target></div>
                         <span class="field-hint" id="attachments-hint">Optional — pick photos of the damage or any PDFs. Your request opens in your own email app, so you'll attach the files you choose here to that email before pressing <strong>Send</strong>. You can also email them any time to <a href="mailto:assignments@corbettclaims.net">assignments@corbettclaims.net</a>.</span>
                     </div>
 
@@ -1003,8 +1003,12 @@
             }
 
             // ----- Attachments (photos / PDFs) -----
-            // The mailto handoff can't carry files, so we list the chosen files here and
-            // remind the visitor to attach them to the email that opens on submit.
+            // The removable thumbnail-grid preview is rendered into #attachments-list by
+            // secure-upload.js's initAttachmentPreviews() (opt-in via the input's
+            // data-secure-upload-preview attribute); it keeps input.files authoritative, so
+            // a removed tile is excluded from BOTH the Worker upload and the mailto list.
+            // selectedFileNames()/escHtml() remain — the mailto fallback lists the surviving
+            // filenames from input.files, and _fileCount reads the same source.
             const fileInput = document.getElementById('attachments');
             const fileList = document.getElementById('attachments-list');
             function selectedFileNames() {
@@ -1017,16 +1021,6 @@
                 const d = document.createElement('div');
                 d.textContent = String(s);
                 return d.innerHTML;
-            }
-            if (fileInput && fileList) {
-                fileInput.addEventListener('change', function () {
-                    fileList.innerHTML = '';
-                    selectedFileNames().forEach(function (n) {
-                        const li = document.createElement('li');
-                        li.textContent = n;
-                        fileList.appendChild(li);
-                    });
-                });
             }
 
             // ----- Submit -----

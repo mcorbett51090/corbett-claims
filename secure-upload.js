@@ -557,13 +557,289 @@ export function initSecureUpload(overrides = {}) {
   document.querySelectorAll(selector).forEach((form) => bindForm(form, overrides));
 }
 
+// ---------------------------------------------------------------------------
+// Attachment preview grid — OPT-IN removable thumbnails
+// ---------------------------------------------------------------------------
+// Renders a thumbnail grid for a file input, each tile with an X that removes
+// that ONE file. Keeps `input.files` the SINGLE source of truth by resyncing it
+// from a rebuilt DataTransfer on every add/remove — so `collectFiles`,
+// `submitForm`, and any host-page submit handler that reads `input.files` need
+// NO changes. Entirely opt-in: only an `input[data-secure-upload-file]` that
+// ALSO carries `data-secure-upload-preview` gets a grid, so every existing page
+// is byte-behavior-unchanged (the init scan is otherwise an empty query).
+
+const PREVIEWABLE_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+const THUMB_MAX_DIM = 256; // longest edge of the generated thumbnail (~2x a 96-128px tile, for retina)
+
+function previewFileKey(f) {
+  return `${f.name}::${f.size}::${f.lastModified}`;
+}
+
+function previewHumanSize(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1048576) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / 1048576).toFixed(1)} MB`;
+}
+
+function previewExtLabel(f) {
+  const m = /\.([^.]+)$/.exec(f.name);
+  return (m ? m[1] : (f.type.split('/')[1] || 'file')).toUpperCase().slice(0, 4);
+}
+
+/**
+ * Build a small DOWNSCALED thumbnail as a blob: URL for a raster image — never
+ * the full-resolution file. A 12-MP photo decodes to ~48 MB of RGBA bitmap no
+ * matter how small the tile's CSS box is; 50 concurrently would exhaust mobile
+ * Safari's per-tab image budget and crash the whole form. Reuses the same
+ * createImageBitmap → canvas path as compressOneImage; the full decode is
+ * transient (one at a time, closed immediately) while the rendered <img> holds
+ * only the ~256px blob. Returns null for PDFs / undecodable (HEIC) / any failure
+ * — the caller then shows a generic file tile and mints no URL. Never throws.
+ */
+async function makeThumbUrl(file) {
+  if (!PREVIEWABLE_IMAGE_TYPES.has(file.type)) return null;
+  try {
+    const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    const scale = Math.min(1, THUMB_MAX_DIM / Math.max(bitmap.width, bitmap.height));
+    const w = Math.max(1, Math.round(bitmap.width * scale));
+    const h = Math.max(1, Math.round(bitmap.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      if (typeof bitmap.close === 'function') bitmap.close();
+      return null;
+    }
+    ctx.drawImage(bitmap, 0, 0, w, h);
+    if (typeof bitmap.close === 'function') bitmap.close();
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.7));
+    return blob ? URL.createObjectURL(blob) : null;
+  } catch {
+    return null;
+  }
+}
+
+function resolvePreviewContainer(input) {
+  const forId = input.getAttribute('data-secure-upload-preview-for');
+  if (forId) {
+    const byId = document.getElementById(forId);
+    if (byId) return byId;
+  }
+  const sibling =
+    input.parentElement && input.parentElement.querySelector('[data-secure-upload-preview-target]');
+  if (sibling) return sibling;
+  // No container declared — insert one right after the input so the capability
+  // works with zero extra markup on the host page.
+  const div = document.createElement('div');
+  div.setAttribute('data-secure-upload-preview-target', '');
+  input.after(div);
+  return div;
+}
+
+/**
+ * Wire a removable thumbnail grid for one file input. `input.files` stays
+ * authoritative; a shadow File[] is the working buffer, so re-opening the native
+ * picker (which REPLACES input.files wholesale) APPENDS instead of silently
+ * discarding previously-kept files. Returns a small handle: { clear }.
+ */
+export function mountAttachmentPreview(input, container) {
+  const files = []; // shadow buffer — the memory the native input doesn't keep
+  const urls = new Map(); // fileKey -> blob: URL (image tiles only)
+  const nodes = new Map(); // fileKey -> tile element
+  const tileTag = /^(?:UL|OL)$/.test(container.tagName) ? 'li' : 'div';
+
+  // Concise announcements go through a DEDICATED visually-hidden live region —
+  // NOT an aria-live on the grid container itself (that would re-read every tile
+  // + every "Remove <file>" button label on each add/remove).
+  const live = document.createElement('span');
+  live.setAttribute('aria-live', 'polite');
+  live.className = 'su-preview__sr';
+  live.style.cssText =
+    'position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;';
+  container.after(live);
+
+  const announce = (msg) => {
+    live.textContent = msg;
+  };
+
+  // Rebuild input.files from the shadow buffer. Assigning input.files does NOT
+  // fire change/input, so this cannot loop.
+  function syncInput() {
+    const dt = new DataTransfer();
+    files.forEach((f) => dt.items.add(f));
+    input.files = dt.files;
+  }
+
+  function focusAfterRemove(removedIndex) {
+    const buttons = container.querySelectorAll('button[data-su-remove]');
+    if (buttons.length === 0) {
+      input.focus();
+      return;
+    }
+    const next = buttons[Math.min(removedIndex, buttons.length - 1)];
+    if (next) next.focus();
+  }
+
+  function removeByKey(key) {
+    const i = files.findIndex((f) => previewFileKey(f) === key);
+    if (i === -1) return;
+    const removed = files[i];
+    files.splice(i, 1);
+    const url = urls.get(key);
+    if (url) {
+      URL.revokeObjectURL(url);
+      urls.delete(key);
+    }
+    const node = nodes.get(key);
+    if (node) {
+      node.remove();
+      nodes.delete(key);
+    }
+    syncInput();
+    announce(`Removed ${removed.name}. ${files.length} attachment${files.length === 1 ? '' : 's'} remaining.`);
+    focusAfterRemove(i);
+  }
+
+  async function addTile(file) {
+    const key = previewFileKey(file);
+    const tile = document.createElement(tileTag);
+    tile.className = 'su-thumb';
+
+    const media = document.createElement('div');
+    media.className = 'su-thumb__media';
+    const thumbUrl = await makeThumbUrl(file);
+    if (thumbUrl) {
+      urls.set(key, thumbUrl);
+      const img = document.createElement('img');
+      img.src = thumbUrl;
+      img.alt = '';
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      // A file whose MIME passed the allow-list but is actually corrupt/mislabeled:
+      // drop to a generic tile and free the URL rather than showing a broken image.
+      img.addEventListener('error', () => {
+        URL.revokeObjectURL(thumbUrl);
+        urls.delete(key);
+        img.remove();
+        media.classList.add('su-thumb__media--file');
+        media.textContent = previewExtLabel(file);
+      });
+      media.appendChild(img);
+    } else {
+      media.classList.add('su-thumb__media--file');
+      media.textContent = previewExtLabel(file);
+    }
+
+    // Filenames are attacker-controllable — always textContent, never innerHTML.
+    const name = document.createElement('span');
+    name.className = 'su-thumb__name';
+    name.textContent = file.name;
+    name.title = file.name;
+
+    const size = document.createElement('span');
+    size.className = 'su-thumb__size';
+    size.textContent = previewHumanSize(file.size);
+
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'su-thumb__remove';
+    remove.setAttribute('data-su-remove', key);
+    remove.setAttribute('aria-label', `Remove ${file.name}`);
+    remove.textContent = '×'; // ×
+    remove.addEventListener('click', () => removeByKey(key));
+
+    tile.append(media, name, size, remove);
+    nodes.set(key, tile);
+    container.appendChild(tile);
+  }
+
+  // Merge a native pick (or the initial input.files) into the shadow buffer with
+  // dedupe, resync input.files, then render only the newly-added tiles.
+  async function merge(fileList) {
+    const incoming = Array.from(fileList || []);
+    const added = [];
+    for (const f of incoming) {
+      const key = previewFileKey(f);
+      if (files.some((x) => previewFileKey(x) === key)) continue; // dedupe (name+size+lastModified)
+      files.push(f);
+      added.push(f);
+    }
+    // Always resync — the native picker REPLACED input.files with just this pick,
+    // so even when every file was a duplicate we must restore the full shadow set
+    // (otherwise re-picking only already-present files would silently drop the rest).
+    syncInput();
+    if (added.length === 0) return;
+    for (const f of added) {
+      // eslint-disable-next-line no-await-in-loop -- bounded by the pick size; one bitmap decode at a time keeps peak memory flat.
+      await addTile(f);
+    }
+    announce(`${files.length} attachment${files.length === 1 ? '' : 's'} selected.`);
+  }
+
+  // Revoke every URL + empty the grid + drop the shadow buffer. Does NOT touch
+  // input.files (the host's reset/success path owns that). Idempotent.
+  function clear() {
+    urls.forEach((u) => URL.revokeObjectURL(u));
+    urls.clear();
+    nodes.clear();
+    files.length = 0;
+    container.textContent = '';
+  }
+
+  input.addEventListener('change', () => {
+    merge(input.files);
+  });
+  // Render-on-bind catch-up: a pick made before this async-imported module bound
+  // is already in input.files — render it now so it is never silently dropped.
+  if (input.files && input.files.length) merge(input.files);
+  // Backstop teardown: form.reset() fires a synchronous 'reset' event, so the
+  // grid + object URLs are cleaned on every reset-based success/clear path.
+  if (input.form) input.form.addEventListener('reset', clear);
+
+  return { clear };
+}
+
+const _attachmentPreviewControllers = [];
+
+/**
+ * Scan for opt-in file inputs (`[data-secure-upload-file][data-secure-upload-preview]`)
+ * and mount a removable thumbnail grid on each. A no-op — an empty
+ * querySelectorAll — for every page that hasn't opted in, so it is always safe
+ * to call. Idempotent per input (guards with a `data-su-preview-bound` marker).
+ */
+export function initAttachmentPreviews(root = document) {
+  root
+    .querySelectorAll('input[type="file"][data-secure-upload-file][data-secure-upload-preview]')
+    .forEach((input) => {
+      if (input.dataset.suPreviewBound) return;
+      input.dataset.suPreviewBound = '1';
+      const container = resolvePreviewContainer(input);
+      _attachmentPreviewControllers.push(mountAttachmentPreview(input, container));
+    });
+}
+
+/**
+ * Clear every mounted preview grid (revoke URLs + empty). For host pages whose
+ * success/teardown path does NOT call form.reset() (e.g. a mailto-only submit)
+ * and that want the grid cleared anyway; reset-based flows are already covered
+ * by each controller's own 'reset' listener.
+ */
+export function clearAttachmentPreviews() {
+  _attachmentPreviewControllers.forEach((c) => c.clear());
+}
+
 // Auto-init on module load so the common case is just dropping in the
 // <script type="module"> tag + data-* attributes, matching the kit's
 // Web3FormScript.astro convention of "no JS wiring required per page."
 if (typeof document !== 'undefined') {
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => initSecureUpload());
+    document.addEventListener('DOMContentLoaded', () => {
+      initSecureUpload();
+      initAttachmentPreviews();
+    });
   } else {
     initSecureUpload();
+    initAttachmentPreviews();
   }
 }

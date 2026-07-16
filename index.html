@@ -1679,7 +1679,7 @@
         function attachAddressAutocomplete(input, opts) {
             if (!input) return;
             opts = opts || {};
-            var bias = opts.bias || { lat: 30.45, lon: -91.19 };
+            var bias = opts.bias || null; // null = unbiased; a fixed regional bias demotes out-of-area addresses
             var onPick = (typeof opts.onPick === 'function') ? opts.onPick : function () {};
 
             // ---- Per-instance DOM: wrap + listbox + sibling live-region + hidden capture inputs ----
@@ -1774,7 +1774,10 @@
                 box.hidden = results.length === 0;
             }
             function choose(r) {
-                input.value = r.label;
+                // Keep the user's leading house number when they pick a STREET-level result (OSM
+                // often has the street but not the rooftop) so "4805" isn't dropped from the field.
+                var typedHN = (String(input.value).match(/^\s*(\d+)\b/) || [])[1];
+                input.value = (typedHN && !/^\s*\d/.test(r.label)) ? (typedHN + ' ' + r.label) : r.label;
                 // Structured capture (internal): Photon properties ‖ Census addressComponents ‖
                 // trailing \d{5} on the label.
                 var parts = r.parts || {};
@@ -1815,7 +1818,7 @@
             // Returns { list, failed } — failed=true ⇒ error/rate-limit (busy), not "no match".
             function photonFetch(q, signal, isRetry) {
                 var url = 'https://photon.komoot.io/api/?q=' + encodeURIComponent(q) +
-                          '&lat=' + bias.lat + '&lon=' + bias.lon + '&limit=10&lang=en';
+                          (bias ? '&lat=' + bias.lat + '&lon=' + bias.lon : '') + '&limit=10&lang=en';
                 return fetch(url, signal ? { signal: signal } : undefined).then(function (r) {
                     if (r.status === 429 || !r.ok) return { list: [], failed: true };   // rate-limit / HTTP error → busy, no retry
                     return r.json().then(
@@ -1875,16 +1878,24 @@
                 var to = ctrl ? setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 4000) : null;
                 setLive('loading');
                 var photonP = photonFetch(q, signal, false);
+                // OSM/Photon often has the STREET but not the rooftop, and a leading house number
+                // breaks the fuzzy street match ("4805 Nahane" → nothing; "Nahane" → the street).
+                // So when the query starts with a house number, ALSO query the street part and
+                // merge — this surfaces the address several keystrokes earlier.
+                var m = q.match(/^\s*\d+\s+(\S.*)$/);
+                var streetQ = (m && m[1].trim().length >= 3) ? m[1].trim() : null;
+                var streetP = streetQ ? photonFetch(streetQ, signal, false) : Promise.resolve({ list: [], failed: false });
                 // Only ask Census when the text contains a house number — that's what it's authoritative for.
                 var censusP = /\d/.test(q) ? censusJSONP(q) : Promise.resolve({ list: [], failed: false });
-                Promise.all([censusP, photonP]).then(function (arr) {
+                Promise.all([censusP, photonP, streetP]).then(function (arr) {
                     if (to) clearTimeout(to);
                     if (my !== reqId) return;                       // a newer keystroke superseded this
-                    var census = arr[0], photon = arr[1];
-                    results = dedup(census.list.concat(photon.list)).slice(0, 10);   // exact Census matches ranked first
+                    var census = arr[0], photon = arr[1], street = arr[2];
+                    // exact Census first, then full-query Photon, then the stripped-street Photon
+                    results = dedup(census.list.concat(photon.list).concat(street.list)).slice(0, 10);
                     active = -1;
                     if (results.length) { setLive(''); draw(); }
-                    else if (census.failed || photon.failed) { clearBox(); setLive('busy'); }   // error/429 ≠ no-match
+                    else if (census.failed || photon.failed || street.failed) { clearBox(); setLive('busy'); }   // error/429 ≠ no-match
                     else { clearBox(); setLive('empty'); }
                 });
             }
@@ -2009,7 +2020,7 @@
             // dispatch — the factory fires that exactly once. GPS/programmatic fills still don't
             // trigger a search (the factory's `!e.isTrusted` guard), and Clear still resets the map.
             attachAddressAutocomplete(input, {
-                bias: { lat: 30.45, lon: -91.19 },
+                bias: null,
                 onPick: function (r) {
                     if (mapsHidden) mapsHidden.value = (r.lat != null) ? 'https://www.google.com/maps?q=' + r.lat + ',' + r.lng : '';
                     setStatus('', null);
@@ -2037,7 +2048,7 @@
             }
 
             attachAddressAutocomplete(input, {
-                bias: { lat: 30.45, lon: -91.19 },
+                bias: null,
                 onPick: function (r, parts) {
                     applyZipReveal((parts && parts.zip) || detectZip(input.value));
                 }

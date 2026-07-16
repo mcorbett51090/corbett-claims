@@ -1125,6 +1125,18 @@
             const progressPct = document.getElementById('form-progress-pct');
             const progressLabel = document.getElementById('form-progress-label');
 
+            // After a submission settles, the (possibly tall) attachment grid collapses on
+            // form.reset(), which on mobile can leave the viewport parked near the page bottom
+            // (reads as a jump "to nowhere"). Bring the green/red status box into view so the
+            // visitor always lands on the outcome message. rAF so the reset's reflow has
+            // settled before we measure/scroll.
+            function revealStatus() {
+                if (!status) return;
+                requestAnimationFrame(function () {
+                    status.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                });
+            }
+
             // ----- Restored vehicle / equipment intake (pre-2d1230f) -----
             // These conditional reveals live INSIDE this IIFE (rather than the old
             // separate submit IIFE) so syncConditionalFields() can call the private
@@ -1297,6 +1309,7 @@
                         // conditional reveals — re-run the sync so the cascade fully resets.
                         syncConditionalFields();
                         updateProgress();
+                        revealStatus();
                         return;
                     }
 
@@ -1443,6 +1456,7 @@
                         // conditional reveals — re-run the sync so the cascade fully resets.
                         syncConditionalFields();
                         updateProgress();
+                        revealStatus();
                         return;
                     }
 
@@ -1529,6 +1543,7 @@
                         + 'Once you press <em>Send</em> in your email app, you&rsquo;re all set: '
                         + 'we&rsquo;ll get back to you <strong>within one business day</strong>. '
                         + 'For anything urgent, call <a href="tel:2256632217">(225)&nbsp;663-2217</a>.';
+                    revealStatus();
                 }, 4000);
             });
 

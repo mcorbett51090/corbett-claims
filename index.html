@@ -190,6 +190,12 @@
       .ac-suggestions[hidden] { display:none; }
       .ac-item { padding:.55rem .7rem; border-radius:7px; font-size:.95rem; cursor:pointer; color:var(--text,#111827); }
       .ac-item:hover, .ac-item.ac-active { background:#eef2f7; }
+      /* Matched-substring highlight — bold only; no new colour (inherits the item's text). */
+      .ac-item mark { background:transparent; color:inherit; font-weight:700; }
+      /* Sibling live-region under the field: Searching… / No matches / busy. Error reuses the
+         existing palette (btn-clear grey #4b5563, geo-status err red #a3272b). */
+      .ac-live { margin-top:.35rem; font-size:.85rem; color:#4b5563; }
+      .ac-live[data-state="busy"] { color:#a3272b; }
     </style>
 
     <!-- Google Analytics 4 — dormant until a Measurement ID is set in analytics.js. See docs/ANALYTICS.md -->
@@ -533,15 +539,16 @@
                         <input id="owner-name" type="text" name="owner_name" autocomplete="name">
                     </div>
 
-                    <div class="form-row">
-                        <div class="field">
-                            <label for="owner-address">Owner Address</label>
-                            <input id="owner-address" type="text" name="owner_address" autocomplete="street-address" placeholder="Street, city, state">
-                        </div>
-                        <div class="field">
-                            <label for="owner-zip">ZIP Code</label>
-                            <input id="owner-zip" type="text" name="owner_zip" autocomplete="postal-code" inputmode="numeric" placeholder="70884">
-                        </div>
+                    <div class="field">
+                        <label for="owner-address">Owner Address</label>
+                        <input id="owner-address" type="text" name="owner_address" autocomplete="street-address" placeholder="Street, city, state">
+                    </div>
+                    <!-- Conditional ZIP: hidden by default. The picked/typed address usually carries its
+                         own ZIP (captured automatically); this compact optional field is revealed only
+                         when the address has no detectable ZIP (e.g. a rural route), so it's never lost. -->
+                    <div class="field" id="field-owner-zip" hidden>
+                        <label for="owner-zip">ZIP (add if known)</label>
+                        <input id="owner-zip" type="text" name="owner_zip" autocomplete="postal-code" inputmode="numeric" placeholder="70884">
                     </div>
 
                     <div class="form-row">
@@ -1184,6 +1191,17 @@
                     : v;
             }
 
+            // ----- Owner address ZIP fallback (conditional #owner-zip) -----
+            // Append the conditional ZIP to the owner address ONLY when it's non-empty AND the
+            // address doesn't already carry a 5-digit ZIP. A rural address that lost its ZIP still
+            // gets one; a normal (ZIP-bearing) address never double-ships it (no "…, 70884, 70884").
+            function appendZipIfMissing(addr, zip) {
+                addr = (addr || '').trim();
+                zip = (zip || '').trim();
+                if (!zip || /\d{5}/.test(addr)) return addr;
+                return addr ? addr + ', ' + zip : zip;
+            }
+
             // ----- Phone auto-formatting (primary + alternate) -----
             function attachPhoneFormatting(el) {
                 if (!el) return;
@@ -1287,6 +1305,15 @@
 
                 const g = (n) => ((form.elements[n] && form.elements[n].value) || '').trim();
 
+                // Conditional ZIP: fold #owner-zip into the owner address ONLY when its field is
+                // actually revealed (the picked/typed address had no detectable ZIP). Computed once
+                // and reused at BOTH sinks below (Worker secureFields + mailto) so they never drift.
+                const _ownerZipField = document.getElementById('field-owner-zip');
+                const _ownerAddress = appendZipIfMissing(
+                    g('owner_address'),
+                    (_ownerZipField && !_ownerZipField.hidden) ? g('owner_zip') : ''
+                );
+
                 // ----- Secure Worker path (plan-v2: the WHOLE submission — text-only AND
                 // with files — routes through the Worker when enabled, replacing mailto
                 // as the primary channel) -----
@@ -1360,7 +1387,7 @@
                             insured: g('insured'),
                             claimant: g('claimant'),
                             owner_name: g('owner_name'),
-                            owner_address: [g('owner_address'), g('owner_zip')].filter(Boolean).join(', '),
+                            owner_address: _ownerAddress,
                             date_of_loss: formatDateOfLoss(g('date_of_loss')),
                             email: g('email'),
                             phone: g('phone'),
@@ -1482,7 +1509,7 @@
                 // No third-party service, no backend: hand the completed, validated request to
                 // the visitor's own email app — pre-filled and addressed to assignments@corbettclaims.net.
                 var _mapUrl = g('location_maps_url');
-                var _ownerAddr = [g('owner_address'), g('owner_zip')].filter(Boolean).join(', ');
+                var _ownerAddr = _ownerAddress;
                 // Emitted in the owner's requested field order so it's ready to key into his software.
                 const lines = [
                     'Claim #: ' + g('claim_number'),
@@ -1644,6 +1671,242 @@
         })();
     </script>
 
+    <!-- Reusable KEYLESS address autocomplete (Photon + US Census), shared by #location and
+         #owner-address. Fully independent per-instance closures; NO map/GPS here (each field's
+         own wrapper owns that). id-qualified JSONP callback; XSS-safe <mark> highlight; an
+         error≠no-match live-region; structured parts captured into per-instance hidden inputs. -->
+    <script>
+        function attachAddressAutocomplete(input, opts) {
+            if (!input) return;
+            opts = opts || {};
+            var bias = opts.bias || { lat: 30.45, lon: -91.19 };
+            var onPick = (typeof opts.onPick === 'function') ? opts.onPick : function () {};
+
+            // ---- Per-instance DOM: wrap + listbox + sibling live-region + hidden capture inputs ----
+            var wrap = document.createElement('div');
+            wrap.className = 'ac-wrap';
+            input.parentNode.insertBefore(wrap, input);
+            wrap.appendChild(input);
+
+            var box = document.createElement('ul');
+            box.className = 'ac-suggestions';
+            box.setAttribute('role', 'listbox');
+            box.hidden = true;
+            wrap.appendChild(box);
+
+            // Live-region OUTSIDE the listbox — announces Searching / No matches / busy.
+            var live = document.createElement('div');
+            live.className = 'ac-live';
+            live.setAttribute('role', 'status');
+            live.setAttribute('aria-live', 'polite');
+            live.hidden = true;
+            wrap.appendChild(live);
+
+            // Structured capture — INTERNAL ONLY (no `name` → never submitted, never read by g()).
+            function mkHidden(suffix) {
+                var h = document.createElement('input');
+                h.type = 'hidden';
+                h.id = input.id + '_' + suffix;
+                wrap.appendChild(h);
+                return h;
+            }
+            var hStreet = mkHidden('street'), hCity = mkHidden('city'), hState = mkHidden('state'), hZip = mkHidden('zip');
+
+            // ---- Fully independent per-instance state ----
+            var results = [], active = -1, timer = null, ctrl = null, lastQ = '', reqId = 0, jsonpId = 0;
+
+            function setLive(kind) {
+                if (!kind) { live.hidden = true; live.textContent = ''; live.removeAttribute('data-state'); return; }
+                var msg = kind === 'loading' ? 'Searching…'
+                        : kind === 'empty'   ? 'No matches — check spelling or type the full address'
+                        : kind === 'busy'    ? 'Address search is busy — just type the full address'
+                        : '';
+                live.textContent = msg;
+                live.setAttribute('data-state', kind);
+                live.hidden = !msg;
+            }
+            function clearBox() { box.hidden = true; box.innerHTML = ''; results = []; active = -1; }
+            function close() { clearBox(); setLive(''); }
+
+            function label(p) {
+                var l1 = [p.housenumber, p.street].filter(Boolean).join(' ') || p.name || '';
+                var city = p.city || p.town || p.village || p.county || '';
+                return [l1, city, p.state, p.postcode].filter(Boolean).join(', ');
+            }
+            function partsFromPhoton(p) {
+                return {
+                    street: [p.housenumber, p.street].filter(Boolean).join(' ') || '',
+                    city: p.city || p.town || p.village || '',
+                    state: p.state || '',
+                    zip: p.postcode || ''
+                };
+            }
+            function partsFromCensus(a) {
+                var ac = a.addressComponents || {};
+                var street = (String(a.matchedAddress || '').split(',')[0] || '').trim();
+                return { street: street, city: ac.city || '', state: ac.state || '', zip: ac.zip || '' };
+            }
+
+            // XSS-safe: build each <li> from textContent + a <mark> DOM node — NEVER innerHTML
+            // with provider text (Photon/Census strings are attacker-influenceable).
+            function appendHighlighted(li, text, q) {
+                text = String(text);
+                var idx = q ? text.toLowerCase().indexOf(q.toLowerCase()) : -1;
+                if (idx < 0) { li.appendChild(document.createTextNode(text)); return; }
+                li.appendChild(document.createTextNode(text.slice(0, idx)));
+                var mark = document.createElement('mark');
+                mark.textContent = text.slice(idx, idx + q.length);
+                li.appendChild(mark);
+                li.appendChild(document.createTextNode(text.slice(idx + q.length)));
+            }
+            function draw() {
+                box.innerHTML = '';
+                var q = (input.value || '').trim();
+                results.forEach(function (r, i) {
+                    var li = document.createElement('li');
+                    li.className = 'ac-item' + (i === active ? ' ac-active' : '');
+                    li.setAttribute('role', 'option');
+                    li.setAttribute('aria-selected', i === active ? 'true' : 'false');
+                    appendHighlighted(li, r.label, q);
+                    li.addEventListener('mousedown', function (e) { e.preventDefault(); choose(r); });
+                    box.appendChild(li);
+                });
+                box.hidden = results.length === 0;
+            }
+            function choose(r) {
+                input.value = r.label;
+                // Structured capture (internal): Photon properties ‖ Census addressComponents ‖
+                // trailing \d{5} on the label.
+                var parts = r.parts || {};
+                var zip = parts.zip || (String(r.label).match(/(\d{5})(?:-\d{4})?\s*$/) || [])[1] || '';
+                hStreet.value = parts.street || '';
+                hCity.value = parts.city || '';
+                hState.value = parts.state || '';
+                hZip.value = zip;
+                close();
+                // EXACTLY-ONCE input dispatch: clears the required-error + refreshes updateProgress()
+                // through the generic [data-validate] listener. It's untrusted, so the search listener
+                // and #location's map listener both ignore it (their `!e.isTrusted` guards). The
+                // wrapper's onPick must NOT dispatch again.
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                onPick(r, { street: parts.street || '', city: parts.city || '', state: parts.state || '', zip: zip });
+            }
+
+            function parsePhoton(data) {
+                if (!data || !data.features) return [];
+                return data.features
+                    .filter(function (f) { return f.properties && String(f.properties.countrycode).toUpperCase() === 'US'; })
+                    .map(function (f) {
+                        var c = (f.geometry && f.geometry.coordinates) || [];
+                        return { label: label(f.properties), lat: c[1], lng: c[0], parts: partsFromPhoton(f.properties) };
+                    })
+                    .filter(function (r) { return r.label; });
+            }
+            function parseCensus(data) {
+                var m = (data && data.result && data.result.addressMatches) || [];
+                return m.map(function (a) {
+                    var c = a.coordinates || {};
+                    return { label: a.matchedAddress || '', lat: c.y, lng: c.x, parts: partsFromCensus(a) };
+                }).filter(function (r) { return r.label; });
+            }
+
+            // Photon (CORS fetch): bias lat/lon, limit=10, 4 s AbortController, ONE
+            // network-failure-only retry (NEVER retries a timeout/abort or a 429).
+            // Returns { list, failed } — failed=true ⇒ error/rate-limit (busy), not "no match".
+            function photonFetch(q, signal, isRetry) {
+                var url = 'https://photon.komoot.io/api/?q=' + encodeURIComponent(q) +
+                          '&lat=' + bias.lat + '&lon=' + bias.lon + '&limit=10&lang=en';
+                return fetch(url, signal ? { signal: signal } : undefined).then(function (r) {
+                    if (r.status === 429 || !r.ok) return { list: [], failed: true };   // rate-limit / HTTP error → busy, no retry
+                    return r.json().then(
+                        function (data) { return { list: parsePhoton(data), failed: false }; },
+                        function () { return { list: [], failed: true }; }
+                    );
+                }, function (err) {
+                    if (err && err.name === 'AbortError') return { list: [], failed: true };  // timeout → busy, NO retry
+                    if (!isRetry) return photonFetch(q, signal, true);                        // ONE network-failure retry
+                    return { list: [], failed: true };
+                });
+            }
+            // US Census geocoder (JSONP; digit queries only). id-qualified callback so two
+            // instances never collide on window.__cen_1. 4.5 s timeout. Returns { list, failed }.
+            function censusJSONP(q) {
+                return new Promise(function (resolve) {
+                    // id-qualified + sanitised: input.id can contain '-' (e.g. owner-address), which
+                    // would make the SERVER-emitted callback identifier invalid JS — map non-ident
+                    // chars to '_'. Still per-instance-unique (…_owner_address_N vs …_location_N).
+                    var name = '__cen_' + String(input.id).replace(/[^a-zA-Z0-9_$]/g, '_') + '_' + (++jsonpId);
+                    var s = document.createElement('script');
+                    var done = false;
+                    function cleanup() {
+                        try { delete window[name]; } catch (e) { window[name] = undefined; }
+                        if (s.parentNode) s.parentNode.removeChild(s);
+                    }
+                    var t = setTimeout(function () {
+                        if (done) return; done = true;
+                        cleanup(); resolve({ list: [], failed: true });   // timeout → busy
+                    }, 4500);
+                    window[name] = function (data) {
+                        if (done) return; done = true;
+                        clearTimeout(t); cleanup(); resolve({ list: parseCensus(data), failed: false });
+                    };
+                    s.onerror = function () {
+                        if (done) return; done = true;
+                        clearTimeout(t); cleanup(); resolve({ list: [], failed: true });   // load error → busy
+                    };
+                    s.src = 'https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=' +
+                            encodeURIComponent(q) + '&benchmark=Public_AR_Current&format=jsonp&callback=' + name;
+                    document.head.appendChild(s);
+                });
+            }
+            function dedup(list) {
+                var seen = {}, out = [];
+                list.forEach(function (r) {
+                    var k = String(r.label).toLowerCase().replace(/[^a-z0-9]/g, '');
+                    if (k && !seen[k]) { seen[k] = 1; out.push(r); }
+                });
+                return out;
+            }
+            function query(q) {
+                var my = ++reqId;
+                if (ctrl) { try { ctrl.abort(); } catch (e) {} }
+                ctrl = ('AbortController' in window) ? new AbortController() : null;
+                var signal = ctrl ? ctrl.signal : null;
+                var to = ctrl ? setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 4000) : null;
+                setLive('loading');
+                var photonP = photonFetch(q, signal, false);
+                // Only ask Census when the text contains a house number — that's what it's authoritative for.
+                var censusP = /\d/.test(q) ? censusJSONP(q) : Promise.resolve({ list: [], failed: false });
+                Promise.all([censusP, photonP]).then(function (arr) {
+                    if (to) clearTimeout(to);
+                    if (my !== reqId) return;                       // a newer keystroke superseded this
+                    var census = arr[0], photon = arr[1];
+                    results = dedup(census.list.concat(photon.list)).slice(0, 10);   // exact Census matches ranked first
+                    active = -1;
+                    if (results.length) { setLive(''); draw(); }
+                    else if (census.failed || photon.failed) { clearBox(); setLive('busy'); }   // error/429 ≠ no-match
+                    else { clearBox(); setLive('empty'); }
+                });
+            }
+            input.addEventListener('input', function (e) {
+                if (!e.isTrusted) return;              // GPS / programmatic fills shouldn't trigger a search
+                var q = input.value.trim();
+                if (q.length < 3) { close(); return; }
+                if (q === lastQ) return; lastQ = q;
+                clearTimeout(timer);
+                timer = setTimeout(function () { query(q); }, 180);
+            });
+            input.addEventListener('keydown', function (e) {
+                if (box.hidden) return;
+                if (e.key === 'ArrowDown') { active = Math.min(active + 1, results.length - 1); draw(); e.preventDefault(); }
+                else if (e.key === 'ArrowUp') { active = Math.max(active - 1, 0); draw(); e.preventDefault(); }
+                else if (e.key === 'Enter' && active >= 0) { choose(results[active]); e.preventDefault(); }
+                else if (e.key === 'Escape') { close(); }
+            });
+            document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) close(); });
+        }
+    </script>
+
     <!-- Location field: current-location (GPS) + Google Places autocomplete bound to our own input -->
     <script>
         (function () {
@@ -1740,119 +2003,59 @@
                 }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
             });
 
-            // Address type-ahead — KEYLESS, via Photon (OpenStreetMap). No API key needed.
-            (function () {
-                var wrap = document.createElement('div');
-                wrap.className = 'ac-wrap';
-                input.parentNode.insertBefore(wrap, input);
-                wrap.appendChild(input);
-                var box = document.createElement('ul');
-                box.className = 'ac-suggestions';
-                box.setAttribute('role', 'listbox');
-                box.hidden = true;
-                wrap.appendChild(box);
-
-                var results = [], active = -1, timer = null, ctrl = null, lastQ = '', reqId = 0, jsonpId = 0;
-
-                function close() { box.hidden = true; box.innerHTML = ''; results = []; active = -1; }
-                function label(p) {
-                    var l1 = [p.housenumber, p.street].filter(Boolean).join(' ') || p.name || '';
-                    var city = p.city || p.town || p.village || p.county || '';
-                    return [l1, city, p.state, p.postcode].filter(Boolean).join(', ');
-                }
-                function draw() {
-                    box.innerHTML = '';
-                    results.forEach(function (r, i) {
-                        var li = document.createElement('li');
-                        li.className = 'ac-item' + (i === active ? ' ac-active' : '');
-                        li.setAttribute('role', 'option');
-                        li.textContent = r.label;
-                        li.addEventListener('mousedown', function (e) { e.preventDefault(); choose(r); });
-                        box.appendChild(li);
-                    });
-                    box.hidden = results.length === 0;
-                }
-                function choose(r) {
-                    input.value = r.label;
+            // Address type-ahead — KEYLESS, via the shared attachAddressAutocomplete factory
+            // (Photon + US Census). #location keeps its map/GPS/clear wrapper here; onPick is
+            // today's choose() body (maps-url + map + setStatus + syncClear) MINUS the input-event
+            // dispatch — the factory fires that exactly once. GPS/programmatic fills still don't
+            // trigger a search (the factory's `!e.isTrusted` guard), and Clear still resets the map.
+            attachAddressAutocomplete(input, {
+                bias: { lat: 30.45, lon: -91.19 },
+                onPick: function (r) {
                     if (mapsHidden) mapsHidden.value = (r.lat != null) ? 'https://www.google.com/maps?q=' + r.lat + ',' + r.lng : '';
-                    close();
-                    refresh();
                     setStatus('', null);
                     if (r.lat != null) showMap(r.lat, r.lng); else hideMap();
                     syncClear();
                 }
-                // Photon (OSM) — fast street/place suggestions via a normal CORS fetch.
-                function parsePhoton(data) {
-                    if (!data || !data.features) return [];
-                    return data.features
-                        .filter(function (f) { return f.properties && String(f.properties.countrycode).toUpperCase() === 'US'; })
-                        .map(function (f) {
-                            var c = (f.geometry && f.geometry.coordinates) || [];
-                            return { label: label(f.properties), lat: c[1], lng: c[0] };
-                        })
-                        .filter(function (r) { return r.label; });
+            });
+        })();
+    </script>
+
+    <!-- Owner Address: same keyless autocomplete (no map/GPS). Conditional ZIP — reveal the
+         otherwise-hidden #owner-zip only when the picked/typed address has no detectable ZIP. -->
+    <script>
+        (function () {
+            var input = document.getElementById('owner-address');
+            if (!input || typeof attachAddressAutocomplete !== 'function') return;
+            var zipField = document.getElementById('field-owner-zip');
+
+            // Detection = trailing \d{5} (optionally ZIP+4) on the current text. When a provider
+            // supplies a ZIP the picked label already ends in it, so this catches picks too.
+            function detectZip(s) { var m = String(s || '').match(/(\d{5})(?:-\d{4})?\s*$/); return m ? m[1] : ''; }
+            function applyZipReveal(zip) {
+                if (!zipField) return;
+                zipField.hidden = !!zip;   // ZIP known → keep hidden; none → reveal the optional field
+            }
+
+            attachAddressAutocomplete(input, {
+                bias: { lat: 30.45, lon: -91.19 },
+                onPick: function (r, parts) {
+                    applyZipReveal((parts && parts.zip) || detectZip(input.value));
                 }
-                // US Census geocoder — authoritative house-number addresses. It has no CORS header,
-                // so we call it via JSONP (dynamic <script>) instead of fetch.
-                function parseCensus(data) {
-                    var m = (data && data.result && data.result.addressMatches) || [];
-                    return m.map(function (a) {
-                        var c = a.coordinates || {};
-                        return { label: a.matchedAddress || '', lat: c.y, lng: c.x };
-                    }).filter(function (r) { return r.label; });
-                }
-                function censusJSONP(q) {
-                    return new Promise(function (resolve) {
-                        var name = '__cen_' + (++jsonpId);
-                        var s = document.createElement('script');
-                        function cleanup() { try { delete window[name]; } catch (e) { window[name] = undefined; } if (s.parentNode) s.parentNode.removeChild(s); }
-                        var t = setTimeout(function () { cleanup(); resolve([]); }, 6000);
-                        window[name] = function (data) { clearTimeout(t); cleanup(); resolve(parseCensus(data)); };
-                        s.onerror = function () { clearTimeout(t); cleanup(); resolve([]); };
-                        s.src = 'https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=' + encodeURIComponent(q) + '&benchmark=Public_AR_Current&format=jsonp&callback=' + name;
-                        document.head.appendChild(s);
-                    });
-                }
-                function dedup(list) {
-                    var seen = {}, out = [];
-                    list.forEach(function (r) {
-                        var k = String(r.label).toLowerCase().replace(/[^a-z0-9]/g, '');
-                        if (k && !seen[k]) { seen[k] = 1; out.push(r); }
-                    });
-                    return out;
-                }
-                function query(q) {
-                    var my = ++reqId;
-                    if (ctrl) { try { ctrl.abort(); } catch (e) {} }
-                    ctrl = ('AbortController' in window) ? new AbortController() : null;
-                    var photonP = fetch('https://photon.komoot.io/api/?q=' + encodeURIComponent(q) + '&lat=30.45&lon=-91.19&limit=6&lang=en', ctrl ? { signal: ctrl.signal } : undefined)
-                        .then(function (r) { return r.ok ? r.json() : null; }).then(parsePhoton).catch(function () { return []; });
-                    // Only ask Census when the text contains a house number — that's what it's authoritative for.
-                    var censusP = /\d/.test(q) ? censusJSONP(q) : Promise.resolve([]);
-                    Promise.all([censusP, photonP]).then(function (arr) {
-                        if (my !== reqId) return;                             // a newer keystroke superseded this
-                        results = dedup(arr[0].concat(arr[1])).slice(0, 8);    // exact Census matches ranked first
-                        active = -1;
-                        draw();
-                    });
-                }
-                input.addEventListener('input', function (e) {
-                    if (!e.isTrusted) return;              // GPS / programmatic fills shouldn't trigger a search
-                    var q = input.value.trim();
-                    if (q.length < 3) { close(); return; }
-                    if (q === lastQ) return; lastQ = q;
-                    clearTimeout(timer);
-                    timer = setTimeout(function () { query(q); }, 280);
-                });
-                input.addEventListener('keydown', function (e) {
-                    if (box.hidden) return;
-                    if (e.key === 'ArrowDown') { active = Math.min(active + 1, results.length - 1); draw(); e.preventDefault(); }
-                    else if (e.key === 'ArrowUp') { active = Math.max(active - 1, 0); draw(); e.preventDefault(); }
-                    else if (e.key === 'Enter' && active >= 0) { choose(results[active]); e.preventDefault(); }
-                    else if (e.key === 'Escape') { close(); }
-                });
-                document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) close(); });
-            })();
+            });
+
+            // Typed (un-picked) address: on blur, reveal the ZIP field only when no ZIP is detectable.
+            input.addEventListener('blur', function () {
+                setTimeout(function () {
+                    var v = input.value.trim();
+                    if (!v) return;                 // empty → leave the field hidden
+                    applyZipReveal(detectZip(v));
+                }, 120);
+            });
+
+            // Keep the conditional ZIP hidden-by-default across a form reset (post-submit).
+            if (input.form) input.form.addEventListener('reset', function () {
+                setTimeout(function () { if (zipField) zipField.hidden = true; }, 0);
+            });
         })();
     </script>
     <!-- Hero background video: load lazily; skip on reduced-motion / data-saver so the poster stays. -->

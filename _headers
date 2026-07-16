@@ -1,0 +1,10 @@
+# Cloudflare Pages ONLY. GitHub Pages -- which serves production at
+# www.corbettclaims.com -- ignores this file entirely, so it cannot affect prod.
+#
+# It exists so the preview deployment can never be indexed. A full copy of this
+# site on a second hostname would otherwise compete with production in search
+# results, and being found in search is the entire point of this site (see
+# getting-found-on-google.txt). If production ever moves to Cloudflare Pages,
+# this file MUST be scoped to the preview project or it will deindex the site.
+/*
+  X-Robots-Tag: noindex, nofollow

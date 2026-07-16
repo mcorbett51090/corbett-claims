@@ -847,10 +847,23 @@
         // checklist), EVERY submission — text-only and with files — routes through the
         // Worker via `submitForm()` as the PRIMARY channel; mailto becomes a fallback,
         // used only if that Worker call fails, plus the always-present <noscript> path.
+        // Which Worker tenant this page submits to is decided by the hostname it is
+        // SERVED from, so ONE file serves both production and the client preview —
+        // the preview is the exact bytes that go live, not a lookalike, which is the
+        // only thing that makes an approval meaningful.
+        //
+        // Fail-safe direction: anything that is NOT a known production host is
+        // treated as the preview, never the reverse. A stray copy of this page can
+        // therefore never submit into the production tenant. (The Worker's per-site
+        // allowedOrigins would reject it anyway — this makes the intent explicit
+        // rather than leaning on that as the only guard.)
+        const PROD_HOSTS = ['www.corbettclaims.com', 'corbettclaims.com'];
+        const IS_PROD = PROD_HOSTS.indexOf(location.hostname) !== -1;
+
         const SECURE_UPLOAD = {
             enabled: true,
             workerUrl: 'https://raven-secure-upload.matt-769.workers.dev',
-            siteId: 'corbett-claims',
+            siteId: IS_PROD ? 'corbett-claims' : 'corbett-claims-preview',
             turnstileSiteKey: '0x4AAAAAAD2pG4nnEomDn82u', // public by design — safe to ship
             // Whole-submission ceiling, and it MUST match the Worker's per-site
             // maxTotalBytes (email-attach mode batches every file into one email).
@@ -858,6 +871,21 @@
             // before a single byte is uploaded; the Worker enforces it regardless.
             maxTotalBytes: 20971520, // 20 MB
         };
+        // The preview is deliberately pixel-identical to production, which means a
+        // visitor cannot otherwise tell them apart — and a claim submitted on the
+        // preview goes to a test inbox, not to Corbett. Say so, unmissably. Never
+        // renders on a production host.
+        if (!IS_PROD) {
+            document.addEventListener('DOMContentLoaded', function () {
+                var b = document.createElement('div');
+                b.setAttribute('role', 'status');
+                b.style.cssText = 'background:#8a2b06;color:#fff;padding:10px 16px;text-align:center;' +
+                    'font:600 14px/1.45 system-ui,-apple-system,sans-serif;position:sticky;top:0;z-index:9999;';
+                b.textContent = 'PREVIEW — for review only. Anything sent from this page goes to a test inbox, not to Corbett Claims.';
+                document.body.insertBefore(b, document.body.firstChild);
+            });
+        }
+
         let secureActive = false;
         let secureUploadModulePromise = null; // resolves to the module, or null on load failure
 

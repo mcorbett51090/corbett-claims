@@ -958,6 +958,78 @@ select[aria-invalid="true"] {
     margin-top: 0.5rem;
 }
 
+/* ---------- Upload-progress modal (Item 1) ---------- */
+.upload-modal {
+    width: min(92vw, 420px);
+    padding: 1.75rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: #fff;
+    color: var(--text);
+    box-shadow: 0 24px 60px rgba(15, 39, 68, 0.28);
+}
+.upload-modal::backdrop {
+    background: rgba(15, 39, 68, 0.55);
+}
+.upload-modal__title {
+    margin: 0 0 1rem;
+    font-size: 1.2rem;
+    color: var(--primary);
+}
+.upload-modal__bar {
+    position: relative;
+    height: 12px;
+    border-radius: 9999px;
+    background: var(--soft-bg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+.upload-modal__bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-soft));
+    transition: width 0.3s ease;
+}
+/* Indeterminate "Preparing…" state — a sweeping stripe until the first real tick.
+   No inline width is set while indeterminate, so this width/animation applies. */
+.upload-modal__bar[data-indeterminate] .upload-modal__bar-fill {
+    width: 40%;
+    background: linear-gradient(90deg, var(--primary-soft), var(--primary), var(--primary-soft));
+    animation: upload-modal-indeterminate 1.1s ease-in-out infinite;
+}
+@keyframes upload-modal-indeterminate {
+    0%   { transform: translateX(-120%); }
+    100% { transform: translateX(320%); }
+}
+.upload-modal__count {
+    margin: 0.9rem 0 0;
+    font-weight: 600;
+    color: var(--text);
+}
+.upload-modal__status {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+.upload-modal__warn {
+    margin: 1rem 0 0;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    background: rgba(185, 28, 28, 0.06);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    font-size: 0.9rem;
+}
+/* Reduced motion: no sweep — a static half-filled bar still reads as "working". */
+@media (prefers-reduced-motion: reduce) {
+    .upload-modal__bar[data-indeterminate] .upload-modal__bar-fill {
+        animation: none;
+        width: 100%;
+        opacity: 0.5;
+    }
+    .upload-modal__bar-fill { transition: none; }
+}
+
 /* ---------- State picker ---------- */
 .state-picker {
     background: white;

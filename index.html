@@ -589,6 +589,105 @@
                         <span class="field-error" id="location-error" aria-live="polite"></span>
                     </div>
 
+                    <!-- Vehicle / equipment intake — restored from the pre-2d1230f form.
+                         Vehicle Type + Assignment Type are required; the conditional detail
+                         blocks below reveal based on the selections (see syncConditionalFields).
+                         NOTE: the error-span ids MUST be `{id}-error` — validateField() looks up
+                         `equipment-type-error` / `assignment-type-error`, so a mismatched id
+                         (the old `equipment-error`) would silently never render a required error. -->
+                    <div class="form-row">
+                        <div class="field">
+                            <label for="equipment-type">Vehicle Type <span class="required-mark" aria-hidden="true">*</span></label>
+                            <select id="equipment-type" name="equipment_type" required aria-describedby="equipment-type-error" data-validate="required">
+                                <option value="">Select vehicle type…</option>
+                                <option>Auto / Light truck</option>
+                                <option>Motorcycle</option>
+                                <option>RV / Motorhome / Trailer</option>
+                                <option>Heavy farm equipment</option>
+                                <option>Other</option>
+                            </select>
+                            <span class="field-error" id="equipment-type-error" aria-live="polite"></span>
+                        </div>
+                        <div class="field">
+                            <label for="assignment-type">Assignment Type <span class="required-mark" aria-hidden="true">*</span></label>
+                            <select id="assignment-type" name="assignment_type" required aria-describedby="assignment-type-error" data-validate="required">
+                                <option value="">Select assignment…</option>
+                                <option>Damage estimate</option>
+                                <option>Total-loss valuation</option>
+                                <option>Diminished-value appraisal</option>
+                                <option>Other</option>
+                            </select>
+                            <span class="field-error" id="assignment-type-error" aria-live="polite"></span>
+                        </div>
+                    </div>
+
+                    <!-- Optional vehicle details — shown only for "Auto / Light truck" (see syncConditionalFields).
+                         Dropdowns populated from vehicles.js (baked from NHTSA vPIC). -->
+                    <div id="field-vehicle-details" hidden>
+                    <div class="form-row">
+                        <div class="field">
+                            <label for="veh-year">Year <span style="color:var(--muted); font-weight:400; font-size:.85em;">(optional)</span></label>
+                            <select id="veh-year" name="vehicle_year">
+                                <option value="">Select year…</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="veh-make">Make <span style="color:var(--muted); font-weight:400; font-size:.85em;">(optional)</span></label>
+                            <select id="veh-make" name="vehicle_make">
+                                <option value="">Select make…</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="field">
+                            <label for="veh-model">Model <span style="color:var(--muted); font-weight:400; font-size:.85em;">(optional)</span></label>
+                            <select id="veh-model" name="vehicle_model" disabled>
+                                <option value="">Select make first…</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="veh-color">Color <span style="color:var(--muted); font-weight:400; font-size:.85em;">(optional)</span></label>
+                            <select id="veh-color" name="vehicle_color">
+                                <option value="">Select color…</option>
+                                <option>White</option>
+                                <option>Black</option>
+                                <option>Gray</option>
+                                <option>Silver</option>
+                                <option>Blue</option>
+                                <option>Red</option>
+                                <option>Green</option>
+                                <option>Brown</option>
+                                <option>Beige / Tan</option>
+                                <option>Gold</option>
+                                <option>Orange</option>
+                                <option>Yellow</option>
+                                <option>Purple</option>
+                                <option>Maroon</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    </div><!-- /#field-vehicle-details -->
+
+                    <!-- Conditional reveal: heavy equipment -->
+                    <div class="field" id="field-equipment-detail" hidden>
+                        <label for="equipment-detail">Make, Model, &amp; Hours / Mileage</label>
+                        <input id="equipment-detail" type="text" name="equipment_detail" placeholder="e.g. John Deere 8R 410, 2,400 hrs">
+                        <span class="field-hint">Helps us scope the appraisal accurately.</span>
+                    </div>
+
+                    <!-- Conditional reveal: RV class/length -->
+                    <div class="field" id="field-rv-detail" hidden>
+                        <label for="rv-detail">RV Class &amp; Length</label>
+                        <input id="rv-detail" type="text" name="rv_detail" placeholder="e.g. Class A, 36 ft">
+                    </div>
+
+                    <!-- Conditional reveal: diminished value -->
+                    <div class="field" id="field-preloss" hidden>
+                        <label for="preloss-condition">Pre-loss Condition (Diminished Value)</label>
+                        <textarea id="preloss-condition" name="preloss_condition" rows="2" placeholder="Brief description of vehicle condition before the loss — mileage, service records, modifications, etc."></textarea>
+                    </div>
+
                     <div class="field">
                         <label for="loss-type">Type of Loss <span class="required-mark" aria-hidden="true">*</span></label>
                         <select id="loss-type" name="loss_type" required aria-describedby="loss-type-error" data-validate="required">
@@ -683,6 +782,21 @@
             </div>
         </div>
     </section>
+
+    <!-- Upload-progress modal (Item 1) — shown at submit-start while photos upload through
+         the Worker. Native <dialog> gives the top-layer + focus-trap for free; every JS
+         helper is feature-guarded (typeof modal.showModal), so an engine without native
+         <dialog> (Safari <15.4) simply keeps the existing plain status text, no throw. -->
+    <dialog id="upload-modal" class="upload-modal" aria-labelledby="upload-modal-title">
+        <h2 id="upload-modal-title" class="upload-modal__title">Uploading your photos…</h2>
+        <div class="upload-modal__bar" id="upload-modal-bar" role="progressbar"
+             aria-labelledby="upload-modal-title" aria-valuemin="0" aria-valuemax="100" data-indeterminate="true">
+            <div class="upload-modal__bar-fill" id="upload-modal-fill"></div>
+        </div>
+        <p class="upload-modal__count" id="upload-modal-count">Preparing your photos…</p>
+        <p class="upload-modal__status" id="upload-modal-status" aria-live="polite"></p>
+        <p class="upload-modal__warn"><strong>⚠ Keep this page open — don't close or go back.</strong></p>
+    </dialog>
 
     </main>
 
@@ -926,6 +1040,80 @@
             });
         }
 
+        // ---------- Upload-progress modal (Item 1) ----------
+        // A blocking, feature-guarded modal shown at submit-start while photos upload
+        // through the Worker. EVERY method no-ops when native <dialog> is unsupported
+        // (Safari <15.4) so the upload still proceeds with the existing plain status text.
+        const uploadModal = (function () {
+            const modal = document.getElementById('upload-modal');
+            const bar = document.getElementById('upload-modal-bar');
+            const fill = document.getElementById('upload-modal-fill');
+            const countEl = document.getElementById('upload-modal-count');
+            const statusEl = document.getElementById('upload-modal-status');
+
+            function supported() {
+                return !!(modal && typeof modal.showModal === 'function');
+            }
+
+            // beforeunload = the real "don't leave" primitive (catches back / close / reload
+            // that the modal's click-blocking can't). Unreliable on iOS — there the modal +
+            // warning text is the mitigation. Added on open, removed on every settle path.
+            let beforeUnloadBound = false;
+            function onBeforeUnload(e) { e.preventDefault(); e.returnValue = ''; return ''; }
+            function bindBeforeUnload() {
+                if (beforeUnloadBound) return;
+                window.addEventListener('beforeunload', onBeforeUnload);
+                beforeUnloadBound = true;
+            }
+            function unbindBeforeUnload() {
+                if (!beforeUnloadBound) return;
+                window.removeEventListener('beforeunload', onBeforeUnload);
+                beforeUnloadBound = false;
+            }
+
+            // Throttle the screen-reader announcement: only on a file-boundary change or a
+            // ~25% step. aria-valuenow stays always-current for the visual bar / on-demand AT.
+            let lastAnnouncedFile = -1;
+            let lastAnnouncedStep = -1;
+
+            function open() {
+                if (!supported()) return;
+                lastAnnouncedFile = -1;
+                lastAnnouncedStep = -1;
+                // Indeterminate "preparing" state until the first onProgress tick.
+                if (bar) { bar.setAttribute('data-indeterminate', 'true'); bar.removeAttribute('aria-valuenow'); }
+                if (fill) fill.style.width = '';   // let the indeterminate CSS drive the fill
+                if (countEl) countEl.textContent = 'Preparing your photos…';
+                if (statusEl) statusEl.textContent = 'Preparing your photos…';
+                try { modal.showModal(); } catch (e) { return; }
+                bindBeforeUnload();
+            }
+
+            function progress(fileIndex, fileCount, pct) {
+                if (!supported() || !fileCount) return;
+                var overall = Math.round(((fileIndex + pct / 100) / fileCount) * 100);
+                var clamped = Math.max(0, Math.min(100, overall));
+                if (bar) { bar.removeAttribute('data-indeterminate'); bar.setAttribute('aria-valuenow', String(clamped)); }
+                if (fill) fill.style.width = clamped + '%';
+                var current = Math.min(fileIndex + 1, fileCount);
+                if (countEl) countEl.textContent = 'File ' + current + ' of ' + fileCount;
+                var step = Math.floor(clamped / 25);
+                if (statusEl && (current !== lastAnnouncedFile || step !== lastAnnouncedStep)) {
+                    lastAnnouncedFile = current;
+                    lastAnnouncedStep = step;
+                    statusEl.textContent = 'File ' + current + ' of ' + fileCount + ' — ' + clamped + '% uploaded.';
+                }
+            }
+
+            function close() {
+                unbindBeforeUnload();
+                if (!supported()) return;
+                if (modal.open) { try { modal.close(); } catch (e) {} }
+            }
+
+            return { supported: supported, open: open, progress: progress, close: close };
+        })();
+
         // ---------- Smart form ----------
         (function () {
             const form = document.getElementById('appraisal-form');
@@ -936,6 +1124,53 @@
             const progressBar = document.getElementById('form-progress-bar');
             const progressPct = document.getElementById('form-progress-pct');
             const progressLabel = document.getElementById('form-progress-label');
+
+            // ----- Restored vehicle / equipment intake (pre-2d1230f) -----
+            // These conditional reveals live INSIDE this IIFE (rather than the old
+            // separate submit IIFE) so syncConditionalFields() can call the private
+            // updateProgress() below without a const collision on status/submitBtn/…
+            const equipmentSel = document.getElementById('equipment-type');
+            const assignmentSel = document.getElementById('assignment-type');
+            const fieldEquipmentDetail = document.getElementById('field-equipment-detail');
+            const fieldRvDetail = document.getElementById('field-rv-detail');
+            const fieldPreloss = document.getElementById('field-preloss');
+            const fieldVehicle = document.getElementById('field-vehicle-details');
+
+            function syncConditionalFields() {
+                if (!equipmentSel || !assignmentSel) return;
+                const eq = equipmentSel.value;
+                const as = assignmentSel.value;
+                if (fieldEquipmentDetail) fieldEquipmentDetail.hidden = eq !== 'Heavy farm equipment';
+                if (fieldRvDetail) fieldRvDetail.hidden = eq !== 'RV / Motorhome / Trailer';
+                if (fieldPreloss) fieldPreloss.hidden = as !== 'Diminished-value appraisal';
+                // Year/Make/Model/Color only apply to autos & light trucks.
+                if (fieldVehicle) {
+                    var showVehicle = eq === 'Auto / Light truck';
+                    fieldVehicle.hidden = !showVehicle;
+                    if (!showVehicle) {
+                        // Reset so a hidden section never submits stale vehicle data.
+                        ['veh-year', 'veh-make', 'veh-color'].forEach(function (id) {
+                            var s = document.getElementById(id); if (s) s.value = '';
+                        });
+                        var vm = document.getElementById('veh-model');
+                        if (vm) { vm.innerHTML = '<option value="">Select make first…</option>'; vm.disabled = true; }
+                    }
+                }
+            }
+            [equipmentSel, assignmentSel].forEach((el) => {
+                if (!el) return;
+                el.addEventListener('change', () => { syncConditionalFields(); updateProgress(); });
+            });
+
+            // ----- Date of Loss → MM-DD-YYYY (Item 3) -----
+            // Pure string reformat of the native date input's ISO value (YYYY-MM-DD) into
+            // the MM-DD-YYYY the appraiser expects. No Date object → no UTC off-by-one;
+            // any non-ISO value is returned untouched (never a "NaN-NaN-" string).
+            function formatDateOfLoss(v) {
+                return /^\d{4}-\d{2}-\d{2}$/.test(v)
+                    ? (v.slice(5, 7) + '-' + v.slice(8, 10) + '-' + v.slice(0, 4))
+                    : v;
+            }
 
             // ----- Phone auto-formatting (primary + alternate) -----
             function attachPhoneFormatting(el) {
@@ -1058,6 +1293,9 @@
                         status.innerHTML = '<strong>&#10003; Thanks &mdash; your request is on its way.</strong>';
                         form.reset();
                         if (fileList) fileList.innerHTML = '';
+                        // Native reset can't undo injected <option>s / disabled state or the
+                        // conditional reveals — re-run the sync so the cascade fully resets.
+                        syncConditionalFields();
                         updateProgress();
                         return;
                     }
@@ -1069,6 +1307,30 @@
                     status.textContent = _fileCount > 0
                         ? 'Sending your request and uploading your files securely…'
                         : 'Sending your request securely…';
+
+                    // Item 1: open the blocking upload modal at submit-start when files are
+                    // attached — this covers the in-browser compression + presign window that
+                    // runs BEFORE the first onProgress tick (the exact gap the modal closes).
+                    // No modal on a fields-only submit.
+                    if (_fileCount > 0) uploadModal.open();
+
+                    // Stall watchdog (Item 1): rejects after ~30s with NO onProgress
+                    // advancement. The timer is re-armed on every tick, so a slow-but-alive
+                    // multi-photo upload is never killed, while a truly hung request frees the
+                    // UI within ~30s → the finally closes the modal → honest error → mailto.
+                    let secureSettled = false;
+                    let watchdogTimer = null;
+                    let watchdogReject = null;
+                    const WATCHDOG_MS = 30000;
+                    const watchdog = new Promise(function (_res, rej) { watchdogReject = rej; });
+                    function armWatchdog() {
+                        if (watchdogTimer) clearTimeout(watchdogTimer);
+                        if (secureSettled) return;
+                        watchdogTimer = setTimeout(function () {
+                            if (secureSettled || !watchdogReject) return;
+                            watchdogReject(new Error('Upload stalled — no progress for 30 seconds.'));
+                        }, WATCHDOG_MS);
+                    }
 
                     let secureDelivered = false;
                     let overCapMessage = '';
@@ -1086,12 +1348,21 @@
                             claimant: g('claimant'),
                             owner_name: g('owner_name'),
                             owner_address: [g('owner_address'), g('owner_zip')].filter(Boolean).join(', '),
-                            date_of_loss: g('date_of_loss'),
+                            date_of_loss: formatDateOfLoss(g('date_of_loss')),
                             email: g('email'),
                             phone: g('phone'),
                             alt_phone: g('alt_phone'),
                             location: g('location'),
                             location_maps_url: g('location_maps_url'),
+                            equipment_type: g('equipment_type'),
+                            assignment_type: g('assignment_type'),
+                            vehicle_year: g('vehicle_year'),
+                            vehicle_make: g('vehicle_make'),
+                            vehicle_model: g('vehicle_model'),
+                            vehicle_color: g('vehicle_color'),
+                            equipment_detail: g('equipment_detail'),
+                            rv_detail: g('rv_detail'),
+                            preloss_condition: g('preloss_condition'),
                             loss_type: g('loss_type'),
                             message: g('message'),
                         };
@@ -1103,7 +1374,7 @@
                         // picks presign+PUT+/complete when files are attached, or posts
                         // fields-only to the Worker's /submit when the file input is empty —
                         // either way this ONE call is the entire submission, no mailto.
-                        await mod.submitForm(
+                        const submitPromise = mod.submitForm(
                             {
                                 workerUrl: SECURE_UPLOAD.workerUrl,
                                 siteId: SECURE_UPLOAD.siteId,
@@ -1117,8 +1388,25 @@
                                 // start if the batch still exceeds the Worker's cap.
                                 quality: (qualityEl && qualityEl.value) || 'actual',
                                 maxTotalBytes: SECURE_UPLOAD.maxTotalBytes,
+                                // Drive the modal bar + throttled SR text, and keep the stall
+                                // watchdog alive on every advance (files only — the fields-only
+                                // /submit path never ticks, so it isn't raced).
+                                onProgress: function (fileIndex, file, pct) {
+                                    uploadModal.progress(fileIndex, _fileCount, pct);
+                                    armWatchdog();
+                                },
                             }
                         );
+                        if (_fileCount > 0) {
+                            // Keep the real upload's eventual rejection handled so that, if the
+                            // watchdog wins the race, the still-in-flight submitForm() can't
+                            // surface later as an unhandled promise rejection.
+                            submitPromise.catch(function () {});
+                            armWatchdog();
+                            await Promise.race([submitPromise, watchdog]);
+                        } else {
+                            await submitPromise;
+                        }
                         secureDelivered = true;
                     } catch (err) {
                         secureDelivered = false;
@@ -1132,6 +1420,13 @@
                             overCapMessage = err.message;
                         }
                     } finally {
+                        // Teardown (Item 1): settle the watchdog, close the modal, and remove
+                        // the beforeunload guard on EVERY exit — success, settled-failure, and
+                        // watchdog trip — so the mailto fallback below never opens behind a
+                        // still-open modal and the user is never caged.
+                        secureSettled = true;
+                        if (watchdogTimer) clearTimeout(watchdogTimer);
+                        uploadModal.close();
                         if (submitBtn) submitBtn.disabled = false;
                     }
 
@@ -1144,6 +1439,9 @@
                             + 'For anything urgent, call <a href="tel:2256632217">(225)&nbsp;663-2217</a>.';
                         form.reset();
                         if (fileList) fileList.innerHTML = '';
+                        // Native reset can't undo injected <option>s / disabled state or the
+                        // conditional reveals — re-run the sync so the cascade fully resets.
+                        syncConditionalFields();
                         updateProgress();
                         return;
                     }
@@ -1178,15 +1476,25 @@
                     'Claimant: ' + g('claimant'),
                     'Owner: ' + g('owner_name'),
                     'Owner Address: ' + _ownerAddr,
-                    'Date of Loss: ' + g('date_of_loss'),
+                    'Date of Loss: ' + formatDateOfLoss(g('date_of_loss')),
                     'Email: ' + g('email'),
                     'Phone: ' + g('phone'),
                     'Alt Phone: ' + g('alt_phone'),
                     'Vehicle Location: ' + g('location') + (_mapUrl ? '  (map: ' + _mapUrl + ')' : ''),
+                    'Vehicle Type: ' + g('equipment_type'),
+                    'Assignment Type: ' + g('assignment_type'),
                     'Type of Loss: ' + g('loss_type'),
-                    '',
-                    'Comments: ' + g('message'),
                 ];
+                // Conditional vehicle-detail lines — included only when filled, so a
+                // non-auto assignment never carries empty Year/Make/Model rows.
+                if (g('vehicle_year')) lines.push('Year: ' + g('vehicle_year'));
+                if (g('vehicle_make')) lines.push('Make: ' + g('vehicle_make'));
+                if (g('vehicle_model')) lines.push('Model: ' + g('vehicle_model'));
+                if (g('vehicle_color')) lines.push('Color: ' + g('vehicle_color'));
+                if (g('equipment_detail')) lines.push('Make/Model/Hours: ' + g('equipment_detail'));
+                if (g('rv_detail')) lines.push('RV Class & Length: ' + g('rv_detail'));
+                if (g('preloss_condition')) lines.push('Pre-loss Condition: ' + g('preloss_condition'));
+                lines.push('', 'Comments: ' + g('message'));
 
                 // Files can't ride along on a mailto: link — note them in the body so the
                 // owner knows to expect them, and prompt the sender to attach them below.
@@ -1225,6 +1533,7 @@
             });
 
             // Init
+            syncConditionalFields();
             updateProgress();
         })();
 
@@ -1547,6 +1856,80 @@
             var play = function () { var p = v.play(); if (p && p.catch) p.catch(function () {}); };
             if (document.readyState === 'complete') play();
             else window.addEventListener('load', play);
+        })();
+    </script>
+
+    <!-- Optional Year/Make/Model/Color dropdowns. Data is baked into vehicles.js (from NHTSA vPIC),
+         so there is NO runtime API call — the fields can't break if an external service is down.
+         This IIFE is self-contained (no shared const), so it lives outside the submit handler. -->
+    <script defer src="vehicles.js"></script>
+    <script>
+        (function () {
+            function fill() {
+                var data = window.VEHICLE_DATA;
+                var yearSel = document.getElementById('veh-year');
+                var makeSel = document.getElementById('veh-make');
+                var modelSel = document.getElementById('veh-model');
+                if (!yearSel || !makeSel || !modelSel) return;
+
+                // Years: next model year down to 1981, then a catch-all.
+                var maxYear = new Date().getFullYear() + 1;
+                for (var y = maxYear; y >= 1981; y--) {
+                    var o = document.createElement('option'); o.value = String(y); o.textContent = y; yearSel.appendChild(o);
+                }
+                var older = document.createElement('option'); older.value = 'Older (pre-1981)'; older.textContent = 'Older (pre-1981)'; yearSel.appendChild(older);
+
+                if (!data) {   // data file didn't load — keep the fields optional and out of the way
+                    makeSel.innerHTML = '<option value="">(unavailable — describe in Comments)</option>';
+                    return;
+                }
+
+                Object.keys(data).filter(function (m) { return data[m] && data[m].length; }).sort().forEach(function (m) {
+                    var o = document.createElement('option'); o.value = m; o.textContent = m; makeSel.appendChild(o);
+                });
+                var mOther = document.createElement('option'); mOther.value = 'Other'; mOther.textContent = 'Other / not listed'; makeSel.appendChild(mOther);
+
+                // The model list depends on Make + (optionally) Year. With a year chosen we ask NHTSA for
+                // that make+year's models (CORS-enabled); the baked list is an INSTANT fallback, so if the
+                // NHTSA lookup ever fails or is slow the dropdown still works (shows the full baked list).
+                var modelReq = 0;
+                function setModel(models) {
+                    modelSel.innerHTML = '';
+                    var ph = document.createElement('option'); ph.value = ''; ph.textContent = 'Select model…'; modelSel.appendChild(ph);
+                    models.forEach(function (m) { var o = document.createElement('option'); o.value = m; o.textContent = m; modelSel.appendChild(o); });
+                    var oOther = document.createElement('option'); oOther.value = 'Other'; oOther.textContent = 'Other / not listed'; modelSel.appendChild(oOther);
+                    modelSel.disabled = false;
+                }
+                function disableModel(msg) {
+                    modelSel.innerHTML = '<option value="">' + (msg || 'Select make first…') + '</option>';
+                    modelSel.disabled = true;
+                }
+                function populateModels() {
+                    var make = makeSel.value, year = yearSel.value;
+                    var baked = data[make] || [];
+                    if (!make || make === 'Other' || !baked.length) {
+                        disableModel(make === 'Other' ? 'Describe in Comments' : 'Select make first…'); return;
+                    }
+                    if (!/^\d{4}$/.test(year)) { setModel(baked); return; }   // no specific year → full baked list
+                    var my = ++modelReq, settled = false;
+                    disableModel('Loading models…');
+                    var finish = function (models) { if (settled || my !== modelReq) return; settled = true; setModel(models); };
+                    var to = setTimeout(function () { finish(baked); }, 5000);   // NHTSA slow/down → baked fallback
+                    fetch('https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/' + encodeURIComponent(make) + '/modelyear/' + year + '?format=json')
+                        .then(function (r) { return r.ok ? r.json() : null; })
+                        .then(function (d) {
+                            clearTimeout(to);
+                            var names = (d && d.Results) ? d.Results.map(function (x) { return (x.Model_Name || '').trim(); }).filter(Boolean) : [];
+                            var ms = Array.from(new Set(names)).sort();
+                            finish(ms.length ? ms : baked);   // empty (e.g. make-name mismatch) → baked
+                        })
+                        .catch(function () { clearTimeout(to); finish(baked); });
+                }
+                makeSel.addEventListener('change', populateModels);
+                yearSel.addEventListener('change', populateModels);   // changing the year re-filters the model list
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fill);
+            else fill();
         })();
     </script>
 

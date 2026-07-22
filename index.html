@@ -494,11 +494,26 @@
 
             <div class="contact-grid">
                 <!--
-                  No third-party service and no backend: on submit, JavaScript opens the
-                  visitor's own email app pre-filled and addressed to assignments@corbettclaims.net.
-                  The action/enctype below are the no-JavaScript fallback (a plain mailto submit).
+                  No third-party service and no backend: on submit, JavaScript delivers the request
+                  to the secure-upload Worker, and falls back to opening the visitor's own email app
+                  pre-filled and addressed to assignments@corbettclaims.net.
+
+                  THERE IS NO no-JavaScript FALLBACK. JavaScript is required to submit this form.
+                  (A previous version of this comment claimed the action/enctype below were a
+                  no-JS mailto fallback. No such attributes existed, so the claim was false.)
+
+                  `method="post"` is load-bearing, not decoration. A form with no action submits to
+                  the CURRENT URL, and with no method it submits GET — so if the inline submit
+                  handler ever fails to bind (a JS parse error, or a Content-Security-Policy that
+                  blocks the inline script), a native submit would put the claimant's name, the
+                  owner's address, the claim number and the date of loss into the QUERY STRING.
+                  That URL then reaches browser history, the Referer header sent to every
+                  third-party origin this page loads, and any analytics beacon's page_location.
+                  With method="post" that submit instead fails visibly with 405 on this static
+                  host, which is loud, harmless, and does not leak. Do not remove it, and do not
+                  add an action attribute without also widening form-action in the CSP.
                 -->
-                <form class="contact-form" id="appraisal-form" autocomplete="on" novalidate>
+                <form class="contact-form" id="appraisal-form" autocomplete="on" novalidate method="post">
 
                     <p class="form-intro">Please complete as much as you can to assist with the appraisal. Fields marked <span class="required-mark" aria-hidden="true">*</span> are required.</p>
 

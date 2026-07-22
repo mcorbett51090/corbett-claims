@@ -46,6 +46,21 @@ someone else's account, and GA4 properties cannot be moved between accounts free
 *Admin → Property access management → **+** (top right) → Add users*, enter the maintainer's email,
 pick a role, uncheck "Notify new users by email" if you like, **Add**.
 
+A **Google Cloud service account** address (`…@….iam.gserviceaccount.com`) is added exactly the same
+way — GA4 treats it as a user. This site's maintainer identity is the same service account that
+manages tag configuration across the other properties in the estate, so that one identity is
+consistent everywhere rather than per-site.
+
+Two things about service accounts that are easy to trip over:
+
+- **A service account cannot sign in to the GA4 web interface.** It acts through the Admin and Data
+  APIs. If a human also needs to click around in GA4 — to read a report, change retention, add a
+  filter — that human needs their **own** grant, in addition to the service account's.
+- **Give it `Editor`, not `Administrator`**, unless it genuinely needs to add and remove *users*.
+  Editor already covers everything tag-shaped: data streams, events, key events, and all other
+  property settings. Administrator adds user management on top, which is the one power a
+  configuration identity has no reason to hold.
+
 GA4's roles, in descending order of power:
 
 | Role | Can do |

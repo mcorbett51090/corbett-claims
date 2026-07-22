@@ -179,6 +179,27 @@ delaying the beacons further — deferring them to the `load` event would drop *
 because those visitors essentially never convert, it would remove them from the denominator and
 silently inflate the conversion rate.
 
+**No Content-Security-Policy — accepted, in writing, on purpose.** Adding an analytics beacon adds a
+new place the browser is allowed to send data to, and the usual control for that is a
+Content-Security-Policy. This site ships none, and this change deliberately did not add one.
+
+The reason is that a policy could not be safely tested. On GitHub Pages a policy can only be
+delivered in a `<meta>` tag, which cannot be run in report-only mode — so there is no way to observe
+what a policy *would* have blocked before it starts blocking it for real. The only staging channel
+available was a Cloudflare Pages copy of the site, which is out of scope for now. A policy pushed
+straight to production without that rehearsal risks blocking the claim-delivery worker or the file
+uploads, and the failure would be silent for the visitor and invisible to us.
+
+Weighed honestly: the site has never had a policy, so shipping without one is not a regression — it
+is the status quo plus two well-known vendor origins. A policy that breaks the claim form is a
+materially worse outcome than no policy at all, because the form is the entire point of the site.
+
+**This is an accepted risk, not an oversight, and it has a review trigger.** Revisit when any of
+these becomes true: the Cloudflare preview copy is available again for a report-only rehearsal;
+continuous integration exists in this repo to keep a policy from going stale; or another third-party
+script is added. The `csp_violation` reporting listener already ships in `analytics.js`, so the
+feedback channel is in place the day a policy is introduced.
+
 **No subresource integrity on the analytics scripts.** SRI pins a hash to an exact file, and both
 vendors serve versionless URLs that are updated in place, so a pinned hash would break the moment the
 vendor shipped an update — a hard network failure, not a graceful one. Contrast Leaflet, which *is*

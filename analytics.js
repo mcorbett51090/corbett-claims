@@ -8,22 +8,50 @@
  * ---------------------------------------------------------------------------
  * ACTIVATION (see docs/ANALYTICS.md — do NOT treat this as a 2-minute job)
  * ---------------------------------------------------------------------------
- *   GA4_MEASUREMENT_ID  paste the "G-XXXXXXXXXX" from the data stream whose
- *                       Website URL is exactly https://www.corbettclaims.com
- *   CWA_SITE_TOKEN      Cloudflare Web Analytics site token (optional; the site
- *                       runs correctly on GA4 alone while this stays empty)
+ *   GTM_CONTAINER_ID    "GTM-XXXXXXX" — the tag manager container. Tags (incl.
+ *                       the GA4 configuration tag) are managed in the GTM
+ *                       console by the maintainer service account. THIS IS THE
+ *                       CONFIGURED PATH.
+ *   GA4_MEASUREMENT_ID  "G-XXXXXXXXXX" — the direct, no-tag-manager path.
+ *                       MUTUALLY EXCLUSIVE with GTM: setting both double-counts
+ *                       every pageview and every conversion, so it is refused.
+ *   CWA_SITE_TOKEN      Cloudflare Web Analytics (optional; currently dormant).
  *
- * Both empty  ->  fully dormant: zero network requests, zero cookies, no vendor
+ * All empty  ->  fully dormant: zero network requests, zero cookies, no vendor
  * script fetched. `window.ccAnalytics` is still defined and every call is a safe
  * no-op, so activation needs NO HTML edits.
  *
- * !! READ BEFORE PASTING AN ID !!
- * A wrong-but-well-formed Measurement ID is the single most dangerous mistake
- * available here. googletagmanager.com returns HTTP 200 for a bogus ID, so the
- * page looks perfectly healthy while collecting nothing — or worse, collecting
- * into somebody else's property. Verify against the DATA STREAM, and check GA4
- * Realtime FILTERED BY HOSTNAME = www.corbettclaims.com. "The script loaded" is
- * not evidence of anything.
+ * ---------------------------------------------------------------------------
+ * HOW THE PII PROTECTION SURVIVES TAG MANAGER — read this before editing
+ * ---------------------------------------------------------------------------
+ * Tag Manager moves tag configuration OUT of this repository and into a console.
+ * That is a deliberate owner decision, and it means a tag can be added, and can
+ * start sending data, without any code review. On a site whose main form carries
+ * claimant names, addresses, claim numbers and free-text accident descriptions,
+ * that is worth being precise about.
+ *
+ * The protection is therefore placed at the BOUNDARY rather than at the sender:
+ *
+ *   this file  ->  [schema projection]  ->  dataLayer  ->  GTM  ->  any tag
+ *                        ^^^^^^^^^^
+ *                  PII is dropped HERE
+ *
+ * Every value this site publishes is projected through a fixed schema BEFORE it
+ * reaches `dataLayer`. A field that is not in the schema is not "filtered out" —
+ * it never enters the dataLayer at all. So a tag added in the console later, by
+ * anyone, cannot read claimant data out of the dataLayer, because it was never
+ * there to read. The console controls WHICH tags fire; this file controls WHAT
+ * THEY CAN SEE.
+ *
+ * Two things this cannot protect, which are console-side and are documented in
+ * docs/ANALYTICS.md as such:
+ *   1. GTM's built-in {{Page URL}} reads the browser address bar directly and
+ *      bypasses the sanitiser below. The GA4 tag must be configured to use the
+ *      `page_location` dataLayer variable instead. GTM is also NOT loaded on
+ *      404.html for this reason (see below).
+ *   2. A tag configured to read the DOM (a Form or Element Visibility trigger,
+ *      or a Custom JavaScript variable) can read the form fields directly. No
+ *      code in this repo can prevent that. Do not add such a tag on this site.
  */
 (function () {
   "use strict";
@@ -32,6 +60,13 @@
    * 1 · Configuration — the only two lines you edit to turn analytics on
    * ========================================================================= */
 
+  // The configured path: tags live in the Tag Manager console, managed by the
+  // maintainer service account.
+  var GTM_CONTAINER_ID = ""; // "GTM-XXXXXXX"
+
+  // The direct path, kept for the case where Tag Manager is removed. Setting
+  // this AND the container ID is refused rather than merged — both would load a
+  // GA4 configuration, and every pageview and conversion would be counted twice.
   var GA4_MEASUREMENT_ID = ""; // "G-XXXXXXXXXX"
 
   // Cloudflare Web Analytics — wired, deliberately NOT enabled (owner decision,
@@ -77,6 +112,21 @@
     "PASTE_TOKEN_HERE",
   ];
 
+  // Containers belonging to other sites this maintainer manages. Same reasoning
+  // as the measurement-ID denylist: one identity manages tags across several
+  // properties, they all appear in the same console picker, and a valid-looking
+  // container from another site would load that site's entire tag set here —
+  // silently, and looking perfectly healthy. Add every other container here.
+  var GTM_DENYLIST = [];
+
+  function validGtmId(v) {
+    if (!v) return null;
+    if (!/^GTM-[A-Z0-9]{4,10}$/.test(v)) return "format";
+    if (/^GTM-(.)\1+$/.test(v)) return "placeholder";
+    if (GTM_DENYLIST.indexOf(v) !== -1) return "foreign-container";
+    return true;
+  }
+
   // Returns true (valid), null (not configured), or a string reason (rejected).
   function validGa4Id(v) {
     if (!v) return null;
@@ -109,14 +159,34 @@
     }
   }
 
+  var gtmCheck = validGtmId(GTM_CONTAINER_ID);
   var ga4Check = validGa4Id(GA4_MEASUREMENT_ID);
   var cwaCheck = validCwaToken(CWA_SITE_TOKEN);
 
+  if (typeof gtmCheck === "string") reject("GTM container id", gtmCheck);
   if (typeof ga4Check === "string") reject("GA4 id", ga4Check);
   if (typeof cwaCheck === "string") reject("Cloudflare site token", cwaCheck);
 
+  var activeGtmId = gtmCheck === true ? GTM_CONTAINER_ID : null;
   var activeGa4Id = ga4Check === true ? GA4_MEASUREMENT_ID : null;
   var activeCwaToken = cwaCheck === true ? CWA_SITE_TOKEN : null;
+
+  // Mutually exclusive, and refused loudly rather than silently merged. Running
+  // the container AND a direct GA4 config means two GA4 configurations on the
+  // page: every pageview and every conversion counted twice, in a property whose
+  // whole purpose is a conversion RATE. A doubled rate looks plausible, which is
+  // what makes it dangerous — nothing about the page would appear wrong.
+  if (activeGtmId && activeGa4Id) {
+    reject(
+      "analytics configuration",
+      "BOTH a GTM container and a direct GA4 id are set. Tag Manager already " +
+        "loads the GA4 configuration tag, so this would double-count every " +
+        "pageview and conversion. Clear GA4_MEASUREMENT_ID and configure GA4 " +
+        "inside the container instead. Loading NEITHER."
+    );
+    activeGtmId = null;
+    activeGa4Id = null;
+  }
 
   /* =========================================================================
    * 3 · Owner-path guard — TF6 PUBLIC-ONLY (owner decision, 2026-07-21)
@@ -334,6 +404,21 @@
     return out;
   }
 
+  // Every key any schema can emit. Used to null out stale values before each
+  // push: GTM's dataLayer variables resolve to the most RECENT value, so a key
+  // set by an earlier event would otherwise still be readable during a later
+  // one, and a tag would report a value that belonged to a different event.
+  var ALL_SCHEMA_KEYS = (function () {
+    var seen = {};
+    for (var ev in SCHEMA) {
+      if (!Object.prototype.hasOwnProperty.call(SCHEMA, ev)) continue;
+      for (var k in SCHEMA[ev]) {
+        if (Object.prototype.hasOwnProperty.call(SCHEMA[ev], k)) seen[k] = true;
+      }
+    }
+    return Object.keys(seen);
+  })();
+
   function track(eventName, rawParams) {
     try {
       var params = project(eventName, rawParams);
@@ -341,6 +426,24 @@
         if (!SCHEMA[eventName]) window.__ccAnalyticsDropped++;
         return;
       }
+
+      // Tag Manager path. `params` is already projected, so the dataLayer only
+      // ever receives allowlisted values — which is the whole reason a tag
+      // added later in the console cannot read claimant data out of it.
+      if (activeGtmId && window.dataLayer) {
+        var payload = { event: eventName };
+        // Clear every schema key first, then set this event's values.
+        for (var i = 0; i < ALL_SCHEMA_KEYS.length; i++) {
+          payload[ALL_SCHEMA_KEYS[i]] = undefined;
+        }
+        for (var k in params) {
+          if (Object.prototype.hasOwnProperty.call(params, k)) payload[k] = params[k];
+        }
+        window.dataLayer.push(payload);
+        return;
+      }
+
+      // Direct path (no tag manager).
       if (!activeGa4Id || typeof window.gtag !== "function") return;
       window.gtag("event", eventName, params);
     } catch (e) {
@@ -353,7 +456,7 @@
   window.ccAnalytics = {
     track: track,
     ready: function () {
-      return !!activeGa4Id;
+      return !!(activeGtmId || activeGa4Id);
     },
   };
 
@@ -369,6 +472,49 @@
    * open a mechanical gap between the two counts that reads exactly like a data
    * anomaly worth investigating.
    */
+
+  // ---------------------------------------------------------------------------
+  // Tag Manager
+  // ---------------------------------------------------------------------------
+  // NOT loaded on 404.html. That page is served for every unmatched URL, so the
+  // address bar holds whatever was requested — a stale link like
+  // /john-smith-total-loss-4471 puts a claimant name in the URL. This file can
+  // sanitise what IT sends, but it cannot stop a tag in the console from reading
+  // the address bar directly via the built-in {{Page URL}} variable. The only
+  // reliable control is not to run the container on that page at all. 404 traffic
+  // is overwhelmingly bots anyway, so nothing of value is lost.
+  if (activeGtmId && !IS_404) {
+    window.dataLayer = window.dataLayer || [];
+
+    // Consent defaults must be in the dataLayer BEFORE the container loads, or
+    // the first tags fire under Google's built-in defaults instead of ours.
+    window.dataLayer.push({
+      "gtm.start": new Date().getTime(),
+      event: "gtm.js",
+    });
+    function gtagDl() {
+      window.dataLayer.push(arguments);
+    }
+    gtagDl("consent", "default", {
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      ad_personalization: "denied",
+      analytics_storage: "granted",
+    });
+
+    // The sanitised address, published as a dataLayer value so the GA4 tag in
+    // the console can be pointed at it INSTEAD of the built-in {{Page URL}}.
+    // See docs/ANALYTICS.md — this is a console-side setting and is the one part
+    // of the URL protection that code here cannot enforce.
+    window.dataLayer.push({ page_location: sanitizedPageLocation() });
+
+    var t = document.createElement("script");
+    t.async = true;
+    t.src =
+      "https://www.googletagmanager.com/gtm.js?id=" +
+      encodeURIComponent(activeGtmId);
+    document.head.appendChild(t);
+  }
 
   if (activeGa4Id) {
     var g = document.createElement("script");

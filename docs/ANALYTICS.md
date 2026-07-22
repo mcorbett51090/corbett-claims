@@ -124,6 +124,73 @@ not "the analytics get a bit fuzzier".
 
 ---
 
+## Google Tag Manager — and the four rules that come with it
+
+Tags are managed in a **Google Tag Manager** container by the maintainer service account, rather than
+being written into this repository. The site loads the container; the container decides what fires.
+
+That is a real trade, and it is worth being plain about both halves. It buys the ability to add or
+change a tag without a code deploy. It costs the guarantee that everything running on this site went
+through code review — **the console is a deployment surface**, and a tag added there starts sending
+data on the next page load.
+
+On a site whose main form carries claimant names, addresses, claim numbers and free-text accident
+descriptions, that matters more than it would on a brochure site. So the protection was moved rather
+than dropped:
+
+```
+this site  ->  [schema allowlist]  ->  dataLayer  ->  GTM  ->  any tag
+                    ^^^^^^^^^^^^^
+                 PII is dropped here
+```
+
+Everything this site publishes is filtered through a fixed list of permitted values **before** it
+reaches the dataLayer. A tag added in the console later cannot read a claimant's name out of the
+dataLayer, because the name was never put there. **The console controls which tags fire; the site
+controls what they can see.**
+
+### Four rules. The first two are console settings that code here cannot enforce.
+
+**1. Point the GA4 tag at the `page_location` dataLayer variable, not `{{Page URL}}`.**
+`{{Page URL}}` reads the browser address bar directly and bypasses the sanitiser. The site publishes
+a cleaned address into the dataLayer as `page_location`; create a Data Layer Variable for it and set
+it as the `page_location` field on the GA4 configuration tag. Without this, campaign attribution
+still works, but the URL protection does not.
+
+**2. Never add a tag, trigger, or variable that reads the form.** Specifically: no Form Submission
+triggers on the appraisal form, no Element Visibility triggers on its fields, and no Custom JavaScript
+variable that queries the DOM. Any of those can read claimant data directly, and **no code in this
+repository can stop it.** The conversion events you need are already published to the dataLayer —
+`generate_lead`, `upload_complete`, `contact_click` — and they are already safe. Use those.
+
+**3. One container, this site only.** The container ID lives in `analytics.js` and is validated. A
+container belonging to another site would load that site's entire tag set here, silently, looking
+perfectly healthy. Add every other container you manage to `GTM_DENYLIST` in `analytics.js`.
+
+**4. Do not also set `GA4_MEASUREMENT_ID`.** The container already loads the GA4 configuration. Both
+together means two GA4 configurations on the page and every pageview and conversion counted twice — a
+doubled conversion *rate* looks entirely plausible, which is what makes it dangerous. `analytics.js`
+refuses to load either one if both are set, and says why.
+
+### What the site publishes to the dataLayer
+
+| dataLayer `event` | Fires when | Values published alongside it |
+|---|---|---|
+| `generate_lead` | a request is delivered | `form_name`, `equipment_type`, `assignment_type`, `loss_type`, `file_count`, `files_failed` |
+| `upload_complete` | files were delivered | `form_name`, `file_count`, `files_failed` |
+| `contact_click` | a phone or email link is clicked | `contact_method` |
+| `lead_fallback_mailto` | the secure path failed *(diagnostic)* | — |
+| `lead_over_cap` | the size cap was hit *(diagnostic)* | — |
+| `csp_violation` | a content-security-policy blocked something | `effective_directive` |
+
+Build GA4 Event tags on Custom Event triggers matching those names. Every value above is already
+allowlisted; nothing else is available, by design.
+
+**Tag Manager is not loaded on `404.html`.** That page is served for every mistyped and stale URL on
+the domain, so the address bar can contain anything — including a name, from an old emailed link. The
+sanitiser covers what the *site* sends, but not what a console tag reads from the address bar, so the
+container simply does not run there. 404 traffic is overwhelmingly bots; nothing of value is lost.
+
 ## What is and is not sent
 
 Events are built from a fixed schema. The code walks **the schema**, never the object handed to it, so

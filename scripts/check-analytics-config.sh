@@ -124,6 +124,9 @@ else
   pass "GA4_MEASUREMENT_ID is not a known foreign property"
 fi
 
+# NOTE: the Tag Manager checks live in section 2c, AFTER the privacy section —
+# one of them needs $H_PRIVACY, which is computed there. Ordering is load-bearing.
+
 # ---------------------------------------------------------------------------
 # 2b · The privacy policy must describe what actually runs
 # ---------------------------------------------------------------------------
@@ -187,6 +190,41 @@ else
     bad "privacy.html claims Cloudflare Web Analytics is in use, but no token is set (over-disclosure)"
   else
     pass "CWA dormant, and privacy.html correctly does not claim it"
+  fi
+fi
+
+# ---------------------------------------------------------------------------
+# 2c · Tag Manager  (must come after 2b — needs $H_PRIVACY)
+# ---------------------------------------------------------------------------
+gtm_set=$(grep -cE 'var GTM_CONTAINER_ID *= *"[^"]+"' <<<"$JS_ANALYTICS" || true)
+ga4_set=$(grep -cE 'var GA4_MEASUREMENT_ID *= *"[^"]+"' <<<"$JS_ANALYTICS" || true)
+
+# Both configured means two GA4 configurations on the page: every pageview and
+# every conversion counted twice. A doubled conversion RATE looks plausible,
+# which is exactly what makes it dangerous — nothing about the page looks wrong.
+if [ "$gtm_set" != "0" ] && [ "$ga4_set" != "0" ]; then
+  bad "BOTH a GTM container and a direct GA4 id are set — this double-counts everything"
+else
+  pass "GTM and direct-GA4 are not both configured"
+fi
+
+# Assert the DECLARATION, not the identifier. An earlier version of this check
+# grepped for the bare name "GTM_DENYLIST", which still appears inside
+# validGtmId() after the declaration is deleted — so it passed on a tree where
+# the list was gone (and the page would throw a ReferenceError at runtime).
+if grep -qE 'var GTM_DENYLIST *= *\[' <<<"$JS_ANALYTICS"; then
+  pass "GTM container denylist is declared"
+else
+  bad "GTM_DENYLIST declaration removed — a container from another site could be pasted here"
+fi
+
+# The container loads whatever the console says. If tags are managed there, the
+# privacy policy has to say so, for the same reason it names GA4.
+if [ "$gtm_set" != "0" ]; then
+  if grep -qi 'tag manager' <<<"$H_PRIVACY"; then
+    pass "GTM is live and privacy.html discloses tag management"
+  else
+    bad "GTM_CONTAINER_ID is set but privacy.html does not mention Tag Manager"
   fi
 fi
 

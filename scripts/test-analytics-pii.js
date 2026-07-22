@@ -225,5 +225,130 @@ const uc = sent.find((s) => s.event === "upload_complete");
 check("int values are clamped", uc && uc.params.file_count === 99 && uc.params.files_failed === 0,
   uc ? JSON.stringify(uc.params) : "no event");
 
+// ===========================================================================
+// TAG MANAGER PATH
+// ===========================================================================
+// This is where the PII protection has to hold now. Tags are configured in a
+// console outside this repo, so anything reaching the dataLayer is readable by
+// any tag anyone adds later. The guarantee under test: PII never reaches the
+// dataLayer in the first place.
+console.log("\n--- tag manager path ---\n");
+
+function bootGtm(opts) {
+  opts = opts || {};
+  let src = fs.readFileSync(SRC, "utf8")
+    .replace('var GTM_CONTAINER_ID = "";', 'var GTM_CONTAINER_ID = "' + (opts.gtm ?? "GTM-ABC1234") + '";');
+  if (opts.ga4) src = src.replace('var GA4_MEASUREMENT_ID = "";', 'var GA4_MEASUREMENT_ID = "' + opts.ga4 + '";');
+  const injected = [];
+  const errs = [];
+  const s = {
+    console: { log() {}, error: (m) => errs.push(String(m)) },
+    URL,
+    window: { console, URL, addEventListener() {}, __ccAnalyticsDropped: 0 },
+    document: {
+      head: { appendChild(el) { injected.push(el); } },
+      body: { getAttribute: () => (opts.is404 ? "404" : null) },
+      createElement: makeEl,
+      querySelector: () => null,
+      addEventListener() {},
+    },
+    location: {
+      pathname: opts.pathname || "/",
+      href: opts.href || "https://www.corbettclaims.com/?utm_source=google&owner_name=ZZPII#faq",
+      origin: "https://www.corbettclaims.com",
+    },
+  };
+  s.globalThis = s;
+  vm.createContext(s);
+  vm.runInContext(src, s);
+  return { s, injected, errs, dl: s.window.dataLayer || [] };
+}
+
+{
+  const { s, injected, dl } = bootGtm();
+  check("GTM container is injected", injected.some((e) => (e.src || "").includes("gtm.js?id=GTM-ABC1234")),
+    injected.map((e) => e.src).join(","));
+  check("ready() true under GTM", s.window.ccAnalytics.ready() === true);
+
+  // Consent must be in the dataLayer before anything else can act on it.
+  // NOTE: gtag-style pushes are `arguments` objects, not Arrays — Array.isArray
+  // is false for them, so normalise with Array.from before inspecting.
+  const consentIdx = dl.findIndex((e) => Array.from(e || [])[0] === "consent");
+  check("consent default is pushed to the dataLayer", consentIdx > -1);
+  const consentEntry = consentIdx > -1 ? Array.from(dl[consentIdx]) : null;
+  check("consent is pushed BEFORE the container script can act on it",
+    consentIdx > -1 && consentIdx < dl.findIndex((e) => e && e.page_location !== undefined) + 1);
+  check("analytics_storage granted, ad signals denied (GTM)",
+    !!consentEntry && consentEntry[2].analytics_storage === "granted" &&
+    consentEntry[2].ad_storage === "denied" && consentEntry[2].ad_user_data === "denied" &&
+    consentEntry[2].ad_personalization === "denied");
+
+  const plEntry = dl.find((e) => e && !Array.isArray(e) && "page_location" in e);
+  check("sanitised page_location published for the console to use",
+    !!plEntry && plEntry.page_location.includes("utm_source=google") &&
+    !plEntry.page_location.includes("ZZPII") && !plEntry.page_location.includes("#faq"),
+    plEntry ? plEntry.page_location : "absent");
+
+  // THE test: push PII at it and confirm none reaches the dataLayer.
+  const before = dl.length;
+  s.window.ccAnalytics.track("generate_lead", {
+    equipment_type: "Motorcycle", assignment_type: "Damage estimate", loss_type: "Hail",
+    file_count: 3, files_failed: 1,
+    owner_name: "Jane Doe", claimant: "John Smith",
+    owner_address: "123 Main St, Baton Rouge LA 70802",
+    message: "rear-ended at the light, airbags deployed", claim_number: "CC-99812",
+    email: "jane@example.com", phone: "225-663-2217",
+  });
+  const pushed = dl.slice(before).find((e) => e && e.event === "generate_lead");
+  check("event reaches the dataLayer", !!pushed);
+  if (pushed) {
+    const blob = JSON.stringify(pushed);
+    check("NO claimant name in the dataLayer", !/Jane Doe|John Smith/.test(blob), blob);
+    check("NO address in the dataLayer", !/Main St|70802/.test(blob), blob);
+    check("NO free text in the dataLayer", !/airbags/.test(blob), blob);
+    check("NO claim number in the dataLayer", !/CC-99812/.test(blob), blob);
+    check("NO email or phone in the dataLayer", !/jane@example\.com|225-663-2217/.test(blob), blob);
+    const defined = Object.keys(pushed).filter((k) => pushed[k] !== undefined).sort().join(",");
+    check("only schema keys carry values",
+      defined === "assignment_type,equipment_type,event,file_count,files_failed,form_name,loss_type", defined);
+  }
+
+  // Stale-value bleed: a later event must not inherit an earlier event's values.
+  const b2 = dl.length;
+  s.window.ccAnalytics.track("upload_complete", { file_count: 2, files_failed: 0 });
+  const second = dl.slice(b2).find((e) => e && e.event === "upload_complete");
+  check("stale keys are cleared between events",
+    !!second && second.loss_type === undefined && second.equipment_type === undefined,
+    second ? JSON.stringify(second) : "absent");
+}
+
+{
+  const { injected } = bootGtm({ is404: true });
+  check("GTM is NOT loaded on 404.html", !injected.some((e) => (e.src || "").includes("gtm.js")),
+    injected.map((e) => e.src).join(","));
+}
+
+{
+  const { injected, errs } = bootGtm({ ga4: "G-TEST123456" });
+  check("GTM + direct GA4 together is REFUSED (would double-count)",
+    injected.length === 0, injected.map((e) => e.src).join(","));
+  check("...and says why, loudly", errs.some((m) => /double-count/i.test(m)), errs.join(" | "));
+}
+
+{
+  const { injected, errs } = bootGtm({ gtm: "GTM-XXXXXXX" });
+  check("placeholder container is refused", !injected.some((e) => (e.src || "").includes("gtm.js")));
+}
+
+{
+  const { injected } = bootGtm({ gtm: "not-a-container" });
+  check("malformed container is refused", !injected.some((e) => (e.src || "").includes("gtm.js")));
+}
+
+{
+  const { injected } = bootGtm({ pathname: "/owner.html" });
+  check("GTM never loads on the owner page", injected.length === 0);
+}
+
 console.log("\n" + (failures ? "\x1b[31m" + failures + " FAILURES\x1b[0m" : "\x1b[32mall harness checks passed\x1b[0m"));
 process.exit(failures ? 1 : 0);

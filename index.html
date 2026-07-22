@@ -622,11 +622,11 @@
                             <label for="equipment-type">Vehicle Type <span class="required-mark" aria-hidden="true">*</span></label>
                             <select id="equipment-type" name="equipment_type" required aria-describedby="equipment-type-error" data-validate="required">
                                 <option value="">Select vehicle type…</option>
-                                <option>Auto / Light truck</option>
-                                <option>Motorcycle</option>
-                                <option>RV / Motorhome / Trailer</option>
-                                <option>Heavy farm equipment</option>
-                                <option>Other</option>
+                                <option value="Auto / Light truck">Auto / Light truck</option>
+                                <option value="Motorcycle">Motorcycle</option>
+                                <option value="RV / Motorhome / Trailer">RV / Motorhome / Trailer</option>
+                                <option value="Heavy farm equipment">Heavy farm equipment</option>
+                                <option value="Other">Other</option>
                             </select>
                             <span class="field-error" id="equipment-type-error" aria-live="polite"></span>
                         </div>
@@ -634,10 +634,10 @@
                             <label for="assignment-type">Assignment Type <span class="required-mark" aria-hidden="true">*</span></label>
                             <select id="assignment-type" name="assignment_type" required aria-describedby="assignment-type-error" data-validate="required">
                                 <option value="">Select assignment…</option>
-                                <option>Damage estimate</option>
-                                <option>Total-loss valuation</option>
-                                <option>Diminished-value appraisal</option>
-                                <option>Other</option>
+                                <option value="Damage estimate">Damage estimate</option>
+                                <option value="Total-loss valuation">Total-loss valuation</option>
+                                <option value="Diminished-value appraisal">Diminished-value appraisal</option>
+                                <option value="Other">Other</option>
                             </select>
                             <span class="field-error" id="assignment-type-error" aria-live="polite"></span>
                         </div>
@@ -714,16 +714,16 @@
                         <label for="loss-type">Type of Loss <span class="required-mark" aria-hidden="true">*</span></label>
                         <select id="loss-type" name="loss_type" required aria-describedby="loss-type-error" data-validate="required">
                             <option value="">Select type of loss…</option>
-                            <option>Collision</option>
-                            <option>Fire</option>
-                            <option>Theft</option>
-                            <option>Vandalism</option>
-                            <option>Flood / Water</option>
-                            <option>Hail</option>
-                            <option>Weather / Storm</option>
-                            <option>Comprehensive</option>
-                            <option>Total loss</option>
-                            <option>Other</option>
+                            <option value="Collision">Collision</option>
+                            <option value="Fire">Fire</option>
+                            <option value="Theft">Theft</option>
+                            <option value="Vandalism">Vandalism</option>
+                            <option value="Flood / Water">Flood / Water</option>
+                            <option value="Hail">Hail</option>
+                            <option value="Weather / Storm">Weather / Storm</option>
+                            <option value="Comprehensive">Comprehensive</option>
+                            <option value="Total loss">Total loss</option>
+                            <option value="Other">Other</option>
                         </select>
                         <span class="field-error" id="loss-type-error" aria-live="polite"></span>
                     </div>

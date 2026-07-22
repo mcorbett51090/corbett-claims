@@ -1,0 +1,39 @@
+{
+  "_comment": [
+    "Event schema for corbettclaims.com, consumed by",
+    "RavenPower-Website/commerce/scripts/gtm-events.mjs to build the GTM tags:",
+    "",
+    "  node scripts/gtm-events.mjs --container GTM-5CCH924Z \\",
+    "    --measurement G-XZQQR1VQ3K --expect corbettclaims.com \\",
+    "    --schema ~/corbett-claims/analytics-schema.json",
+    "",
+    "This file exists so the tooling never falls back to its BUILT-IN default.",
+    "The default happens to be this site's schema, so omitting --schema would",
+    "have worked by coincidence — and coincidence is the thing that breaks when",
+    "the default later changes or another site is onboarded. Pass it explicitly.",
+    "",
+    "THIS FILE AND THE SCHEMA OBJECT IN analytics.js MUST AGREE. They are two",
+    "halves of one contract: analytics.js decides what the site is allowed to",
+    "PUBLISH, this decides what GTM is configured to READ. Both directions fail",
+    "closed — a key here the site never pushes is empty in GA4, a key the site",
+    "pushes that is missing here never arrives — so neither leaks, but both are",
+    "silent. Change them together.",
+    "",
+    "NEVER add a field read from secureFields beyond the three enums below.",
+    "That object holds the claimant, insured and owner names, the owner address,",
+    "the claim number, date of loss, email, phone and the free-text message."
+  ],
+  "generate_lead": [
+    "form_name",
+    "equipment_type",
+    "assignment_type",
+    "loss_type",
+    "file_count",
+    "files_failed"
+  ],
+  "upload_complete": ["form_name", "file_count", "files_failed"],
+  "contact_click": ["contact_method"],
+  "lead_fallback_mailto": [],
+  "lead_over_cap": [],
+  "csp_violation": ["effective_directive"]
+}

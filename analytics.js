@@ -246,10 +246,17 @@
    * whole event. This is a positive literal pick, and it fails CLOSED: adding a
    * field to a form does not silently add it to a beacon.
    *
-   * enum values are the <option> LABEL strings, because these selects carry no
-   * value attributes (index.html:623, :635, :715). A copy edit to an <option>
-   * therefore drops that value from the event rather than transmitting a new
-   * one — fails closed and visibly, which is the correct direction.
+   * enum values match the <option value=""> attributes on the three selects.
+   *
+   * Those values were added explicitly (2026-07-22) and are IDENTICAL to the
+   * visible labels, so nothing transmitted or emailed changed. The point is to
+   * make the coupling visible: previously the selects had no value attributes,
+   * so the label WAS the value, and editing the copy silently dropped that
+   * option from every event — failing closed, correctly, but invisibly.
+   *
+   * Now anyone editing a label sees the value sitting next to it and has to
+   * decide. If you change a value here, change it in this list and in
+   * analytics-schema.json too, or the option stops being reported.
    */
   var EQUIPMENT_TYPES = [
     "Auto / Light truck",

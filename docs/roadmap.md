@@ -92,14 +92,23 @@ choice is informed.
 - **Verdict: OPTIONAL.** Genuine LSU footage isn't on free-stock libraries (and would be a trademark
   risk); the current clip is the closest trademark-safe fit.
 
-### ✅ Website analytics _(wired — activate when you want it)_
+### ✅ Website analytics _(built — one credential away from live)_
 
-- **What:** **Google Analytics 4** is wired into the site but ships **off**. No script, no cookies, and
-  no data are collected until a Measurement ID is pasted in — see [`ANALYTICS.md`](ANALYTICS.md).
-- **To turn it on (≈2 min):** create a free GA4 property, copy its `G-XXXXXXXXXX` ID, paste it into the
-  single activation line in `analytics.js`, and push. Full steps in [`ANALYTICS.md`](ANALYTICS.md).
-- **Note:** GA4 uses a cookie; no consent banner is included (fine for a US-only audience — the
-  reasoning and the EU/CA alternatives are documented in `ANALYTICS.md`).
+- **What:** **Google Analytics 4** is fully built and ships **off**. No script, no cookies and no data
+  until a Measurement ID is pasted into `analytics.js`. Conversion tracking, the privacy policy and the
+  safety checks are all already in place — see [`ANALYTICS.md`](ANALYTICS.md).
+- **To turn it on (~15 minutes):** create a free GA4 property, copy its `G-XXXXXXXXXX` ID, paste it into
+  the activation line in `analytics.js`, then **verify against the Data-stream ID and a Hostname-filtered
+  Realtime view**. That verification is not optional — Google returns a normal response for a wrong ID,
+  so a typo collects nothing (or fills someone else's property) while looking perfectly healthy.
+  Full steps in [`OWNER-VIEW-SETUP.md`](OWNER-VIEW-SETUP.md).
+- **What it answers:** the conversion **rate** and where visitors came from. **Not** the lead count —
+  the inbox is already a complete ledger of leads, and GA4's number will always be lower. Reading GA4
+  as a lead count is the one way to be actively misled by it.
+- **Cookies / consent:** GA4 sets a first-party cookie. No consent banner is included — a deliberate
+  choice for a US audience, with Consent Mode v2 wired as future-proofing. Reasoning in `ANALYTICS.md`.
+- **Cloudflare Web Analytics** is wired but **deliberately not enabled** (owner decision, 2026-07-22).
+  Enabling it later requires updating `privacy.html` in the same change; the pre-push check enforces it.
 
 ---
 

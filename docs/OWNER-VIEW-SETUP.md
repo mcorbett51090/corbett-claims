@@ -27,7 +27,72 @@ Everything below is **free**. You'll need a Google account, then you set up Goog
 Google occasionally renames buttons, so a label may read slightly differently than written here —
 the flow is the same.
 
-### 0. A Google account (skip if you already have one)
+### 0. Who owns the analytics, and who maintains it
+
+Two different roles, deliberately held by two different logins.
+
+| | Login | What it is |
+|---|---|---|
+| **Owner** | `corbettclaims2326@gmail.com` | Creates the GA4 account and property. **Owns the data.** If the maintenance arrangement ever ends, this account keeps the property and its full history — nothing has to be migrated or re-created. |
+| **Maintainer** | the RavenPower identity | Granted access *to* the owner's property. Configures it, reads it, keeps it working. Holds no ownership. |
+
+**Create the property while signed in as the owner account**, then grant the maintainer access from
+inside it. Doing it the other way round — creating the property under the maintainer's login and
+"sharing" it back — looks identical on day one and is materially worse later: the data lives in
+someone else's account, and GA4 properties cannot be moved between accounts freely.
+
+**Granting the maintainer access** (as `corbettclaims2326@gmail.com`):
+
+*Admin → Property access management → **+** (top right) → Add users*, enter the maintainer's email,
+pick a role, uncheck "Notify new users by email" if you like, **Add**.
+
+A **Google Cloud service account** address (`…@….iam.gserviceaccount.com`) is added exactly the same
+way — GA4 treats it as a user. This site's maintainer identity is the same service account that
+manages tag configuration across the other properties in the estate, so that one identity is
+consistent everywhere rather than per-site.
+
+Two things about service accounts that are easy to trip over:
+
+- **A service account cannot sign in to the GA4 web interface.** It acts through the Admin and Data
+  APIs. If a human also needs to click around in GA4 — to read a report, change retention, add a
+  filter — that human needs their **own** grant, in addition to the service account's.
+- **Give it `Editor`, not `Administrator`**, unless it genuinely needs to add and remove *users*.
+  Editor already covers everything tag-shaped: data streams, events, key events, and all other
+  property settings. Administrator adds user management on top, which is the one power a
+  configuration identity has no reason to hold.
+
+GA4's roles, in descending order of power:
+
+| Role | Can do |
+|---|---|
+| **Administrator** | Everything, including managing users |
+| **Editor** | All settings; cannot manage users |
+| **Marketer** | Audiences, events, key events, attribution |
+| **Analyst** | Create and share explorations |
+| **Viewer** | See settings and reports; change what appears in a report |
+
+Roles can be granted at **account** or **property** level, and account-level grants are inherited by
+every property beneath them. Grant at the **property** level unless the account will only ever hold
+this one site.
+
+> ### ⚠️ This setup makes one specific mistake much easier — read this before step 5
+>
+> Once the maintainer login can see more than one property, the GA4 property picker lists them all,
+> and **the wrong Measurement ID is one mis-click away.** Google returns a perfectly normal response
+> for a valid ID belonging to a different site, so nothing would look broken — the site would simply
+> feed a different property, and **that data cannot be un-mixed afterwards.**
+>
+> Two protections are already in place, and both matter more under this arrangement than they would
+> for a single-property login:
+>
+> - `analytics.js` carries a denylist of known other properties and **refuses to load** if one is
+>   pasted here. It currently lists `G-WX1VSLNYS1` (southernwinecountry.com). **Every additional
+>   property the maintainer login gains access to should be added to that list** — in `analytics.js`
+>   *and* in `scripts/check-analytics-config.sh`.
+> - The verification in step 8 requires a Realtime view **filtered by hostname**. An unfiltered
+>   Realtime view will happily show another site's traffic and look exactly like success.
+
+### 0b. The owner's Google account (skip if it already exists)
 
 If the owners already use Gmail, YouTube, or any Google service, that login works — go to step 1.
 
@@ -35,8 +100,7 @@ Otherwise, create one once:
 
 1. Go to <https://accounts.google.com/signup>.
 2. Fill in a name, pick a username, set a password, finish the prompts.
-3. **Write down the email + password** — this is the account that will "own" the analytics, and
-   the only one that can see the dashboard.
+3. **Write down the email + password** — this is the account that will **own** the analytics.
 
 Use this **same** Google account for every step below.
 
@@ -67,9 +131,33 @@ no tracking) and the dashboard has no data.
    ```
 7. Save, commit, and push (or send the ID to whoever maintains the site and they'll paste it).
    Analytics is now live.
-8. **Check it worked:** open <https://www.corbettclaims.com> in another tab, then in Analytics go
-   to **Reports → Realtime** — you should see 1 active user (you). Data can take ~24h to appear in
-   the main reports; Realtime is instant.
+8. **Check it worked — and check it worked _for this site_.**
+
+   Google returns a normal, successful response for a Measurement ID that is wrong, so a typo — or
+   pasting the ID of another property you own — produces a page that looks completely healthy while
+   collecting nothing, or while quietly filling up somebody else's property. That is not recoverable
+   afterwards: analytics history cannot be un-mixed. So do both of these, not just the second:
+
+   1. **Compare the ID character by character** against the one on the Data-stream page from step 5.
+      Not "it looks right" — actually compare it.
+   2. Open <https://www.corbettclaims.com> in another tab, then in Analytics go to
+      **Reports → Realtime**, and **set the Hostname filter to `www.corbettclaims.com`**
+      (*Add comparison / filter → Hostname*). You should see 1 active user — you.
+
+   The hostname filter is the whole point of this step. An unfiltered Realtime view will cheerfully
+   show you traffic from a *different* website and look exactly like success.
+
+   Data can take ~24h to reach the main reports; Realtime is instant.
+
+9. **Four one-time settings**, all free, all worth doing now:
+   - **Admin → Data retention → 14 months** (the default is 2 months, which is shorter than a season).
+   - **Leave Google Signals OFF.** It adds advertising-flavoured data collection this site has no use
+     for, and it makes requests that can look like a site fault.
+   - **Define an internal-traffic filter for your own IP** (*Admin → Data streams → Configure tag
+     settings → Define internal traffic*). At this site's traffic level your own visits are a
+     material share of the sample.
+   - Expect the 404 page to look busy. It is served for every mistyped and stale URL on the domain
+     and is heavily crawled by bots; that traffic is not people.
 
 Full analytics notes, including the cookieless / EU-privacy alternatives, are in
 [`ANALYTICS.md`](ANALYTICS.md).

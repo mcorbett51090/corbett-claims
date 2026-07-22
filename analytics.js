@@ -56,10 +56,18 @@
   // Properties that are real, valid, and NOT this website's. Pasting one of
   // these mixes Corbett Claims traffic into a live property that belongs to a
   // different site, and GA4 history cannot be retroactively cleaned.
-  //   G-WX1VSLNYS1 — southernwinecountry.com (live). Same owner, same Google
-  //                  account, so it is exactly the ID most likely to be pasted
-  //                  here by muscle memory or clipboard.
-  // Add any further owned properties here as they are created.
+  //   G-WX1VSLNYS1 — southernwinecountry.com (live). Reachable from the same
+  //                  maintainer login, so it is exactly the ID most likely to
+  //                  be pasted here by muscle memory or clipboard.
+  //
+  // KEEP THIS LIST GROWING. This property is owned by the client's Google
+  // account and maintained from a separate one. Every additional property that
+  // maintainer login can see appears in the same GA4 property picker, and each
+  // one is another valid-looking ID that could land here by mis-click. Google
+  // returns a normal response for a wrong-but-valid ID, so nothing would look
+  // broken — the site would just feed someone else's property, permanently.
+  // Add every other property you own here, and to
+  // scripts/check-analytics-config.sh, as they are created.
   var GA4_DENYLIST = ["G-WX1VSLNYS1"];
 
   var CWA_PLACEHOLDERS = [

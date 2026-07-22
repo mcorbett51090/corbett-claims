@@ -27,7 +27,57 @@ Everything below is **free**. You'll need a Google account, then you set up Goog
 Google occasionally renames buttons, so a label may read slightly differently than written here —
 the flow is the same.
 
-### 0. A Google account (skip if you already have one)
+### 0. Who owns the analytics, and who maintains it
+
+Two different roles, deliberately held by two different logins.
+
+| | Login | What it is |
+|---|---|---|
+| **Owner** | `corbettclaims2326@gmail.com` | Creates the GA4 account and property. **Owns the data.** If the maintenance arrangement ever ends, this account keeps the property and its full history — nothing has to be migrated or re-created. |
+| **Maintainer** | the RavenPower identity | Granted access *to* the owner's property. Configures it, reads it, keeps it working. Holds no ownership. |
+
+**Create the property while signed in as the owner account**, then grant the maintainer access from
+inside it. Doing it the other way round — creating the property under the maintainer's login and
+"sharing" it back — looks identical on day one and is materially worse later: the data lives in
+someone else's account, and GA4 properties cannot be moved between accounts freely.
+
+**Granting the maintainer access** (as `corbettclaims2326@gmail.com`):
+
+*Admin → Property access management → **+** (top right) → Add users*, enter the maintainer's email,
+pick a role, uncheck "Notify new users by email" if you like, **Add**.
+
+GA4's roles, in descending order of power:
+
+| Role | Can do |
+|---|---|
+| **Administrator** | Everything, including managing users |
+| **Editor** | All settings; cannot manage users |
+| **Marketer** | Audiences, events, key events, attribution |
+| **Analyst** | Create and share explorations |
+| **Viewer** | See settings and reports; change what appears in a report |
+
+Roles can be granted at **account** or **property** level, and account-level grants are inherited by
+every property beneath them. Grant at the **property** level unless the account will only ever hold
+this one site.
+
+> ### ⚠️ This setup makes one specific mistake much easier — read this before step 5
+>
+> Once the maintainer login can see more than one property, the GA4 property picker lists them all,
+> and **the wrong Measurement ID is one mis-click away.** Google returns a perfectly normal response
+> for a valid ID belonging to a different site, so nothing would look broken — the site would simply
+> feed a different property, and **that data cannot be un-mixed afterwards.**
+>
+> Two protections are already in place, and both matter more under this arrangement than they would
+> for a single-property login:
+>
+> - `analytics.js` carries a denylist of known other properties and **refuses to load** if one is
+>   pasted here. It currently lists `G-WX1VSLNYS1` (southernwinecountry.com). **Every additional
+>   property the maintainer login gains access to should be added to that list** — in `analytics.js`
+>   *and* in `scripts/check-analytics-config.sh`.
+> - The verification in step 8 requires a Realtime view **filtered by hostname**. An unfiltered
+>   Realtime view will happily show another site's traffic and look exactly like success.
+
+### 0b. The owner's Google account (skip if it already exists)
 
 If the owners already use Gmail, YouTube, or any Google service, that login works — go to step 1.
 
@@ -35,8 +85,7 @@ Otherwise, create one once:
 
 1. Go to <https://accounts.google.com/signup>.
 2. Fill in a name, pick a username, set a password, finish the prompts.
-3. **Write down the email + password** — this is the account that will "own" the analytics, and
-   the only one that can see the dashboard.
+3. **Write down the email + password** — this is the account that will **own** the analytics.
 
 Use this **same** Google account for every step below.
 

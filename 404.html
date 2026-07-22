@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page Not Found | Corbett Claims</title>
     <meta name="robots" content="noindex">
+    <!--
+      This page is served for EVERY unmatched URL on the domain, so the path is
+      whatever a visitor, a stale link or a crawler asked for — e.g. a mistyped
+      legacy link of the shape /john-smith-total-loss-4471. That path must not
+      leak to third parties. Two controls:
+        1. this referrer policy, so the requested path is not put in a Referer
+           header sent to unpkg / fonts / Turnstile / Google / any other origin;
+        2. data-page="404" below, which makes analytics.js report a CONSTANT
+           page_location for this page instead of the requested path.
+      Removing either one re-opens a PII channel that no parameter allowlist
+      can see, because the leak is in the URL rather than in an event parameter.
+    -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231e3a5f'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial, sans-serif' font-weight='800' font-size='32' fill='white'%3ECC%3C/text%3E%3C/svg%3E">
     <style>
         :root { color-scheme: light; }
@@ -42,7 +55,7 @@
     <!-- Google Analytics 4 — dormant until a Measurement ID is set in analytics.js. See docs/ANALYTICS.md -->
     <script src="/analytics.js" defer></script>
 </head>
-<body>
+<body data-page="404">
     <div class="code">404</div>
     <h1>We couldn't find that page.</h1>
     <p>The page you're looking for may have moved or no longer exists. Let's get you back to Corbett Claims.</p>

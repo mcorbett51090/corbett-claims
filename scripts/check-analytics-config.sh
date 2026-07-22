@@ -125,6 +125,72 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+# 2b · The privacy policy must describe what actually runs
+# ---------------------------------------------------------------------------
+# Google Analytics' terms require a posted policy disclosing GA use, the cookie,
+# and a link to Google's "how we use information" page. Beyond the terms, the
+# policy is only worth having if it is TRUE — so enabling a second measurement
+# tool without disclosing it is exactly the failure this phase existed to fix.
+H_PRIVACY="$(strip_html privacy.html 2>/dev/null || true)"
+
+if [ -f privacy.html ]; then
+  pass "privacy.html exists"
+  if grep -qi 'policies\.google\.com/technologies/partner-sites' <<<"$H_PRIVACY"; then
+    pass "privacy.html links Google's data-use page (GA ToS requirement)"
+  else
+    bad "privacy.html is missing the required Google data-use link"
+  fi
+  if grep -qi '_ga' <<<"$H_PRIVACY"; then
+    pass "privacy.html discloses the cookie by name"
+  else
+    bad "privacy.html does not disclose the _ga cookie"
+  fi
+  # The spam defence must never be described publicly — and this check runs
+  # against the RAW file, deliberately, unlike every other check here.
+  #
+  # HTML comments are SERVED. They are in the source of every page a visitor can
+  # view. So for a disclosure question the comment text is part of the public
+  # surface, and stripping it before checking would hide exactly the leak worth
+  # catching. (This is not hypothetical: the first draft of privacy.html carried
+  # a comment reading "do not name the spam honeypot here", which named it, in
+  # public, and passed the comment-stripped check.)
+  #
+  # Comment-stripping is right for "does the code do X"; raw is right for
+  # "does the public see X".
+  if grep -qiE 'honeypot|botcheck' privacy.html; then
+    bad "privacy.html names the spam defence — HTML comments are public too"
+  else
+    pass "privacy.html does not name the spam defence (raw source checked)"
+  fi
+else
+  bad "privacy.html is missing — GA4 must not be activated without it"
+fi
+
+# Discoverability: a policy nothing links to is posted to nobody.
+grep -q 'privacy' sitemap.xml && pass "privacy.html is in sitemap.xml" \
+  || bad "privacy.html missing from sitemap.xml"
+grep -q 'href="/privacy' <<<"$H_INDEX" && pass "index.html links the privacy policy" \
+  || bad "index.html has no privacy link"
+grep -q 'href="/privacy' <<<"$H_404" && pass "404.html links the privacy policy" \
+  || bad "404.html has no privacy link"
+
+# The coupling: a live CWA token obliges a policy that describes Cloudflare.
+cwa_set=$(grep -cE 'var CWA_SITE_TOKEN *= *"[^"]+"' <<<"$JS_ANALYTICS" || true)
+if [ "$cwa_set" != "0" ]; then
+  if grep -qi 'cloudflare web analytics' <<<"$H_PRIVACY"; then
+    pass "CWA is enabled and privacy.html describes it"
+  else
+    bad "CWA_SITE_TOKEN is set but privacy.html does not disclose Cloudflare Web Analytics"
+  fi
+else
+  if grep -qi 'cloudflare web analytics' <<<"$H_PRIVACY"; then
+    bad "privacy.html claims Cloudflare Web Analytics is in use, but no token is set (over-disclosure)"
+  else
+    pass "CWA dormant, and privacy.html correctly does not claim it"
+  fi
+fi
+
+# ---------------------------------------------------------------------------
 # 3 · TF6 PUBLIC-ONLY — owner surfaces carry no analytics
 # ---------------------------------------------------------------------------
 if grep -qE 'analytics\.js|cloudflareinsights|googletagmanager' <<<"$H_OWNER"; then

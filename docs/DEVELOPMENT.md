@@ -47,6 +47,29 @@ When staging is ready to go live:
 
 That merge is the **only** moment the public site changes. Everything before it is private.
 
+## Before you push
+
+A `pre-push` hook runs these if it is installed (`.git/hooks/pre-push`). They are **convenience
+checks, not controls** — this repo has no CI, so a script nobody runs is exactly as strong as a
+comment. The real protections live in the code itself.
+
+```sh
+./scripts/check-vendor-drift.sh        # secure-upload.js still matches its pinned hash
+./scripts/check-analytics-config.sh    # analytics + privacy-policy safety checks
+node scripts/test-analytics-pii.js     # 27 assertions that no PII can reach an analytics request
+```
+
+**A note on how long "live" takes.** GitHub Pages redeploys `main` in about a minute, but production
+is served with `cache-control: max-age=600` and there is no way to purge it. Real time-to-safe after a
+bad push is therefore **~11 minutes**, not ~1. Plan rollbacks accordingly — and prefer a forward fix
+to a revert when the broken state is the safer of the two.
+
+> ⚠️ **If production ever moves to Cloudflare Pages, delete `_headers` FIRST.**
+> That file exists only to keep the Cloudflare *preview* out of search results, and it carries
+> `X-Robots-Tag: noindex, nofollow` for the whole site. GitHub Pages ignores it entirely, which is the
+> only reason it is safe today. Cloudflare Pages would honour it and **deindex the live site** — for a
+> business whose entire strategy document is `getting-found-on-google.txt`.
+
 ## Why not preview on the github.io URL?
 
 Once the custom domain (`corbettclaims.net`) is attached, GitHub Pages **redirects**

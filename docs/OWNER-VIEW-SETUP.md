@@ -67,9 +67,33 @@ no tracking) and the dashboard has no data.
    ```
 7. Save, commit, and push (or send the ID to whoever maintains the site and they'll paste it).
    Analytics is now live.
-8. **Check it worked:** open <https://www.corbettclaims.com> in another tab, then in Analytics go
-   to **Reports → Realtime** — you should see 1 active user (you). Data can take ~24h to appear in
-   the main reports; Realtime is instant.
+8. **Check it worked — and check it worked _for this site_.**
+
+   Google returns a normal, successful response for a Measurement ID that is wrong, so a typo — or
+   pasting the ID of another property you own — produces a page that looks completely healthy while
+   collecting nothing, or while quietly filling up somebody else's property. That is not recoverable
+   afterwards: analytics history cannot be un-mixed. So do both of these, not just the second:
+
+   1. **Compare the ID character by character** against the one on the Data-stream page from step 5.
+      Not "it looks right" — actually compare it.
+   2. Open <https://www.corbettclaims.com> in another tab, then in Analytics go to
+      **Reports → Realtime**, and **set the Hostname filter to `www.corbettclaims.com`**
+      (*Add comparison / filter → Hostname*). You should see 1 active user — you.
+
+   The hostname filter is the whole point of this step. An unfiltered Realtime view will cheerfully
+   show you traffic from a *different* website and look exactly like success.
+
+   Data can take ~24h to reach the main reports; Realtime is instant.
+
+9. **Four one-time settings**, all free, all worth doing now:
+   - **Admin → Data retention → 14 months** (the default is 2 months, which is shorter than a season).
+   - **Leave Google Signals OFF.** It adds advertising-flavoured data collection this site has no use
+     for, and it makes requests that can look like a site fault.
+   - **Define an internal-traffic filter for your own IP** (*Admin → Data streams → Configure tag
+     settings → Define internal traffic*). At this site's traffic level your own visits are a
+     material share of the sample.
+   - Expect the 404 page to look busy. It is served for every mistyped and stale URL on the domain
+     and is heavily crawled by bots; that traffic is not people.
 
 Full analytics notes, including the cookieless / EU-privacy alternatives, are in
 [`ANALYTICS.md`](ANALYTICS.md).

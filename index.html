@@ -826,7 +826,10 @@
 
     <footer>
         <div class="footer-inner">
-            <p class="footer-nav"><a href="#faq">FAQ</a></p>
+            <!-- The privacy link is required, not decorative: Google Analytics' terms
+                 oblige us to POST a privacy policy, and a policy nothing links to is
+                 posted to nobody. It is also listed in sitemap.xml. -->
+            <p class="footer-nav"><a href="#faq">FAQ</a> &middot; <a href="/privacy.html">Privacy</a></p>
             <!-- The © glyph is a discreet "secret door" to the owner-only view. Looks like
                  ordinary footer text; leads to /owner.html (noindex) which links out to the
                  Google analytics dashboard behind Google sign-in — no data lives on this page. -->

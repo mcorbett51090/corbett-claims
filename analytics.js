@@ -33,7 +33,17 @@
    * ========================================================================= */
 
   var GA4_MEASUREMENT_ID = ""; // "G-XXXXXXXXXX"
-  var CWA_SITE_TOKEN = ""; // Cloudflare Web Analytics site token
+
+  // Cloudflare Web Analytics — wired, deliberately NOT enabled (owner decision,
+  // 2026-07-22). Leaving this empty costs nothing: GA4 carries every conversion
+  // on its own, because Cloudflare Web Analytics supports no custom events.
+  //
+  // !! SETTING THIS REQUIRES EDITING privacy.html IN THE SAME COMMIT !!
+  // privacy.html describes what actually runs. Enabling a second measurement
+  // tool without disclosing it puts the site back in the position this whole
+  // phase existed to fix: a public privacy statement that is no longer true.
+  // scripts/check-analytics-config.sh fails the push if these two disagree.
+  var CWA_SITE_TOKEN = "";
 
   /* =========================================================================
    * 2 · Validators — reject LOUDLY; never silently no-op on a bad value

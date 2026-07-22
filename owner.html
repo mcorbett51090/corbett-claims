@@ -9,6 +9,17 @@
          The page itself holds NO analytics data — it only links out to Google's dashboard,
          which sits behind Google sign-in. So even though the URL is technically reachable,
          nothing sensitive is exposed here. -->
+
+    <!-- INTENTIONALLY NO ANALYTICS — TF6 owner decision, 2026-07-21 (PUBLIC-ONLY).
+         Do not add analytics.js to this page. Analytics never fires on an owner or
+         internal surface, and this page's whole security story is that it holds no
+         data. Two independent reasons beyond the policy: the owner's own sessions
+         would pollute a very small conversion dataset, and this page currently has
+         no <script> element at all.
+         Checked at pre-push by scripts/check-analytics-config.sh; ENFORCED at runtime
+         by the owner-path guard in analytics.js, which returns before loading any
+         vendor script on a path matching /owner/i. The runtime guard is the real
+         control — the script is a convenience, because this repo has no CI. -->
     <meta name="robots" content="noindex, nofollow">
     <link rel="canonical" href="https://www.corbettclaims.com/owner.html">
     <link rel="stylesheet" href="/styles.css">

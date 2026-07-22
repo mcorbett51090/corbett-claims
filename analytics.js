@@ -486,15 +486,37 @@
   if (activeGtmId && !IS_404) {
     window.dataLayer = window.dataLayer || [];
 
-    // Consent defaults must be in the dataLayer BEFORE the container loads, or
-    // the first tags fire under Google's built-in defaults instead of ours.
-    window.dataLayer.push({
-      "gtm.start": new Date().getTime(),
-      event: "gtm.js",
-    });
     function gtagDl() {
       window.dataLayer.push(arguments);
     }
+
+    /* ORDER IS THE WHOLE THING HERE. DO NOT REARRANGE.
+     *
+     * Tag Manager processes the dataLayer queue strictly in order, and the
+     * `event: 'gtm.js'` message is what fires Container Loaded / Initialization
+     * — which is when the GA4 configuration tag fires. Anything pushed AFTER
+     * that message is not in Tag Manager's model yet when the config tag reads
+     * its variables.
+     *
+     * Get this wrong and it fails silently in the worst possible direction: the
+     * tag still fires, Preview looks healthy, and `page_location` resolves to
+     * undefined — at which point GA4 falls back to the browser's real address
+     * bar and the sanitiser accomplishes exactly nothing. On the 404 page that
+     * is the claimant-name-in-a-URL leak this whole mechanism exists to close.
+     * (Observed in Preview on 2026-07-22, with these three pushes in the
+     * opposite order.)
+     *
+     * So: state first, event last.
+     */
+
+    // 1 · The sanitised address, published for the GA4 config tag to read
+    //     INSTEAD of the built-in {{Page URL}} (which reads the address bar
+    //     directly and cannot be sanitised from here).
+    window.dataLayer.push({ page_location: sanitizedPageLocation() });
+
+    // 2 · Consent defaults — before the container loads, or the first tags fire
+    //     under Google's built-in defaults instead of ours. This is also the
+    //     order Google's own documented snippet uses.
     gtagDl("consent", "default", {
       ad_storage: "denied",
       ad_user_data: "denied",
@@ -502,11 +524,12 @@
       analytics_storage: "granted",
     });
 
-    // The sanitised address, published as a dataLayer value so the GA4 tag in
-    // the console can be pointed at it INSTEAD of the built-in {{Page URL}}.
-    // See docs/ANALYTICS.md — this is a console-side setting and is the one part
-    // of the URL protection that code here cannot enforce.
-    window.dataLayer.push({ page_location: sanitizedPageLocation() });
+    // 3 · ONLY NOW the container-loaded event, with every value it needs
+    //     already in the model.
+    window.dataLayer.push({
+      "gtm.start": new Date().getTime(),
+      event: "gtm.js",
+    });
 
     var t = document.createElement("script");
     t.async = true;

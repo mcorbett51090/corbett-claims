@@ -308,8 +308,28 @@ function bootGtm(opts) {
   const consentIdx = dl.findIndex((e) => Array.from(e || [])[0] === "consent");
   check("consent default is pushed to the dataLayer", consentIdx > -1);
   const consentEntry = consentIdx > -1 ? Array.from(dl[consentIdx]) : null;
-  check("consent is pushed BEFORE the container script can act on it",
-    consentIdx > -1 && consentIdx < dl.findIndex((e) => e && e.page_location !== undefined) + 1);
+  /*
+   * THE ordering invariant, and the one that actually bit.
+   *
+   * GTM processes the dataLayer queue strictly in order, and `event:'gtm.js'`
+   * is what fires Container Loaded — which is when the GA4 config tag reads its
+   * variables. Anything pushed AFTER that message is not in GTM's model yet, so
+   * the tag reads undefined and GA4 silently falls back to the real address bar.
+   *
+   * The previous assertion here compared consent's index to page_location's and
+   * never looked at the gtm.js event at all. It passed while the shipped file
+   * pushed BOTH values after gtm.js — caught only by a human reading `undefined`
+   * in Preview. Assert against the event, or this test means nothing.
+   */
+  const gtmJsIdx = dl.findIndex((e) => e && e.event === "gtm.js");
+  const plIdx = dl.findIndex((e) => e && e.page_location !== undefined);
+  check("gtm.js container-loaded event is pushed", gtmJsIdx > -1);
+  check("page_location is pushed BEFORE gtm.js (or it resolves undefined)",
+    plIdx > -1 && gtmJsIdx > -1 && plIdx < gtmJsIdx,
+    `page_location@${plIdx} vs gtm.js@${gtmJsIdx}`);
+  check("consent default is pushed BEFORE gtm.js",
+    consentIdx > -1 && gtmJsIdx > -1 && consentIdx < gtmJsIdx,
+    `consent@${consentIdx} vs gtm.js@${gtmJsIdx}`);
   check("analytics_storage granted, ad signals denied (GTM)",
     !!consentEntry && consentEntry[2].analytics_storage === "granted" &&
     consentEntry[2].ad_storage === "denied" && consentEntry[2].ad_user_data === "denied" &&

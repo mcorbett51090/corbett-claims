@@ -9,10 +9,42 @@ const fs = require("fs");
 const path = require("path");
 
 const SRC = path.join(process.argv[2] || path.join(__dirname, ".."), "analytics.js");
-let code = fs.readFileSync(SRC, "utf8");
 
-// Scratch ID: valid shape, not all-same-char, not on the denylist.
-code = code.replace('var GA4_MEASUREMENT_ID = "";', 'var GA4_MEASUREMENT_ID = "G-TEST123456";');
+/*
+ * Set BOTH config values explicitly, by regex, never by exact-string match.
+ *
+ * An earlier version replaced the literal `var GTM_CONTAINER_ID = "";`. That
+ * works only while the file is unprovisioned — the moment a real container ID
+ * is pasted in, the match fails silently, every test runs against the live
+ * config instead of its fixture, and the suite goes red on the exact commit
+ * that activates analytics. A test that breaks when the thing under test is
+ * turned on is worse than no test: the obvious "fix" is to stop trusting it.
+ *
+ * Always pin both values, so a fixture means the same thing whether or not the
+ * shipped file is provisioned.
+ */
+function withConfig(src, opts) {
+  opts = opts || {};
+  return src
+    .replace(/var GTM_CONTAINER_ID = "[^"]*";/, 'var GTM_CONTAINER_ID = "' + (opts.gtm || "") + '";')
+    .replace(/var GA4_MEASUREMENT_ID = "[^"]*";/, 'var GA4_MEASUREMENT_ID = "' + (opts.ga4 || "") + '";');
+}
+
+// Sanity: the pins must actually bite, or every assertion below is theatre.
+{
+  const probe = withConfig(fs.readFileSync(SRC, "utf8"), { gtm: "GTM-PROBE01", ga4: "G-PROBE00000" });
+  if (!/var GTM_CONTAINER_ID = "GTM-PROBE01";/.test(probe) ||
+      !/var GA4_MEASUREMENT_ID = "G-PROBE00000";/.test(probe)) {
+    console.error("\x1b[31mFATAL\x1b[0m the config pins did not apply — analytics.js's config lines changed shape.");
+    console.error("Fix withConfig() in this file; do NOT ignore this.");
+    process.exit(2);
+  }
+}
+
+// Direct-GA4 path: scratch ID, valid shape, not all-same-char, not denylisted.
+// GTM explicitly blank so the two paths are never both live (they are mutually
+// exclusive in analytics.js, and both-set nulls both).
+const code = withConfig(fs.readFileSync(SRC, "utf8"), { ga4: "G-TEST123456" });
 
 const sent = [];
 const appended = [];
@@ -167,8 +199,7 @@ check("email-shaped enum value is rejected as a non-member",
 // wires it to a leaky field. Simulate exactly that: add a `string` type and a
 // schema key using it, then confirm the guard drops the whole event.
 {
-  let future = fs.readFileSync(SRC, "utf8")
-    .replace('var GA4_MEASUREMENT_ID = "";', 'var GA4_MEASUREMENT_ID = "G-TEST123456";')
+  let future = withConfig(fs.readFileSync(SRC, "utf8"), { ga4: "G-TEST123456" })
     // a future contributor adds a permissive type...
     .replace(
       "      } else {\n        continue;\n      }",
@@ -236,9 +267,10 @@ console.log("\n--- tag manager path ---\n");
 
 function bootGtm(opts) {
   opts = opts || {};
-  let src = fs.readFileSync(SRC, "utf8")
-    .replace('var GTM_CONTAINER_ID = "";', 'var GTM_CONTAINER_ID = "' + (opts.gtm ?? "GTM-ABC1234") + '";');
-  if (opts.ga4) src = src.replace('var GA4_MEASUREMENT_ID = "";', 'var GA4_MEASUREMENT_ID = "' + opts.ga4 + '";');
+  const src = withConfig(fs.readFileSync(SRC, "utf8"), {
+    gtm: opts.gtm !== undefined ? opts.gtm : "GTM-ABC1234",
+    ga4: opts.ga4 || "",
+  });
   const injected = [];
   const errs = [];
   const s = {

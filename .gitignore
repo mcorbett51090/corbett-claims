@@ -1,0 +1,7 @@
+# FORGE run artifacts. These document the spam honeypot's element id, its exact
+# geometry and its bypass semantics (see the analytics run's orchestrator-verified.md),
+# so they must never be published by a `wrangler pages deploy` of the repo root.
+.ravenclaude/
+
+# Wrangler local state. `.wrangler/cache/wrangler-account.json` holds the account id.
+.wrangler/

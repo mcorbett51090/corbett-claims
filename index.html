@@ -1390,6 +1390,14 @@
                     let secureDelivered = false;
                     let overCapMessage = '';
                     const qualityEl = document.getElementById('photo-quality');
+                    // Analytics values must be declared HERE, at the secureDelivered scope, and
+                    // assigned inside the try. The success block that emits them sits AFTER the
+                    // try closes, so anything declared with const/let inside the try is out of
+                    // scope there — and the emit's own try/catch would swallow the resulting
+                    // ReferenceError, silently stopping every event forever while every test
+                    // that asks "did the page still work?" passes.
+                    let _res = null;        // server-authoritative result of the submission
+                    let _leadEnums = null;  // three closed-set values, picked by name (see below)
                     try {
                         const tsInput = form.querySelector('input[name="cf-turnstile-response"]');
                         const turnstileToken = tsInput ? tsInput.value : '';
@@ -1420,6 +1428,25 @@
                             preloss_condition: g('preloss_condition'),
                             loss_type: g('loss_type'),
                             message: g('message'),
+                        };
+
+                        // ⚠ secureFields is the most PII-dense object in this repository: claim
+                        // number, insured, claimant, owner name, owner address, date of loss,
+                        // email, phone, alt phone, location and the free-text message.
+                        //
+                        // NEVER spread it, NEVER loop it, NEVER hand it to an analytics call in
+                        // any form. `track('generate_lead', secureFields)` or
+                        // `{...secureFields, x}` would ship claimant names, addresses, phone
+                        // numbers and accident descriptions to Google. None of those looks wrong
+                        // at a glance and all of them pass every build and test.
+                        //
+                        // Exactly these three named reads, and nothing else. All three are
+                        // closed-set <select> values (index.html:623, :635, :715) with no
+                        // free-text escape hatch.
+                        _leadEnums = {
+                            equipment_type: secureFields.equipment_type,
+                            assignment_type: secureFields.assignment_type,
+                            loss_type: secureFields.loss_type,
                         };
 
                         const mod = secureUploadModulePromise ? await secureUploadModulePromise : null;
@@ -1458,9 +1485,16 @@
                             // surface later as an unhandled promise rejection.
                             submitPromise.catch(function () {});
                             armWatchdog();
-                            await Promise.race([submitPromise, watchdog]);
+                            // Capture the resolved value: it carries the DELIVERED file count and
+                            // the per-file failures. submitForm() resolves on PARTIAL failure —
+                            // it only throws when nothing at all was staged — so the selected
+                            // count and the delivered count genuinely differ, and on a claims
+                            // intake that delta is missing evidence.
+                            _res = await Promise.race([submitPromise, watchdog]);
                         } else {
-                            await submitPromise;
+                            // Fields-only branch resolves { fileCount: 0, failures: [] }, so the
+                            // capture is well-defined on both branches.
+                            _res = await submitPromise;
                         }
                         secureDelivered = true;
                     } catch (err) {
@@ -1486,10 +1520,34 @@
                     }
 
                     if (secureDelivered) {
+                        // ONE source of truth for what the visitor is told AND what is measured:
+                        // the server-authoritative result. The previous copy reported the count
+                        // the visitor SELECTED, so a partial upload said "your request and 5
+                        // files were delivered securely" when 3 arrived. On a claims intake that
+                        // is missing evidence the visitor believes we already hold — they would
+                        // never think to re-send it.
+                        const _delivered = Math.max(0, parseInt((_res && _res.fileCount) || 0, 10) || 0);
+                        const _notSent = Math.max(0, _fileCount - _delivered);
+                        // Distinct from _notSent on purpose: failures counts ENTRIES, which is one
+                        // per failed file plus at most one aggregate entry for a batch that
+                        // expired before sending. _notSent is the visitor-meaningful number; this
+                        // is the diagnostic one. Both derive from the same _res.
+                        const _failedEntries = ((_res && _res.failures) || []).length;
+
                         status.setAttribute('data-state', 'success');
-                        status.innerHTML = (_fileCount > 0
-                                ? '<strong>&#10003; Thanks &mdash; your request and ' + _fileCount + ' file' + (_fileCount > 1 ? 's were' : ' was') + ' delivered securely.</strong> '
-                                : '<strong>&#10003; Thanks &mdash; your request was delivered securely.</strong> ')
+                        let _msg;
+                        if (_delivered > 0 && _notSent > 0) {
+                            _msg = '<strong>&#10003; Thanks &mdash; your request and ' + _delivered + ' of ' + _fileCount
+                                + ' file' + (_fileCount > 1 ? 's were' : ' was') + ' delivered securely.</strong> '
+                                + '<strong>' + _notSent + ' file' + (_notSent > 1 ? 's' : '') + ' could not be sent</strong> &mdash; please reply to our '
+                                + 'email with ' + (_notSent > 1 ? 'those files' : 'that file') + ', or call us and we&rsquo;ll take '
+                                + (_notSent > 1 ? 'them' : 'it') + ' another way. ';
+                        } else if (_delivered > 0) {
+                            _msg = '<strong>&#10003; Thanks &mdash; your request and ' + _delivered + ' file' + (_delivered > 1 ? 's were' : ' was') + ' delivered securely.</strong> ';
+                        } else {
+                            _msg = '<strong>&#10003; Thanks &mdash; your request was delivered securely.</strong> ';
+                        }
+                        status.innerHTML = _msg
                             + 'We&rsquo;ll get back to you <strong>within one business day</strong>. '
                             + 'For anything urgent, call <a href="tel:2256632217">(225)&nbsp;663-2217</a>.';
                         form.reset();
@@ -1499,6 +1557,30 @@
                         syncConditionalFields();
                         updateProgress();
                         revealStatus();
+
+                        // Analytics LAST: after the success UI and revealStatus(), before return.
+                        // Two independent layers keep it off the delivery path — this placement,
+                        // and the try/catch below. Bot exclusion is STRUCTURAL: the honeypot
+                        // returns far above this point, so no botcheck inspection belongs here;
+                        // adding one would imply this point is otherwise bot-reachable.
+                        // Double-counting is structural too: this block returns.
+                        try {
+                            window.ccAnalytics && window.ccAnalytics.track('generate_lead', {
+                                form_name: 'appraisal_request',
+                                equipment_type: _leadEnums && _leadEnums.equipment_type,
+                                assignment_type: _leadEnums && _leadEnums.assignment_type,
+                                loss_type: _leadEnums && _leadEnums.loss_type,
+                                file_count: _delivered,
+                                files_failed: _failedEntries
+                            });
+                            if (_delivered > 0) {
+                                window.ccAnalytics && window.ccAnalytics.track('upload_complete', {
+                                    form_name: 'appraisal_request',
+                                    file_count: _delivered,
+                                    files_failed: _failedEntries
+                                });
+                            }
+                        } catch (e) { /* analytics must never affect claim delivery */ }
                         return;
                     }
 
@@ -1509,6 +1591,9 @@
                         status.setAttribute('data-state', 'error');
                         status.textContent = overCapMessage;
                         if (qualityEl) qualityEl.focus();
+                        // Diagnostic, NOT a conversion: no parameters, never a key event. The
+                        // visitor hit the total-size cap and stopped here.
+                        try { window.ccAnalytics && window.ccAnalytics.track('lead_over_cap', {}); } catch (e) {}
                         return;
                     }
 
@@ -1523,6 +1608,18 @@
 
                 // No third-party service, no backend: hand the completed, validated request to
                 // the visitor's own email app — pre-filled and addressed to assignments@corbettclaims.net.
+                // Diagnostic, NOT a conversion: no parameters, never a key event.
+                //
+                // This one line is the only client-side signal that the secure intake is
+                // degrading. Everything that can break it lands here: SECURE_UPLOAD.enabled
+                // set false, a Turnstile failure, a Worker outage, a dropped
+                // import('/secure-upload.js'), and the 30-second stall watchdog. In every one
+                // of those cases the owner still RECEIVES the lead by email while analytics
+                // records nothing — so without this event, "no leads this week" and "the
+                // secure intake has been broken all week and every lead arrived with no
+                // photos" look identical in the data.
+                try { window.ccAnalytics && window.ccAnalytics.track('lead_fallback_mailto', {}); } catch (e) {}
+
                 var _mapUrl = g('location_maps_url');
                 var _ownerAddr = _ownerAddress;
                 // Emitted in the owner's requested field order so it's ready to key into his software.

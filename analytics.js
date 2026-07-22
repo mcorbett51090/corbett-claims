@@ -237,6 +237,19 @@
    * =========================================================================
    * Catches a future contributor who adds a legitimate schema entry but points
    * it at a leaky source. ANY hit drops the ENTIRE event, not just the value.
+   *
+   * !! DO NOT DELETE THIS AS DEAD CODE !!
+   * With today's schema this guard is UNREACHABLE, and that is by design, not by
+   * accident: every current type already constrains its output to a safe set —
+   * `const` emits a literal, `enum` emits only an exact member, `int` emits a
+   * clamped number. Nothing PII-shaped can reach the guard through them.
+   *
+   * A coverage report will therefore show this branch never firing. It exists
+   * for the moment someone adds a freer type (a `string` param, a raw
+   * pass-through) and wires it to a field that turns out to carry claimant data.
+   * That is precisely when a backstop is worth having and precisely when nobody
+   * remembers to add one. Removing it because it "never runs" would delete the
+   * protection at the exact moment it starts to matter.
    */
   var LEAK_PATTERNS = [
     /[@]/, // email

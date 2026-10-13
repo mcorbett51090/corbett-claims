@@ -764,7 +764,7 @@
                       `hidden` removes this from layout entirely (no flex gap, no reflow), no
                       script loads, and no submit-handler branch reads it. Only flipping
                       `enabled: true` (once the Worker + Turnstile keys are provisioned) makes
-                      this participate in the page at all. See raven-site-kit/secure-upload/.
+                      this participate in the page at all. See RavenPower-website-factory/secure-upload/.
                     -->
                     <div id="secure-upload-widgets" hidden>
                         <div id="cf-turnstile-mount"></div>
@@ -982,7 +982,7 @@
         // no script loads, no widget activates, `secureActive` stays false, and the
         // Smart-form submit handler below takes its existing mailto-only branch
         // unchanged — byte-identical to today. Once flipped on (only after the Worker +
-        // Turnstile keys are provisioned per raven-site-kit/secure-upload/README.md's
+        // Turnstile keys are provisioned per RavenPower-website-factory/secure-upload/README.md's
         // checklist), EVERY submission — text-only and with files — routes through the
         // Worker via `submitForm()` as the PRIMARY channel; mailto becomes a fallback,
         // used only if that Worker call fails, plus the always-present <noscript> path.
